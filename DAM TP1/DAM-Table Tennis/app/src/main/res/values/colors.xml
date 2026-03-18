@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Seed color for Static/Fallback theming (pre-Android 12) - Table Tennis Red -->
+    <color name="seed">#C62828</color>
+    <color name="md_theme_light_primary">#C62828</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#FFCDD2</color>
+    <color name="md_theme_light_onPrimaryContainer">#410002</color>
+    <color name="md_theme_light_secondary">#795548</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_secondaryContainer">#D7CCC8</color>
+    <color name="md_theme_light_onSecondaryContainer">#3E2723</color>
+    <color name="md_theme_light_background">#FEFBFF</color>
+    <color name="md_theme_light_onBackground">#1B1B1F</color>
+    <color name="md_theme_light_surface">#FEFBFF</color>
+    <color name="md_theme_light_onSurface">#1B1B1F</color>
+    <color name="md_theme_light_surfaceVariant">#F5DDDA</color>
+    <color name="md_theme_light_onSurfaceVariant">#534341</color>
+    <color name="md_theme_light_outline">#857370</color>
+    <color name="md_theme_light_error">#B3261E</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
+
+    <!-- Dark -->
+    <color name="md_theme_dark_primary">#FFB3AE</color>
+    <color name="md_theme_dark_onPrimary">#680006</color>
+    <color name="md_theme_dark_primaryContainer">#93000D</color>
+    <color name="md_theme_dark_onPrimaryContainer">#FFCDD2</color>
+    <color name="md_theme_dark_secondary">#BCAAA4</color>
+    <color name="md_theme_dark_onSecondary">#3E2723</color>
+    <color name="md_theme_dark_secondaryContainer">#5D4037</color>
+    <color name="md_theme_dark_onSecondaryContainer">#D7CCC8</color>
+    <color name="md_theme_dark_background">#1B1B1F</color>
+    <color name="md_theme_dark_onBackground">#E6E1E5</color>
+    <color name="md_theme_dark_surface">#1B1B1F</color>
+    <color name="md_theme_dark_onSurface">#E6E1E5</color>
+    <color name="md_theme_dark_surfaceVariant">#534341</color>
+    <color name="md_theme_dark_onSurfaceVariant">#D8C2BF</color>
+    <color name="md_theme_dark_outline">#A08C8A</color>
+    <color name="md_theme_dark_error">#F2B8B5</color>
+    <color name="md_theme_dark_onError">#601410</color>
+</resources>

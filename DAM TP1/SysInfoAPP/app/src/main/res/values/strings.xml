@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SysInfoAPP</string>
+    <string name="hello_world">Hello Wordl Opcional !</string>
+    <string name="system_info">System Info:</string>
+</resources>

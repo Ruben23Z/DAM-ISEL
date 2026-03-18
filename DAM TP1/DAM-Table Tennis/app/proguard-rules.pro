@@ -1,0 +1,3 @@
+-keep class pt.ipl.dam.tabletennisscore.** { *; }
+-keepattributes *Annotation*
+-dontwarn com.github.PhilJay.**

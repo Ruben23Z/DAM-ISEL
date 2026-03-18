@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Table Tennis Score</string>
+
+    <!-- Nav labels -->
+    <string name="nav_scoreboard">Score</string>
+    <string name="nav_history">History</string>
+    <string name="nav_statistics">Stats</string>
+    <string name="nav_reminders">Reminders</string>
+
+    <!-- Players -->
+    <string name="player_1">Player 1</string>
+    <string name="player_2">Player 2</string>
+    <string name="enter_player1_name">Player 1 name</string>
+    <string name="enter_player2_name">Player 2 name</string>
+
+    <!-- Scoreboard -->
+    <string name="set_number">Set %1$d</string>
+    <string name="set_winner">%1$s wins the set!</string>
+    <string name="match_winner">🏆 %1$s wins!</string>
+    <string name="match_saved">Match Saved</string>
+    <string name="match_saved_message">The match has been recorded in your history.</string>
+    <string name="new_match">New Match</string>
+    <string name="view_history">View History</string>
+    <string name="next_set">Next Set →</string>
+    <string name="save_match">Save Match</string>
+    <string name="undo">Undo</string>
+    <string name="start_match">Start Match</string>
+    <string name="best_of">Best of</string>
+    <string name="points_per_set">Points per set</string>
+    <string name="match_deleted">Match deleted</string>
+
+    <!-- History -->
+    <string name="no_matches_yet">No matches yet.\nStart a new game!</string>
+
+    <!-- Statistics -->
+    <string name="total_matches">Total Matches: %1$d</string>
+    <string name="total_sets">Total Sets: %1$d</string>
+    <string name="total_points">Total Points: %1$d</string>
+    <string name="avg_points_per_set">Avg Points / Set</string>
+    <string name="wins">Wins</string>
+    <string name="losses">Losses</string>
+    <string name="no_stats_yet">Play some matches to see statistics!</string>
+
+    <!-- Reminders -->
+    <string name="no_reminders">No reminders yet.\nAdd one with the + button.</string>
+    <string name="add_reminder">Add Reminder</string>
+    <string name="edit_reminder">Edit Reminder</string>
+    <string name="reminder_title">Title</string>
+    <string name="reminder_notes">Notes / Training Plan (optional)</string>
+    <string name="reminder_time">Time</string>
+    <string name="pick_time">Pick Time</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="error_title_required">Please enter a title</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Training Reminders</string>
+    <string name="notification_permission_denied">Permission to show notifications was denied.</string>
+</resources>

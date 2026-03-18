@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvAddTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reminder Details"
+            android:textAppearance="?attr/textAppearanceHeadlineMedium"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilTitle"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:hint="@string/reminder_title"
+            app:layout_constraintTop_toBottomOf="@id/tvAddTitle">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNotes"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/reminder_notes"
+            app:layout_constraintTop_toBottomOf="@id/tilTitle">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:lines="4"
+                android:gravity="top|start" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Time Picker -->
+        <TextView
+            android:id="@+id/tvTimeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/reminder_time"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            app:layout_constraintTop_toBottomOf="@id/tilNotes"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <LinearLayout
+            android:id="@+id/llTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTimeLabel">
+
+            <TextView
+                android:id="@+id/tvSelectedTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="09:00"
+                android:textAppearance="?attr/textAppearanceDisplayMedium"
+                android:textColor="?attr/colorPrimary"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPickTime"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pick_time" />
+        </LinearLayout>
+
+        <!-- Day picker (Chips) -->
+        <TextView
+            android:id="@+id/tvRepeatLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Repeat on"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            app:layout_constraintTop_toBottomOf="@id/llTime"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupDays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tvRepeatLabel">
+            <com.google.android.material.chip.Chip android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Widget.Material3.Chip.Filter" android:text="M" android:checked="true"/>
+            <com.google.android.material.chip.Chip android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Widget.Material3.Chip.Filter" android:text="T" android:checked="true"/>
+            <com.google.android.material.chip.Chip android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Widget.Material3.Chip.Filter" android:text="W" android:checked="true"/>
+            <com.google.android.material.chip.Chip android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Widget.Material3.Chip.Filter" android:text="T" android:checked="true"/>
+            <com.google.android.material.chip.Chip android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Widget.Material3.Chip.Filter" android:text="F" android:checked="true"/>
+            <com.google.android.material.chip.Chip android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Widget.Material3.Chip.Filter" android:text="S" android:checked="true"/>
+            <com.google.android.material.chip.Chip android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Widget.Material3.Chip.Filter" android:text="S" android:checked="true"/>
+        </com.google.android.material.chip.ChipGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="40dp"
+            app:layout_constraintTop_toBottomOf="@id/chipGroupDays">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/save" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
