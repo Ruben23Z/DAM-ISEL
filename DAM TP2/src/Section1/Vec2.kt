@@ -59,6 +59,9 @@ operator fun Vec2.get(index: Int): Double {
     else throw IndexOutOfBoundsException("Index out of bounds: $index")
 }
 
+operator fun Vec2.component1() = this.x
+operator fun Vec2.component2() = this.y
+
 // Define uma função para calcular a magnitude (comprimento) do vetor.
 // A magnitude é a raiz quadrada da soma dos quadrados das coordenadas, fórmula padrão da geometria euclidiana.
 fun Vec2.magnitude(): Double {
