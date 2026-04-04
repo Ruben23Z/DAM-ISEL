@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "dam_A51388.coolweatherapp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "dam_A51388.coolweatherapp"
@@ -46,13 +46,13 @@ dependencies {
     // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui-graphics)
-    implementation(libs.androidx.ui-tooling-preview)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    debugImplementation(libs.androidx.ui-tooling)
+    debugImplementation(libs.androidx.ui.tooling)
 }

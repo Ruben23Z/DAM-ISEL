@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Aplicação Meteorológica Fresca</string>
+    <string name="cool_weather_app">Aplicação Meteorológica Fresca</string>
+    <string name="app">APP</string>
+    <string name="Cidade">Lisboa</string>
+    <string name="Data">TERÇA-FEIRA, 31 DE MARÇO</string>
+    <string name="Temperatura">30°</string>
+    <string name="Tempo"><![CDATA[ENSOLARADO E LIMPO]]></string>
+    <string name="Humidade">HUMIDADE</string>
+    <string name="PercentagemHumidade">45%</string>
+    <string name="Vento">VENTO</string>
+    <string name="Velo_Vento">15 km/h</string>
+    <string name="latitude">LATITUDE</string>
+    <string name="longitude">LONGITUDE</string>
+    <string name="sea_level_pressure">PRESSÃO AO NÍVEL DO MAR</string>
+    <string name="wind_direction">DIREÇÃO DO VENTO</string>
+    <string name="wind_speed">VELOCIDADE DO VENTO</string>
+    <string name="time">HORA</string>
+    <string name="update">ATUALIZAR</string>
+    <string name="input_value">Introduzir valor: </string>
+    <string name="atmospheric">ATMOSFÉRICO</string>
+    <string name="_45">45%</string>
+    <string name="altitude">ALTITUDE</string>
+    <string name="pressure">PRESSÃO</string>
+    <string name="uv_index">ÍNDICE UV</string>
+    <string name="altitude_value">1200 m</string>
+    <string name="latitude_value">38.76°</string>
+    <string name="pressure_value">1026.4 hPa</string>
+    <string name="wind_direction_value">214°</string>
+    <string name="uv_index_value">6</string>
+</resources>

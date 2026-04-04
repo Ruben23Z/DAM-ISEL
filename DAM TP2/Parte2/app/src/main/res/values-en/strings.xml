@@ -3,7 +3,7 @@
     <string name="cool_weather_app">Cool Weather APP</string>
     <string name="app">APP</string>
     <string name="Cidade">Lisboa</string>
-    <string name="Data">TERÇA-FEIRA, 31 DE MARÇO</string>
+    <string name="Data">TUESDAY, MARCH 31</string>
     <string name="Temperatura">30°</string>
     <string name="Tempo"><![CDATA[SUNNY & CLEAR]]></string>
     <string name="Humidade">HUMIDITY</string>
@@ -17,7 +17,7 @@
     <string name="wind_speed">WIND SPEED</string>
     <string name="time">TIME</string>
     <string name="update">UPDATE</string>
-    <string name="input_value">Enter value</string>
+    <string name="input_value">Enter value: </string>
     <string name="atmospheric">ATMOSPHERIC</string>
     <string name="_45">45%</string>
     <string name="altitude">ALTITUDE</string>
