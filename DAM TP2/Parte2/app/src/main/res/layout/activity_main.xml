@@ -71,7 +71,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_menu">
 
         <TextView
-            android:id="@+id/tv_location"
+            android:id="@+id/info_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/Cidade"
@@ -80,7 +80,7 @@
             android:textStyle="normal" />
 
         <TextView
-            android:id="@+id/tv_date"
+            android:id="@+id/info_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:alpha="0.7"
@@ -114,7 +114,7 @@
         app:layout_constraintTop_toBottomOf="@+id/weatherImage">
 
         <TextView
-            android:id="@+id/tv_temp"
+            android:id="@+id/info_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/Temperatura"
@@ -123,7 +123,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tv_status"
+            android:id="@+id/info_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:alpha="0.8"
@@ -405,6 +405,7 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        android:onClick="onUpdateWeatherClick"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/metrics_scroll"
         app:layout_constraintBottom_toBottomOf="parent" />

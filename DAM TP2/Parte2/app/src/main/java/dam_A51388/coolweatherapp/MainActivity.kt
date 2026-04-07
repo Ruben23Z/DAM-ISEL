@@ -6,19 +6,28 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.gson.Gson
 import java.io.InputStreamReader
 import java.net.URL
 import java.util.Calendar
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationServices
+import kotlin.time.Clock
 
 class MainActivity : AppCompatActivity() {
 
     private var day: Boolean = true
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val LOCATION_REQUEST_CODE = 100
+    lateinit var weatherMap: Map<Int, WeatherCodeInfo>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        day = if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) false else true
-
         when (resources.configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> {
                 if (day) {
@@ -27,6 +36,7 @@ class MainActivity : AppCompatActivity() {
                     setTheme(R.style.Theme_Night)
                 }
             }
+
             Configuration.ORIENTATION_LANDSCAPE -> {
                 if (day) {
                     setTheme(R.style.Theme_Day_Land)
@@ -37,16 +47,65 @@ class MainActivity : AppCompatActivity() {
         }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        weatherMap = loadWeatherCodes(this) // para inicializar uma unica vez
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        getLocation()
+    }
 
-        // Setup update button
-        val updateButton: Button = findViewById(R.id.btn_update)
-        updateButton.setOnClickListener {
-            System.out.println("Update button clicked")
-            fetchWeatherData(38.7223f, -9.1393f).start()
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLocation()
+            }
         }
+    }
 
-        // Fetch initial weather data
-        fetchWeatherData(-22.9035f,  -43.2096f).start()
+    private fun getLocation() {
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    val lat = location.latitude.toFloat()
+                    val long = location.longitude.toFloat()
+                    fetchWeatherData(lat, long).start()
+                }
+            }
+        } else {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
+        }
+    }
+
+    fun loadWeatherCodes(context: Context): Map<Int, WeatherCodeInfo> {
+        val codes = context.resources.getIntArray(R.array.weather_codes)
+        val images = context.resources.getStringArray(R.array.weather_images)
+        val descriptions = context.resources.getStringArray(R.array.weather_descriptions)
+
+        val map = mutableMapOf<Int, WeatherCodeInfo>()
+        for (i in codes.indices) {
+            val code = codes[i]
+            val image = images[i]
+            val description = descriptions[i]
+            map[code] = WeatherCodeInfo(code, description, image)
+        }
+        return map
+    }
+
+    fun onUpdateWeatherClick(v: android.view.View) {
+        System.out.println("Update button clicked")
+//        fetchWeatherData(-22.9035f, -43.2096f).start()
+        getLocation()
+    }
+
+    private fun setDay(request: WeatherData) {
+        if (request.current.is_day >= 1) {
+            day = true
+        } else {
+            day = false
+        }
     }
 
     private fun WeatherAPI_Call(lat: Float, long: Float): WeatherData {
@@ -65,63 +124,76 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-     private fun fetchWeatherData(lat: Float, long: Float): Thread {
-         return Thread {
-             val weather = WeatherAPI_Call(lat, long)
-             updateUI(weather)
-         }
-     }
+    private fun fetchWeatherData(lat: Float, long: Float): Thread {
+        return Thread {
+            val weather = WeatherAPI_Call(lat, long)
+            updateUI(weather)
+        }
+    }
 
-     private fun updateUI(request: WeatherData) {
-         runOnUiThread {
-             val weatherImage: ImageView = findViewById(R.id.weatherImage)
-             val pressureValue: TextView = findViewById(R.id.pressureValue)
-             val humidadeValue: TextView = findViewById(R.id.humidadeValue)
-             val latitudeValue: TextView = findViewById(R.id.latitudeValue)
-             val altitudeValue: TextView = findViewById(R.id.altitudeValue)
-             val velocidadeVentoValue: TextView = findViewById(R.id.velocidadeVentoValue)
-             val direcaoVentoValue: TextView = findViewById(R.id.direcaoVentoValue)
-             val tempoValue: TextView = findViewById(R.id.tempoValue)
-             val uvIndexValue: TextView = findViewById(R.id.uvIndexValue)
-             val tvTemp: TextView = findViewById(R.id.tv_temp)
+    private fun updateUI(request: WeatherData) {
+        runOnUiThread {
 
-             val now = Calendar.getInstance()
-             val currentHour = now.get(Calendar.HOUR_OF_DAY)
-             val safeIndex = if (currentHour < request.hourly.time.size) currentHour else 0
+            setDay(request)
+            val weatherImage: ImageView = findViewById(R.id.weatherImage)
+            val pressureValue: TextView = findViewById(R.id.pressureValue)
+            val humidadeValue: TextView = findViewById(R.id.humidadeValue)
+            val latitudeValue: TextView = findViewById(R.id.latitudeValue)
+            val altitudeValue: TextView = findViewById(R.id.altitudeValue)
+            val velocidadeVentoValue: TextView = findViewById(R.id.velocidadeVentoValue)
+            val direcaoVentoValue: TextView = findViewById(R.id.direcaoVentoValue)
+            val tempoValue: TextView = findViewById(R.id.tempoValue)
+            val uvIndexValue: TextView = findViewById(R.id.uvIndexValue)
+            val info_Temp: TextView = findViewById(R.id.info_temp)
+            val info_Status: TextView = findViewById(R.id.info_status)
 
-             tvTemp.text = request.current.temperature_2m.toInt().toString() + "°"
-             pressureValue.text = request.current.surface_pressure.toString() + " hPa"
-             humidadeValue.text = request.hourly.relative_humidity_2m[safeIndex].toString() + "%"
+            val now = Calendar.getInstance()
+            val currentHour = now.get(Calendar.HOUR_OF_DAY)
+            val safeIndex = if (currentHour < request.hourly.time.size) currentHour else 0
 
-             uvIndexValue.text = request.hourly.uv_index[safeIndex].toString()
+            info_Temp.text = request.current.temperature_2m.toInt().toString() + "°"
+            pressureValue.text = request.current.surface_pressure.toString() + " hPa"
+            humidadeValue.text = request.hourly.relative_humidity_2m[safeIndex].toString() + "%"
+            uvIndexValue.text = request.hourly.uv_index[safeIndex].toString()
+            latitudeValue.text = request.latitude.toString() + "°"
+            altitudeValue.text = request.longitude.toString() + "°"
+            velocidadeVentoValue.text = request.current.wind_speed_10m.toString() + " km/h"
+            direcaoVentoValue.text = request.current.wind_direction_10m.toString() + "°"
 
-             latitudeValue.text = request.latitude.toString() + "°"
-             altitudeValue.text = request.longitude.toString() + "°"
-             velocidadeVentoValue.text = request.current.wind_speed_10m.toString() + " km/h"
-             direcaoVentoValue.text = request.current.wind_direction_10m.toString() + "°"
+            val minute = String.format("%02d", now.get(Calendar.MINUTE))
+            tempoValue.text = request.timezone + ": " + currentHour + ":" + minute
+//
+//            val mapt = getWeatherCodeMap()
+//            val wCode = mapt.get(request.current.weather_code)
+//            val wImage = when (wCode) {
+//                WMO_WeatherCode.CLEAR_SKY, WMO_WeatherCode.MAINLY_CLEAR, WMO_WeatherCode.PARTLY_CLOUDY -> if (day) wCode?.image + "day" else wCode?.image + "night"
+//
+//                else -> wCode?.image
+//            }
 
-             val minute = String.format("%02d", now.get(Calendar.MINUTE))
-             tempoValue.text = request.timezone + ": " + currentHour + ":" + minute
+            val weatherInfo = weatherMap[request.current.weather_code]
+            val imageName =
+                if (weatherInfo?.code == 0 || weatherInfo?.code == 1 || weatherInfo?.code == 2) {
+                    if (day) {
+                        weatherInfo?.imagePrefix + "day"
+                    } else {
+                        weatherInfo?.imagePrefix + "night"
+                    }
+                } else {
+                    weatherInfo?.imagePrefix
+                }
 
-             val mapt = getWeatherCodeMap()
-             val wCode = mapt.get(request.current.weather_code)
-             val wImage = when (wCode) {
-                 WMO_WeatherCode.CLEAR_SKY,
-                 WMO_WeatherCode.MAINLY_CLEAR,
-                 WMO_WeatherCode.PARTLY_CLOUDY -> if (day) wCode?.image + "day" else
-                     wCode?.image + "night"
-                 else -> wCode?.image
-             }
+            info_Status.text = weatherInfo?.description ?: "Unknown"
+            val resID = if (imageName != null) {
+                resources.getIdentifier(imageName, "drawable", packageName)
+            } else 0
 
-             val res = getResources()
-             weatherImage.setImageResource(R.drawable.fog)
-             val resID = res.getIdentifier(wImage, "drawable", getPackageName())
-             val drawable = this.getDrawable(resID)
-             weatherImage.setImageDrawable(drawable)
-         }
-     }
 
-    fun onUpdateWeatherClick(v: android.view.View) {
-        fetchWeatherData(38.7223f, -9.1393f).start()
+            if (resID != 0) {
+                weatherImage.setImageResource(resID)
+            } else {
+                weatherImage.setImageResource(R.drawable.fog)
+            }
+        }
     }
 }
