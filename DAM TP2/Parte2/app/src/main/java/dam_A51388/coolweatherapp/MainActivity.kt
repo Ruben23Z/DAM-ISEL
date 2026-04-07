@@ -16,6 +16,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 import kotlin.time.Clock
 
@@ -25,6 +26,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val LOCATION_REQUEST_CODE = 100
     lateinit var weatherMap: Map<Int, WeatherCodeInfo>
+
+    private lateinit var viewModel: WeatherViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +50,11 @@ class MainActivity : AppCompatActivity() {
         }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        viewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
+        viewModel.LiveWeatherData.observe(this) { request ->
+            updateUI(request)
+        }
+
         weatherMap = loadWeatherCodes(this) // para inicializar uma unica vez
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         getLocation()
@@ -70,7 +78,7 @@ class MainActivity : AppCompatActivity() {
                 if (location != null) {
                     val lat = location.latitude.toFloat()
                     val long = location.longitude.toFloat()
-                    fetchWeatherData(lat, long).start()
+                    viewModel.fetchWeather(lat, long)
                 }
             }
         } else {
@@ -108,28 +116,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun WeatherAPI_Call(lat: Float, long: Float): WeatherData {
-        val reqString = buildString {
-            append("https://api.open-meteo.com/v1/forecast?")
-            append("latitude=${lat}&longitude=${long}&")
-            append("daily=uv_index_max,temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,sunset,sunrise,precipitation_sum,precipitation_hours&")
-            append("hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,precipitation,uv_index,is_day,weather_code,wind_speed_10m,wind_direction_10m&")
-            append("current=is_day,rain,snowfall,temperature_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,precipitation,cloud_cover,weather_code,surface_pressure&")
-            append("minutely_15=precipitation,apparent_temperature,relative_humidity_2m,temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility")
-        }
-        val url = URL(reqString)
-        url.openStream().use {
-            val request = Gson().fromJson(InputStreamReader(it, "UTF-8"), WeatherData::class.java)
-            return request
-        }
-    }
 
-    private fun fetchWeatherData(lat: Float, long: Float): Thread {
-        return Thread {
-            val weather = WeatherAPI_Call(lat, long)
-            updateUI(weather)
-        }
-    }
 
     private fun updateUI(request: WeatherData) {
         runOnUiThread {
