@@ -7,10 +7,10 @@ Create Android project using Kotlin and XML Views
 Add internet permission in AndroidManifest
 
 ## Step 3
-Create data model (ImageItem)
+Create data model (ImageItem) - Adapted for Dog API
 
 ## Step 4
-Create API service for Unsplash
+Create API service for Dog CEO API
 
 ## Step 5
 Create Repository class
@@ -40,7 +40,7 @@ Implement vertical scrolling behavior
 
 ## Step 11
 Implement swipe-to-refresh
-- Fetch new images
+- Fetch new dog images
 
 ## Step 12
 Add loading indicator

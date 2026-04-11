@@ -1,27 +1,22 @@
 # API Usage
 
 ## API
-Unsplash API
+Dog CEO API
 
 Documentation:
-https://unsplash.com/documentation
+https://dog.ceo/dog-api/
 
 ## Endpoint Example
-https://api.unsplash.com/photos/random?count=10
+https://dog.ceo/api/breeds/image/random/10
 
 ## Headers
-Authorization: Client-ID YOUR_ACCESS_KEY
+None (Public API)
 
 ## Example Response
-[
-  {
-    "id": "abc123",
-    "urls": {
-      "regular": "https://images.unsplash.com/photo-xyz"
-    },
-    "user": {
-      "name": "John Doe"
-    },
-    "description": "A beautiful landscape"
-  }
-]
+{
+    "message": [
+        "https://images.dog.ceo/breeds/hound-afghan/n02088094_1003.jpg",
+        "https://images.dog.ceo/breeds/retriever-golden/n02099601_100.jpg"
+    ],
+    "status": "success"
+}

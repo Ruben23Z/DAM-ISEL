@@ -1,6 +1,6 @@
 # Features
 
-1. Fetch images from Unsplash API
+1. Fetch images from Dog CEO API
 2. Display images in a vertical feed
 3. Swipe down to load new images
 4. Refresh images manually

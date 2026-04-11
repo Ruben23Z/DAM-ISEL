@@ -4,8 +4,7 @@
 
 id: String  
 url: String  
-description: String  
-author: String  
+breed: String
 
 ## API Response (Simplified)
 

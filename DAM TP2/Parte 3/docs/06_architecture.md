@@ -29,4 +29,4 @@ API Service
 - Abstracts API layer
 
 ### API Service
-- Makes HTTP requests to Unsplash API
+- Makes HTTP requests to Dog CEO API

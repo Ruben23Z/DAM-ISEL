@@ -4,11 +4,7 @@ plugins {
 
 android {
     namespace = "damA51388.galeriaaleatoria"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "damA51388.galeriaaleatoria"
@@ -33,6 +29,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+    }
+
 }
 
 dependencies {
@@ -41,6 +42,26 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
+    // Architecture — ViewModel + LiveData
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
+
+    // Network — Retrofit + Gson
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.gson)
+
+    // Image loading — Glide
+    implementation(libs.glide)
+
+    // UI — ViewPager2 + SwipeRefreshLayout
+    implementation(libs.viewpager2)
+    implementation(libs.swiperefreshlayout)
+
+    // Coroutines
+    implementation(libs.coroutines.android)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

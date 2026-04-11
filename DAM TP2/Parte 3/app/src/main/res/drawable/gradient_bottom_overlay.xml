@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- gradient_bottom_overlay.xml
+     Transparent → black gradient at the bottom of each fullscreen card.
+     Used to ensure the text overlay is readable over any image. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="linear"
+        android:angle="270"
+        android:startColor="#00000000"
+        android:endColor="#CC000000" />
+</shape>
