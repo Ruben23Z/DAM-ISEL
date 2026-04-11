@@ -13,7 +13,9 @@ package damA51388.galeriaaleatoria.model
 data class ImageItem(
     val id: String,          // unique: URL-based hash
     val url: String,         // full image URL from the API
-    val breed: String        // e.g. "hound-afghan"
+    val breed: String,       // e.g. "hound-afghan"
+    var isLiked: Boolean = false,
+    var isFavorite: Boolean = false
 ) {
     /** Human-readable breed: "hound-afghan" → "Hound Afghan" */
     val displayBreed: String

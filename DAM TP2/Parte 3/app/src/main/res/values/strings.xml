@@ -4,10 +4,10 @@
     <string name="tab_following">Following</string>
     <string name="tab_for_you">For You dogs</string>
     <string name="tab_live">LIVE</string>
-    <string name="placeholder_username">@dogbreed</string>
+    <string name="placeholder_username">@dog</string>
     <string name="placeholder_description">Beautiful dog…</string>
     <string name="placeholder_tags">#dogs #puppy</string>
-    <string name="placeholder_likes">0</string>
+    <string name="placeholder_likes">Like</string>
     <string name="like_description">Like this dog</string>
     <string name="save_description">Save to favorites</string>
     <string name="save_label">Save</string>

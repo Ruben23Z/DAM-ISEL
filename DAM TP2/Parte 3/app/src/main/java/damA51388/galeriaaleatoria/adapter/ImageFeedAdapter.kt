@@ -10,28 +10,52 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import damA51388.galeriaaleatoria.databinding.ItemImageCardBinding
 import damA51388.galeriaaleatoria.model.ImageItem
+import android.view.GestureDetector
+import android.view.MotionEvent
 
 /**
  * Adapter for the dog image feed.
  */
-class ImageFeedAdapter : ListAdapter<ImageItem, ImageFeedAdapter.ImageViewHolder>(DiffCallback) {
+class ImageFeedAdapter(
+    private val onLikeStateChanged: (ImageItem) -> Unit = {}
+) : ListAdapter<ImageItem, ImageFeedAdapter.ViewHolder>(DiffCallback) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemImageCardBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
-        return ImageViewHolder(binding)
+        return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    inner class ImageViewHolder(
+    inner class ViewHolder(
         private val binding: ItemImageCardBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
+        private val gestureDetector = GestureDetector(binding.root.context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = getItem(position)
+                    if (!item.isLiked) {
+                        item.isLiked = true
+                        onLikeStateChanged(item)
+                    }
+                    showHeartAnimation()
+                }
+                return true
+            }
+        })
+
         fun bind(item: ImageItem) {
+            binding.root.setOnTouchListener { v, event ->
+                gestureDetector.onTouchEvent(event)
+                v.performClick()
+                true
+            }
             // Breed name instead of username
             binding.usernameText.text = item.displayBreed
             binding.descriptionText.text = "A beautiful ${item.displayBreed}"
@@ -64,6 +88,30 @@ class ImageFeedAdapter : ListAdapter<ImageItem, ImageFeedAdapter.ImageViewHolder
                     }
                 })
                 .into(binding.imageMain)
+        }
+
+        private fun showHeartAnimation() {
+            binding.likeAnimationHeart.visibility = View.VISIBLE
+            binding.likeAnimationHeart.alpha = 1f
+            binding.likeAnimationHeart.scaleX = 0f
+            binding.likeAnimationHeart.scaleY = 0f
+
+            binding.likeAnimationHeart.animate()
+                .scaleX(1.2f)
+                .scaleY(1.2f)
+                .setDuration(300)
+                .withEndAction {
+                    binding.likeAnimationHeart.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .alpha(0f)
+                        .setDuration(300)
+                        .withEndAction {
+                            binding.likeAnimationHeart.visibility = View.GONE
+                        }
+                        .start()
+                }
+                .start()
         }
     }
 

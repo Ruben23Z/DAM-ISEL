@@ -33,32 +33,45 @@ class ImageViewModel(
 
     // ── Actions ────────────────────────────────────────────────────────────
 
+    private var isFetching = false
+
     init {
         loadImages()          // fetch on first creation
     }
 
     /**
-     * Loads [count] random images from Dog CEO API.
-     * Step 11: calling this again from SwipeRefresh replaces the list.
-     * Step 12: manages the loading indicator state.
-     * Step 13: catches errors and exposes a message.
+     * Loads images. 
+     * [append] = true: add to existing list (infinite scroll).
+     * [append] = false: replace list (refresh).
      */
-    fun loadImages(count: Int = 10) {
+    fun loadImages(count: Int = 10, append: Boolean = false) {
+        if (isFetching) return
+
         viewModelScope.launch {
-            _isLoading.value = true
+            isFetching = true
+            if (!append) _isLoading.value = true
             _errorMessage.value = null
+
             try {
                 val result = repository.fetchRandomImages(count)
-                _images.value = result
+                if (append) {
+                    val currentList = _images.value ?: emptyList()
+                    _images.value = currentList + result
+                } else {
+                    _images.value = result
+                }
             } catch (e: Exception) {
-                // Step 13 – graceful error handling
                 _errorMessage.value = "Erro ao carregar imagens: ${e.localizedMessage}"
             } finally {
                 _isLoading.value = false
+                isFetching = false
             }
         }
     }
 
+    /** Appends more images to the current feed. */
+    fun loadMore() = loadImages(append = true)
+
     /** Called when the user pulls to refresh (Step 11). */
-    fun refresh() = loadImages()
+    fun refresh() = loadImages(append = false)
 }

@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- activity_main.xml
-     Ecrã principal — ViewPager2 vertical fullscreen + tabs no topo + barra de ações em baixo
-     Barra inferior: Like | Guardar | Baixar  (sem BottomNavigationView de navegação)
-     Colocar em: res/layout/activity_main.xml
--->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
-    <!-- Feed: ViewPager2 vertical, ocupa ecrã todo -->
+    <!-- Feed: ViewPager2 vertical -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerFeed"
         android:layout_width="0dp"
@@ -23,14 +18,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Tabs no topo (Following / For You / LIVE) — flutuam sobre o ViewPager2 -->
+    <!-- Tabs no topo: Em land, ocupam a parte superior central -->
     <LinearLayout
         android:id="@+id/topTabsContainer"
         android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_height="40dp"
         android:orientation="horizontal"
-        android:gravity="center|bottom"
-        android:paddingBottom="6dp"
+        android:gravity="center"
         android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,34 +41,20 @@
             android:paddingHorizontal="18dp"
             android:paddingBottom="2dp"
             android:background="@drawable/tab_active_underline" />
-
     </LinearLayout>
 
-    <!-- Loading indicator global (quando busca mais imagens) -->
-    <ProgressBar
-        android:id="@+id/loadingIndicator"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:indeterminateTint="@android:color/white"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomActionsBar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Barra de ações inferior: Like | Guardar | Baixar -->
+    <!-- Barra de ações inferior: Em land, podemos torná-la ligeiramente mais estreita -->
     <LinearLayout
         android:id="@+id/bottomActionsBar"
-        android:layout_width="0dp"
-        android:layout_height="68dp"
+        android:layout_width="400dp"
+        android:layout_height="56dp"
         android:orientation="horizontal"
         android:gravity="center"
-        android:background="#CC000000"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Botão Like -->
         <LinearLayout
             android:id="@+id/likeContainer"
             android:layout_width="0dp"
@@ -83,32 +63,20 @@
             android:orientation="vertical"
             android:gravity="center"
             android:background="?attr/selectableItemBackground">
-
             <ImageView
                 android:id="@+id/likeButton"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/ic_heart_outline"
-                android:contentDescription="@string/like_description" />
-
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_heart_outline" />
             <TextView
                 android:id="@+id/likeCountText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/placeholder_likes"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp"
-                android:fontFamily="sans-serif-medium"
-                android:layout_marginTop="4dp" />
+                android:textSize="10sp" />
         </LinearLayout>
 
-        <!-- Divisor vertical -->
-        <View
-            android:layout_width="0.5dp"
-            android:layout_height="32dp"
-            android:background="#33FFFFFF" />
-
-        <!-- Botão Guardar (favoritos FIFO) -->
         <LinearLayout
             android:id="@+id/saveContainer"
             android:layout_width="0dp"
@@ -117,31 +85,19 @@
             android:orientation="vertical"
             android:gravity="center"
             android:background="?attr/selectableItemBackground">
-
             <ImageView
                 android:id="@+id/saveButton"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:src="@drawable/ic_star_outline"
-                android:contentDescription="@string/save_description" />
-
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_star_outline" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/save_label"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp"
-                android:fontFamily="sans-serif-medium"
-                android:layout_marginTop="4dp" />
+                android:textSize="10sp" />
         </LinearLayout>
 
-        <!-- Divisor vertical -->
-        <View
-            android:layout_width="0.5dp"
-            android:layout_height="32dp"
-            android:background="#33FFFFFF" />
-
-        <!-- Botão Baixar -->
         <LinearLayout
             android:id="@+id/downloadContainer"
             android:layout_width="0dp"
@@ -150,27 +106,32 @@
             android:orientation="vertical"
             android:gravity="center"
             android:background="?attr/selectableItemBackground">
-
             <ImageView
                 android:id="@+id/downloadButton"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:src="@drawable/ic_download"
-                android:contentDescription="@string/download_description" />
-
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_download" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/download_label"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp"
-                android:fontFamily="sans-serif-medium"
-                android:layout_marginTop="4dp" />
+                android:textSize="10sp" />
         </LinearLayout>
 
     </LinearLayout>
 
-    <!-- Banner offline (aparece quando sem rede) -->
+    <ProgressBar
+        android:id="@+id/loadingIndicator"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:indeterminateTint="@android:color/white"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <TextView
         android:id="@+id/offlineBanner"
         android:layout_width="0dp"
@@ -179,7 +140,7 @@
         android:textColor="#FFFFFF"
         android:textSize="12sp"
         android:gravity="center"
-        android:padding="6dp"
+        android:padding="4dp"
         android:background="#CC333333"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/bottomActionsBar"

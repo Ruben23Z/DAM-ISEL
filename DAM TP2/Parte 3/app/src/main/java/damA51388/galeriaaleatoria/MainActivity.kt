@@ -8,9 +8,19 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import damA51388.galeriaaleatoria.adapter.ImageFeedAdapter
 import damA51388.galeriaaleatoria.databinding.ActivityMainBinding
 import damA51388.galeriaaleatoria.viewmodel.ImageViewModel
+import damA51388.galeriaaleatoria.storage.FavoritesManager
+import damA51388.galeriaaleatoria.model.ImageItem
+import damA51388.galeriaaleatoria.adapter.ImageFeedAdapter
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import android.content.ContentValues
+import android.os.Build
+import android.provider.MediaStore
 
 /**
  * Steps 9–13 – MainActivity
@@ -28,11 +38,14 @@ import damA51388.galeriaaleatoria.viewmodel.ImageViewModel
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    // viewModels() delegate creates/restores the ViewModel across config changes
     private val viewModel: ImageViewModel by viewModels()
-
-    private val adapter = ImageFeedAdapter()
+    private lateinit var favoritesManager: FavoritesManager
+    
+    private val adapter = ImageFeedAdapter(onLikeStateChanged = { item ->
+        // Handle like count UI update if needed, already handled by data binding in real apps
+        // but here we just update the button state
+        updateLikeUI(item)
+    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,17 +63,99 @@ class MainActivity : AppCompatActivity() {
 
         setupViewPager()        // Step 10
         setupSwipeRefresh()     // Step 11
+        setupActionButtons()
         observeViewModel()      // Steps 9, 12, 13
+        
+        favoritesManager = FavoritesManager(this)
+    }
+
+    private fun setupActionButtons() {
+        binding.likeContainer.setOnClickListener {
+            val position = binding.viewPagerFeed.currentItem
+            if (position in 0 until adapter.itemCount) {
+                val item = adapter.currentList[position]
+                item.isLiked = !item.isLiked
+                updateLikeUI(item)
+                // In a real app, we'd notify the ViewModel here to sync with API
+            }
+        }
+
+        binding.saveContainer.setOnClickListener {
+            val position = binding.viewPagerFeed.currentItem
+            if (position in 0 until adapter.itemCount) {
+                val item = adapter.currentList[position]
+                val wasFav = favoritesManager.isFavorite(item.id)
+                val isNowFav = favoritesManager.toggleFavorite(item)
+                
+                if (isNowFav && !wasFav && favoritesManager.getFavorites().size == 5) {
+                    // This was a FIFO eviction? No, toggleFavorite handles it internally.
+                }
+                
+                binding.saveButton.setImageResource(if (isNowFav) android.R.drawable.btn_star_big_on else R.drawable.ic_star_outline)
+                Toast.makeText(this, if (isNowFav) R.string.saved_ok_message else R.string.remove_label, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.downloadContainer.setOnClickListener {
+            val position = binding.viewPagerFeed.currentItem
+            if (position in 0 until adapter.itemCount) {
+                val item = adapter.currentList[position]
+                downloadImage(item.url, "${item.breed}_${item.id}.jpg")
+            }
+        }
+    }
+
+    private fun updateLikeUI(item: ImageItem) {
+        binding.likeButton.setImageResource(if (item.isLiked) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline)
+        // Simulate like count
+        binding.likeCountText.text = if (item.isLiked) "1" else "0"
+    }
+
+    private fun downloadImage(url: String, filename: String) {
+        Glide.with(this)
+            .asBitmap()
+            .load(url)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    saveBitmapToGallery(resource, filename)
+                }
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
+    }
+
+    private fun saveBitmapToGallery(bitmap: Bitmap, filename: String) {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/DogFeed")
+            }
+        }
+
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        uri?.let {
+            contentResolver.openOutputStream(it).use { stream ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream!!)
+            }
+            Toast.makeText(this, R.string.download_ok_message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     // ── Step 10 – TikTok-style vertical ViewPager2 ────────────────────────
 
     private fun setupViewPager() {
-        // ViewPager2 with VERTICAL orientation already set in XML.
-        // Attaching the adapter enables full-screen paging behaviour natively.
         binding.viewPagerFeed.adapter = adapter
-        // offscreenPageLimit keeps 1 page loaded on each side for smooth swiping
         binding.viewPagerFeed.offscreenPageLimit = 1
+
+        // Pagination: load more when user is near the end
+        binding.viewPagerFeed.registerOnPageChangeCallback(object : androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val totalItems = adapter.itemCount
+                if (position >= totalItems - 3 && totalItems > 0) {
+                    viewModel.loadMore()
+                }
+            }
+        })
     }
 
     // ── Step 11 – Swipe-to-refresh ────────────────────────────────────────

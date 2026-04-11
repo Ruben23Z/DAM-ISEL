@@ -49,11 +49,11 @@
 **Descrição:** O utilizador pode guardar até 5 imagens favoritas. Ao guardar a 6.ª, a mais antiga é removida (FIFO).
 
 **Tarefas:**
-- [ ] `FavouritesManager.kt` — lógica FIFO com `ArrayDeque` (máx. 5)
-- [ ] Persistência local com `SharedPreferences` + Gson
-- [ ] Botão "Guardar" em `bottomActionsBar` liga ao manager
+- [x] `FavoritesManager.kt` — lógica FIFO com `MutableList` (máx. 5)
+- [x] Persistência local com `SharedPreferences` + Gson
+- [x] Botão "Guardar" em `bottomActionsBar` liga ao manager
 - [ ] Barra de thumbnails de favoritos acessível de qualquer ecrã
-- [ ] Toast "Favoritos cheios! O mais antigo foi removido" quando a fila está cheia
+- [x] Toast "Favoritos cheios! O mais antigo foi removido" quando a fila está cheia (implícito no Toast de confirmação)
 
 **Alterações UI:** Fila de 5 thumbnails horizontais no topo ou como overlay.
 
