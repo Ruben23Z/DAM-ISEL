@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImageFeed</string>
+    <string name="tab_following">Following</string>
+    <string name="tab_for_you">For You</string>
+    <string name="tab_live">LIVE</string>
+    <string name="placeholder_username">@username</string>
+    <string name="placeholder_description">Descrição da imagem aqui…</string>
+    <string name="placeholder_tags">#photography #nature</string>
+    <string name="placeholder_likes">0</string>
+    <string name="like_description">Dar like nesta imagem</string>
+    <string name="save_description">Guardar nos favoritos</string>
+    <string name="save_label">Guardar</string>
+    <string name="download_description">Baixar esta imagem</string>
+    <string name="download_label">Baixar</string>
+    <string name="image_content_description">Imagem do feed</string>
+    <string name="detail_image_description">Detalhe da imagem</string>
+    <string name="avatar_description">Avatar do utilizador</string>
+    <string name="back_description">Voltar</string>
+    <string name="thumbnail_description">Miniatura de favorito</string>
+    <string name="stat_likes">Likes</string>
+    <string name="stat_views">Visualizações</string>
+    <string name="share_full_label">Partilhar imagem</string>
+    <string name="view_detail_label">Ver detalhe</string>
+    <string name="remove_label">Remover</string>
+    <string name="favorites_title">Os Meus Favoritos</string>
+    <string name="favorites_queue_label">Fila FIFO — máx. 5</string>
+    <string name="no_favorites_label">Sem favoritos. Guarda uma imagem!</string>
+    <string name="offline_banner">Sem ligação — a mostrar cache</string>
+    <string name="error_loading">Erro ao carregar imagem</string>
+    <string name="retry_label">Tentar de novo</string>
+    <string name="favorites_full_message">Favoritos cheios! O mais antigo foi removido</string>
+    <string name="saved_ok_message">Guardado nos favoritos</string>
+    <string name="download_ok_message">Imagem guardada na galeria</string>
+</resources>
