@@ -85,15 +85,41 @@
                 android:textSize="28sp"
                 android:textStyle="normal" />
 
-            <TextView
-                android:id="@+id/info_date"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:alpha="0.7"
-                android:letterSpacing="0.1"
-                android:text="@string/Data"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/info_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.7"
+                    android:letterSpacing="0.1"
+                    android:text="@string/Data"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:alpha="0.7"
+                    android:text="|"
+                    android:textColor="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/tempoValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:alpha="0.9"
+                    android:text="@{viewModel.currentTime}"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="14:00" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Weather Image -->
@@ -101,7 +127,7 @@
             android:id="@+id/weatherImage"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:layout_marginTop="48dp"
+            android:layout_marginTop="32dp"
             android:src="@drawable/clear_day"
             app:imageResource="@{viewModel.weatherIconRes}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -113,7 +139,7 @@
             android:id="@+id/temp_section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
@@ -147,10 +173,10 @@
             android:id="@+id/metrics_scroll"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
             android:clipToPadding="false"
             android:paddingHorizontal="24dp"
-            android:paddingVertical="16dp"
+            android:paddingVertical="8dp"
             app:layout_constraintBottom_toTopOf="@+id/btn_update"
             app:layout_constraintTop_toBottomOf="@+id/temp_section">
 
@@ -159,11 +185,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Row 1: Humidity & Altitude -->
+                <!-- Row 1: Humidity & Prob. Rain -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -173,22 +199,22 @@
                         android:layout_weight="1"
                         android:background="@drawable/glass_card"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.6"
-                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf((int)viewModel.liveWeatherData.hourly.relative_humidity_2m[0]) + "%" : "--"}'
+                            android:text="Humidade"
                             android:textColor="@android:color/white"
-                            android:textSize="9sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <TextView
                             android:id="@+id/humidadeValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/_45"
+                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf(viewModel.liveWeatherData.current.relative_humidity_2m) + "%" : "--"}'
                             android:textColor="@android:color/white"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -200,33 +226,33 @@
                         android:layout_weight="1"
                         android:background="@drawable/glass_card"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.6"
-                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf((int)viewModel.liveWeatherData.altitude) + "º" : "--"}'
+                            android:text="Chance Chuva"
                             android:textColor="@android:color/white"
-                            android:textSize="9sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <TextView
-                            android:id="@+id/altitudeValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/altitude_value"
+                            android:text="@{viewModel.probRain}"
                             android:textColor="@android:color/white"
                             android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="10%" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Row 2: Latitude & Pressure -->
+                <!-- Row 2: Apparent Temp & Pressure -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -236,25 +262,25 @@
                         android:layout_weight="1"
                         android:background="@drawable/glass_card"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.6"
-                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf((int)viewModel.liveWeatherData.latitude) + "°" : "--"}'
+                            android:text="Sensação"
                             android:textColor="@android:color/white"
-                            android:textSize="9sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <TextView
-                            android:id="@+id/latitudeValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/latitude_value"
+                            android:text="@{viewModel.apparentTemp}"
                             android:textColor="@android:color/white"
                             android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="24.5º" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -263,58 +289,58 @@
                         android:layout_weight="1"
                         android:background="@drawable/glass_card"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.6"
-                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf((int)viewModel.liveWeatherData.current.surface_pressure) + "hPa" : "--"}'
+                            android:text="Pressão"
                             android:textColor="@android:color/white"
-                            android:textSize="9sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <TextView
                             android:id="@+id/pressureValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/pressure_value"
+                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf((int)viewModel.liveWeatherData.current.surface_pressure) + " hPa" : "--"}'
                             android:textColor="@android:color/white"
                             android:textSize="16sp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Row 3: Wind Speed & Wind Direction -->
+                <!-- Row 3: Wind & Gusts -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
                         android:background="@drawable/glass_card"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.6"
-                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf((int)viewModel.liveWeatherData.current.wind_speed_10m) + "km/h" : "--"}'
+                            android:text="Vento"
                             android:textColor="@android:color/white"
-                            android:textSize="9sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <TextView
                             android:id="@+id/velocidadeVentoValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/Velo_Vento"
+                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf((int)viewModel.liveWeatherData.current.wind_speed_10m) + " km/h" : "--"}'
                             android:textColor="@android:color/white"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -326,29 +352,156 @@
                         android:layout_weight="1"
                         android:background="@drawable/glass_card"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.6"
-                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf((int)viewModel.liveWeatherData.current.wind_direction_10m) + "°" : "--"}'
+                            android:text="Rajadas"
                             android:textColor="@android:color/white"
-                            android:textSize="9sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <TextView
-                            android:id="@+id/direcaoVentoValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/wind_direction_value"
+                            android:text="@{viewModel.windGusts}"
                             android:textColor="@android:color/white"
                             android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="15.2 km/h" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Row 4: Time & UV Index -->
+                <!-- Row 4: Sunrise & Sunset -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/glass_card"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.6"
+                            android:text="Nascer Sol"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            tools:ignore="SmallSp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{viewModel.sunrise}"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="06:45" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/glass_card"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.6"
+                            android:text="Pôr do Sol"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            tools:ignore="SmallSp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{viewModel.sunset}"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="20:15" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Row 5: Visibility & UV -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/glass_card"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.6"
+                            android:text="Visibilidade"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            tools:ignore="SmallSp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{viewModel.visibility}"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="10.0 km" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/glass_card"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.6"
+                            android:text="Índice UV"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            tools:ignore="SmallSp" />
+
+                        <TextView
+                            android:id="@+id/uvIndexValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{viewModel.currentUV}"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="5.2" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Row 6: Fuso & Nuvens -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -361,24 +514,24 @@
                         android:layout_weight="1"
                         android:background="@drawable/glass_card"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.6"
-                            android:text='@{viewModel.liveWeatherData != null ? viewModel.liveWeatherData.timezone : "--"}'
+                            android:text="Região"
                             android:textColor="@android:color/white"
-                            android:textSize="9sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <TextView
-                            android:id="@+id/tempoValue"
+                            android:id="@+id/fusoValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="00:00"
+                            android:text='@{viewModel.liveWeatherData != null ? viewModel.liveWeatherData.timezone : "--"}'
                             android:textColor="@android:color/white"
-                            android:textSize="16sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -388,25 +541,25 @@
                         android:layout_weight="1"
                         android:background="@drawable/glass_card"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.6"
-                            android:text='@{viewModel.liveWeatherData != null ? String.valueOf((int)viewModel.liveWeatherData.hourly.uv_index[0]) + " UV Index" : "--"}'
+                            android:text="Nuvens"
                             android:textColor="@android:color/white"
-                            android:textSize="9sp"
+                            android:textSize="10sp"
                             tools:ignore="SmallSp" />
 
                         <TextView
-                            android:id="@+id/uvIndexValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0.0"
+                            android:text="@{viewModel.cloudCover}"
                             android:textColor="@android:color/white"
                             android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="45%" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
