@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,6 +18,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Barra de Favoritos (Thumbnails) no topo - Land -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewFavorites"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="12dp"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:listitem="@layout/item_favorite_thumbnail" />
 
     <!-- Tabs no topo: Em land, ocupam a parte superior central -->
     <LinearLayout
@@ -43,7 +57,7 @@
             android:background="@drawable/tab_active_underline" />
     </LinearLayout>
 
-    <!-- Barra de ações inferior: Em land, podemos torná-la ligeiramente mais estreita -->
+    <!-- Barra de ações inferior -->
     <LinearLayout
         android:id="@+id/bottomActionsBar"
         android:layout_width="400dp"
@@ -67,7 +81,8 @@
                 android:id="@+id/likeButton"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_heart_outline" />
+                android:src="@drawable/ic_heart_outline"
+                android:contentDescription="@string/like_description" />
             <TextView
                 android:id="@+id/likeCountText"
                 android:layout_width="wrap_content"
@@ -89,7 +104,8 @@
                 android:id="@+id/saveButton"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:src="@drawable/ic_star_outline" />
+                android:src="@drawable/ic_star_outline"
+                android:contentDescription="@string/save_description" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -110,7 +126,8 @@
                 android:id="@+id/downloadButton"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:src="@drawable/ic_download" />
+                android:src="@drawable/ic_download"
+                android:contentDescription="@string/download_description" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

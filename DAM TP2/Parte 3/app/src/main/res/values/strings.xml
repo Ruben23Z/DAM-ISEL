@@ -32,4 +32,8 @@
     <string name="favorites_full_message">Favorites full! Oldest removed</string>
     <string name="saved_ok_message">Saved to favorites</string>
     <string name="download_ok_message">Dog saved to gallery</string>
+
+    <!-- Extension 3 Strings -->
+    <string name="source_label">Source: %1$s</string>
+    <string name="share_text_template">Check out this beautiful %1$s: %2$s</string>
 </resources>

@@ -1,52 +1,46 @@
-# Implementation Plan
+# Plano de Implementação
 
-## Step 1
-Create Android project using Kotlin and XML Views
+O presente documento descreve o roteiro metodológico para o desenvolvimento da aplicação DogFeed, estruturado em etapas sequenciais para garantir a integridade da arquitetura MVVM.
 
-## Step 2
-Add internet permission in AndroidManifest
+## Etapa 1: Configuração do Ambiente e Estrutura Inicial
+- Criação do projeto Android utilizando Kotlin e XML Views.
+- Configuração das dependências necessárias (Retrofit, Glide, ViewModel, LiveData) no ficheiro `build.gradle.kts`.
 
-## Step 3
-Create data model (ImageItem) - Adapted for Dog API
+## Etapa 2: Definição de Permissões e Segurança
+- Declaração da permissão `INTERNET` no `AndroidManifest.xml`.
+- Configuração da permissão `ACCESS_NETWORK_STATE` para a monitorização de conetividade.
 
-## Step 4
-Create API service for Dog CEO API
+## Etapa 3: Modelação de Dados
+- Implementação da classe de dados `ImageItem`, adaptada para a estrutura de resposta da Dog CEO API.
+- Inclusão de lógica para extração de metadados (raça) a partir dos URLs das imagens.
 
-## Step 5
-Create Repository class
+## Etapa 4: Camada de Rede (Network)
+- Implementação do serviço API utilizando a biblioteca Retrofit.
+- Configuração do conversor GSON para a desserialização de objetos JSON.
 
-## Step 6
-Create ViewModel with LiveData
+## Etapa 5: Camada de Dados (Repository)
+- Criação da classe `ImageRepository` para abstração da fonte de dados.
+- Implementação da lógica de decisão entre dados remotos e cache local.
 
-## Step 7
-Design activity_main.xml layout
-- RecyclerView
-- SwipeRefreshLayout
-- ProgressBar
+## Etapa 6: Lógica de Negócio e Estado da UI (ViewModel)
+- Implementação do `ImageViewModel` com recurso a `LiveData`.
+- Gestão de estados de carregamento, sucesso e erro.
 
-## Step 8
-Create RecyclerView Adapter
-- Full screen item layout
-- ImageView for each item
+## Etapa 7: Desenho da Interface Principal (Layout)
+- Conceção do `activity_main.xml` com `ViewPager2` para navegação vertical.
+- Implementação de indicadores de progresso e painéis de ação.
 
-## Step 9
-Connect ViewModel to Activity
-- Observe LiveData
-- Update RecyclerView
+## Etapa 8: Adaptadores e Renderização de Listas
+- Criação do `ImageFeedAdapter` para a gestão do fluxo de imagens em ecrã total.
+- Integração da biblioteca Glide para o carregamento assíncrono de recursos visuais.
 
-## Step 10
-Implement vertical scrolling behavior
-- Each item fills screen
+## Etapa 9: Integração UI-ViewModel
+- Estabelecimento da ligação entre a `MainActivity` e o `ImageViewModel`.
+- Implementação de observadores para atualização dinâmica da interface.
 
-## Step 11
-Implement swipe-to-refresh
-- Fetch new dog images
+## Etapa 10: Refinamento da Experiência de Utilizador
+- Implementação do comportamento de "snap" vertical.
+- Adição da funcionalidade de atualização por gesto (*Swipe-to-Refresh*).
 
-## Step 12
-Add loading indicator
-
-## Step 13
-Handle API errors
-
-## Step 14
-Test application
+## Etapa 11: Validação e Testes
+- Realização de testes funcionais para verificar a recuperação de dados e a estabilidade da aplicação em diferentes condições de rede.

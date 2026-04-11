@@ -11,7 +11,6 @@
 **Objetivo:** Iniciar o projeto e configurar o ambiente
 
 **Prompt:**
-
 Lê toda a documentação dentro de `/docs` e segue as regras do `agents.md`.
 Começa a implementar o Passo 1 e o Passo 2 do plano de implementação.
 Cria:
@@ -29,7 +28,6 @@ Explica o que estás a fazer.
 **Objetivo:** Criar o modelo de dados
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 3:
 Cria o modelo de dados `ImageItem` com base em `docs/04_data_model.md`.
@@ -44,7 +42,6 @@ Mantém o código simples e limpo.
 **Objetivo:** Criar o serviço de API
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 4:
 Cria um serviço de API para ir buscar imagens à API definida em `docs/07_api_usage.md`.
@@ -62,7 +59,6 @@ Não implementes UI ainda.
 **Objetivo:** Criar a camada Repository
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 5:
 Cria uma classe Repository que:
@@ -79,7 +75,6 @@ Segue a arquitetura MVVM de forma rigorosa.
 **Objetivo:** Criar o ViewModel
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 6:
 Cria um ViewModel que:
@@ -97,7 +92,6 @@ Mantém a lógica dentro do ViewModel (não na Activity).
 **Objetivo:** Criar o layout principal
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 7:
 Cria o `activity_main.xml` com:
@@ -115,7 +109,6 @@ Cada item deve ocupar a altura total do ecrã.
 **Objetivo:** Criar o adaptador do RecyclerView
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 8:
 Cria o Adapter do RecyclerView:
@@ -133,7 +126,6 @@ Mantém o código simples e legível.
 **Objetivo:** Ligar o ViewModel à MainActivity
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 9:
 Liga o ViewModel à MainActivity:
@@ -150,7 +142,6 @@ Segue o MVVM corretamente (sem lógica de negócio na Activity).
 **Objetivo:** Comportamento estilo TikTok (snap vertical)
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 10:
 Faz o RecyclerView comportar-se como o TikTok:
@@ -168,7 +159,6 @@ Usa o LayoutManager ou SnapHelper adequado.
 **Objetivo:** Adicionar swipe-to-refresh
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 11:
 Adiciona o swipe-to-refresh:
@@ -184,46 +174,67 @@ Adiciona o swipe-to-refresh:
 **Objetivo:** ProgressBar e tratamento de erros
 
 **Prompt:**
-
 Continua a seguir o plano de implementação.
 Implementa o Passo 12 e o Passo 13:
 - Mostra o ProgressBar enquanto carrega
 - Trata os erros da API de forma adequada
 A app não deve fechar com erros.
 
-**Resultado:** ProgressBar ligado ao LiveData `isLoading`. Erros capturados com try/catch e apresentados via Snackbar com botão "Tentar de novo". A app não fecha em caso de falha de rede.
+**Resultado:** ProgressBar ligado ao LiveData `isLoading`. Erros capturados com try/catch e apresentados via Toast/Snackbar.
 
 ---
 
-## Prompt 12
+## Prompt 14 (Extensão)
 
-**Objetivo:** Criar recursos drawable em falta
+**Objetivo:** Implementar Animação de Like (TikTok style)
 
 **Prompt:**
+Adiciona uma animação de coração ao centro da imagem quando o utilizador faz double-tap.
+- Usa um GestureDetector no adaptador.
+- O coração deve aparecer com escala e alpha, e depois desaparecer.
+- Sincroniza o estado de "isLiked" com a MainActivity.
 
-Continue. Cria os drawables em falta que o layout XML referencia:
-- `gradient_bottom_overlay` — gradiente transparente→preto para legibilidade do texto
-- `tab_active_underline` — sublinhado branco para o separador activo
-- `ic_heart_outline` — ícone de coração (botão de like)
-- `ic_star_outline` — ícone de estrela (botão de guardar)
-- `ic_download` — ícone de descarregar
-
-**Resultado:** Todos os cinco ficheiros XML de drawable criados como vectores/shapes. O projeto compila sem erros de recursos.
+**Resultado:** Implementado no `ImageFeedAdapter` com animação suave e callback para a UI principal.
 
 ---
 
-## Prompt 13
+## Prompt 15 (Extensão)
 
-**Objetivo:** Corrigir erros de build e validar compilação
+**Objetivo:** Implementar Favoritos FIFO (Máx. 5) e Cache Offline
 
 **Prompt:**
+Implementa a lógica de favoritos:
+- Máximo de 5 itens (FIFO).
+- Persistência com SharedPreferences e Gson.
+- Implementa também um `ImageCache` para guardar até 50 imagens e permitir acesso offline.
+- Adiciona um `NetworkMonitor` para avisar o utilizador quando não há internet.
 
-Continue. Corre `./gradlew assembleDebug` e corrige todos os erros de compilação:
-- Plugin Kotlin duplicado (AGP 9.1 inclui Kotlin nativamente)
-- `kotlinOptions` não disponível sem plugin Kotlin explícito
+**Resultado:** Criados `FavoritesManager`, `ImageCache` e `NetworkMonitor`. A app agora funciona sem rede usando os dados locais.
 
-**Resultado:** BUILD SUCCESSFUL em 2m 51s. APK de debug gerado corretamente. 37 tarefas executadas sem erros.
+---
 
+## Prompt 16 (Extensão)
 
+**Objetivo:** Criar a Barra de Favoritos (Thumbnails)
 
-ok esta feito, ,mas faltam as partes de likes, onde ao clicar no like aparce a animação de coração, save numa lista default e o guardar que me permite transferir a imagem. 
+**Prompt:**
+Adiciona uma barra horizontal no topo da MainActivity para mostrar os 5 favoritos.
+- Usa uma RecyclerView pequena com thumbnails circulares.
+- Atualiza a barra em tempo real quando o utilizador clica no botão "Guardar".
+
+**Resultado:** Criado `FavoritesAdapter` e integrado no layout principal. A UI reflete instantaneamente as mudanças nos favoritos.
+
+---
+
+## Prompt 17 (Extensão)
+
+**Objetivo:** Implementar Ecrã de Detalhes e Partilha
+
+**Prompt:**
+Cria a `ImageDetailsActivity`:
+- Mostra a imagem em grande plano.
+- Mostra a raça do cão e a fonte (URL).
+- Adiciona um botão para partilhar o link da imagem via Intent.ACTION_SEND.
+- Permite abrir este ecrã clicando na imagem do feed ou nos thumbnails de favoritos.
+
+**Resultado:** Ecrã de detalhes funcional com suporte a partilha externa e navegação fluida.

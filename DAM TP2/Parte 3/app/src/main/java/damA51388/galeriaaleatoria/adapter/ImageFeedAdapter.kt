@@ -17,7 +17,8 @@ import android.view.MotionEvent
  * Adapter for the dog image feed.
  */
 class ImageFeedAdapter(
-    private val onLikeStateChanged: (ImageItem) -> Unit = {}
+    private val onLikeStateChanged: (ImageItem) -> Unit = {},
+    private val onItemClicked: (ImageItem) -> Unit = {}
 ) : ListAdapter<ImageItem, ImageFeedAdapter.ViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -48,6 +49,14 @@ class ImageFeedAdapter(
                 }
                 return true
             }
+
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClicked(getItem(position))
+                }
+                return true
+            }
         })
 
         fun bind(item: ImageItem) {
@@ -56,7 +65,7 @@ class ImageFeedAdapter(
                 v.performClick()
                 true
             }
-            // Breed name instead of username
+
             binding.usernameText.text = item.displayBreed
             binding.descriptionText.text = "A beautiful ${item.displayBreed}"
             binding.tagsText.text = "#dog #${item.breed.replace("-", "")}"
