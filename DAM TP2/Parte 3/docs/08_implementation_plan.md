@@ -12,7 +12,7 @@ O presente documento descreve o roteiro metodológico para o desenvolvimento da 
 
 ## Etapa 3: Modelação de Dados
 - Implementação da classe de dados `ImageItem`, adaptada para a estrutura de resposta da Dog CEO API.
-- Inclusão de lógica para extração de metadados (raça) a partir dos URLs das imagens.
+- Inclusão de lógica para extração de metadados (raça) a partir das URLs das imagens.
 
 ## Etapa 4: Camada de Rede (Network)
 - Implementação do serviço API utilizando a biblioteca Retrofit.

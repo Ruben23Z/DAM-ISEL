@@ -47,8 +47,7 @@ class FavoritesAdapter(
          */
         fun bind(item: ImageItem) {
             // Processamento e renderização da imagem com recorte circular utilizando a biblioteca Glide
-            Glide.with(binding.favThumbnail.context)
-                .load(item.url)
+            Glide.with(binding.favThumbnail.context).load(item.url)
                 .circleCrop() // Aplicação de máscara circular para conformidade estética
                 .into(binding.favThumbnail)
 
@@ -65,6 +64,7 @@ class FavoritesAdapter(
     private object DiffCallback : DiffUtil.ItemCallback<ImageItem>() {
         // Verificação de identidade biunívoca baseada no identificador único
         override fun areItemsTheSame(old: ImageItem, new: ImageItem) = old.id == new.id
+
         // Verificação de igualdade estrutural do conteúdo dos objetos
         override fun areContentsTheSame(old: ImageItem, new: ImageItem) = old == new
     }

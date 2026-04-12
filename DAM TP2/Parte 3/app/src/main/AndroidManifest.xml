@@ -2,10 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Step 2: INTERNET permission required for Dog CEO API -->
+    <!-- INTERNET-permission required -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Extension 6: Required for NetworkMonitor -->
+    <!-- Required for NetworkMonitor -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Permission for saving images on older Android versions (API < 29) -->

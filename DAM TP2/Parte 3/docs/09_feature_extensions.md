@@ -13,7 +13,7 @@
 - [x] Criar `ImageViewModel` com LiveData para imagens, loading e erros
 - [x] `MainActivity` apenas observa — sem chamadas de rede diretas
 
-**Alterações UI:** Nenhuma — arquitectura interna.
+**Alterações UI:** Nenhuma — arquitetura interna.
 
 ---
 
@@ -61,7 +61,7 @@
 
 ## Extensão 5 — Cache de até 50 Itens
 
-**Descrição:** Manter uma cache local de até 50 imagens (excluindo favoritos), com pelo menos 10 itens à frente e 10 atrás da posição actual.
+**Descrição:** Manter uma cache local de até 50 imagens (excluindo favoritos), com pelo menos 10 itens à frente e 10 atrás da posição atual.
 
 **Tarefas:**
 - [ ] `ImageCache.kt` — cache em memória com `LinkedHashMap` (máx. 50, FIFO de evicção)
@@ -81,7 +81,7 @@
 - [ ] `ImageRepository` devolve dados da cache quando offline
 - [ ] Banner `offlineBanner` em `activity_main.xml` torna-se visível
 
-**Alterações UI:** Banner cinzento translúcido acima da barra de acções.
+**Alterações UI:** Banner cinzento translúcido acima da barra de ações.
 
 ---
 
@@ -93,6 +93,6 @@
 - [x] try/catch em `ImageViewModel.loadImages()`
 - [x] `_errorMessage` LiveData expõe a mensagem
 - [x] `MainActivity` mostra Toast com a mensagem de erro
-- [ ] Botão "Tentar de novo" substitui o Toast por um Snackbar com acção
+- [ ] Botão "Tentar de novo" substitui o Toast por um Snackbar com ação
 
 **Alterações UI:** Snackbar persistente com botão de retry.

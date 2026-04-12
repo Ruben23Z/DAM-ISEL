@@ -55,12 +55,12 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 // Solicitação de dados ao repositório (abstrai a origem: remota ou local)
                 val result = repository.fetchRandomImages(count)
-                
+
                 // Verificação de vacuidade de dados para emissão de alerta de indisponibilidade
                 if (result.isEmpty() && !append) {
                     _errorMessage.value = "Inexistência de conectividade e de registos em cache."
                 }
-                
+
                 // Estratégia de atualização: anexação ao final da lista ou substituição integral
                 if (append) {
                     val currentList = _images.value ?: emptyList()

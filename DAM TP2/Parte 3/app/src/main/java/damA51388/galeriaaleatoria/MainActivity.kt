@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: ImageViewModel by viewModels() // Delegação da gestão de dados ao ViewModel
     private lateinit var favoritesManager: FavoritesManager // Mecanismo de persistência de itens prediletos
     private lateinit var networkMonitor: NetworkMonitor // Monitor de estado da conetividade de rede
-    
+
     // Instanciação do adaptador para o fluxo de imagens com definição de callbacks para interação
     private val feedAdapter = ImageFeedAdapter(
         onLikeStateChanged = { item ->
@@ -138,11 +138,12 @@ class MainActivity : AppCompatActivity() {
             val position = binding.viewPagerFeed.currentItem
             if (position in 0 until feedAdapter.itemCount) {
                 val item = feedAdapter.currentList[position]
-                val isNowFav = favoritesManager.toggleFavorite(item) // Inversão do estado de persistência
-                
+                val isNowFav =
+                    favoritesManager.toggleFavorite(item) // Inversão do estado de persistência
+
                 updateSaveUI(isNowFav) // Atualização do ícone representativo
                 refreshFavoritesUI() // Sincronização da barra superior
-                
+
                 // Emissão de feedback informativo ao utilizador
                 val message = if (isNowFav) {
                     getString(R.string.saved_ok_message)
@@ -186,7 +187,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun updateSaveUI(isFavorite: Boolean) {
         binding.saveButton.setImageResource(
-            if (isFavorite) android.R.drawable.btn_star_big_on 
+            if (isFavorite) android.R.drawable.btn_star_big_on
             else R.drawable.ic_star_outline
         )
     }
@@ -203,6 +204,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     saveBitmapToGallery(resource, filename) // Escrita no sistema de ficheiros
                 }
+
                 override fun onLoadCleared(placeholder: Drawable?) {
                     // Libertação de referências se necessário
                 }
@@ -223,13 +225,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Inserção metódica no provedor de conteúdos de media
-        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        val uri =
+            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
         uri?.let {
             try {
                 contentResolver.openOutputStream(it).use { stream ->
                     if (stream != null) {
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-                        Toast.makeText(this, R.string.download_ok_message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, R.string.download_ok_message, Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             } catch (e: Exception) {
@@ -246,14 +250,15 @@ class MainActivity : AppCompatActivity() {
         binding.viewPagerFeed.offscreenPageLimit = 2 // Otimização de desempenho por pré-carregamento
 
         // Definição de callbacks para monitorização de transição entre páginas
-        binding.viewPagerFeed.registerOnPageChangeCallback(object : androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+        binding.viewPagerFeed.registerOnPageChangeCallback(object :
+            androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 val totalItems = feedAdapter.itemCount
                 if (position in 0 until totalItems) {
                     val item = feedAdapter.currentList[position]
                     updateLikeUI(item)
                     updateSaveUI(favoritesManager.isFavorite(item.id))
-                    
+
                     // Estratégia de carregamento antecipado (Lazy Loading) ao atingir o limiar da lista
                     if (position >= totalItems - 3 && totalItems > 0) {
                         viewModel.loadMore()
