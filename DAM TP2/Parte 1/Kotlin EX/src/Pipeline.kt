@@ -27,13 +27,15 @@ class Pipeline {
 
     // Função para descrever os estágios do pipeline
     fun describe() {
-        println("Pipeline stages:") // Imprime o cabeçalho
-        stages.forEachIndexed { index, stage -> // Itera sobre os stages com índice
-            println("${index + 1}. ${stage.name}") // Imprime o número e nome de cada estágio
+        println("Pipeline stages:")
+        for (i in stages.indices) {
+            println("${i + 1}. ${stages[i].name}")
         }
     }
 
     fun compose(nome1: String, nome2: String): Stage {
+
+        //Obtém o estados a partir dos nomes
         val stage1 = stages.find {
             it.name == nome1
         }
@@ -45,6 +47,8 @@ class Pipeline {
             val output1 = stage1.transform(input)
             stage2.transform(output1)
         }
+
+        // val transform = stage1.andThen(stage2)
         val stage3 = Stage("${stage1.name} + ${stage2.name}", transform)
         val index = stages.indexOf(stage1)
         // Remover antigas
@@ -57,7 +61,6 @@ class Pipeline {
     fun fork(input: List<String>, p1: Pipeline, p2: Pipeline): Pair<List<String>, List<String>> {
         val r1 = p1.execute(input)
         val r2 = p2.execute(input)
-
         return Pair(r1, r2)
     }
 

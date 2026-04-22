@@ -28,13 +28,13 @@ operator fun Vec2.minus(other: Vec2): Vec2 {
 }
 
 // Define o operador * para multiplicar um vetor por um escalar (Double).
-// Permite escrever v * 2.0 para escalar o vetor, comum em gráficos e física.
+// Permite escrever v * 2.0 para escalar o vetor
 operator fun Vec2.times(other: Double): Vec2 {
     // Retorna um novo vetor com cada coordenada multiplicada pelo escalar.
     return Vec2(this.x * other, this.y * other)
 }
 
-// Define o operador * para multiplicar um escalar por um vetor (ordem reversa).
+// Define o operador * para multiplicar um escalar por um vetor (ordem inversa).
 // Necessário porque Kotlin não permite comutatividade automática; permite escrever 2.0 * v.
 operator fun Double.times(other: Vec2): Vec2 {
     // Retorna um novo vetor com o escalar multiplicado por cada coordenada.
@@ -59,6 +59,7 @@ operator fun Vec2.get(index: Int): Double {
     else throw IndexOutOfBoundsException("Index out of bounds: $index")
 }
 
+//permte fazer isto val (x, y) = v de forma facil
 operator fun Vec2.component1() = this.x
 operator fun Vec2.component2() = this.y
 

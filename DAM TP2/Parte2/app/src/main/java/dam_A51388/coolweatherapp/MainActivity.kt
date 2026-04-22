@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -98,6 +99,16 @@ class MainActivity : AppCompatActivity() {
     // Atribuição do LifecycleOwner para permitir a reatividade automática dos LiveData
     binding.lifecycleOwner = this
 
+    // Configuração do listener para o campo de entrada de coordenadas
+    binding.etInput.setOnEditorActionListener { v, actionId, event ->
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+            viewModel.fetchWeatherByCoordinates(v.text.toString())
+            true
+        } else {
+            false
+        }
+    }
+
     // Inicialização do cliente de geolocalização e desencadeamento do fluxo de dados
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     getLocation()
@@ -126,5 +137,21 @@ class MainActivity : AppCompatActivity() {
    */
   fun onUpdateWeatherClick(v: android.view.View) {
     getLocation()
+  }
+
+  /**
+   * Responde ao resultado do diálogo de permissões do sistema operativo.
+   */
+  override fun onRequestPermissionsResult(
+      requestCode: Int,
+      permissions: Array<out String>,
+      grantResults: IntArray,
+  ) {
+      super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+      if (requestCode == LOCATION_REQUEST_CODE) {
+          if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+              getLocation()
+          }
+      }
   }
 }

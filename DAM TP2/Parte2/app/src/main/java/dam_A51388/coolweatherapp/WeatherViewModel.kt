@@ -43,12 +43,6 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     // Mapa para tradução de códigos meteorológicos WMO
     private var weatherMap: Map<Int, WeatherCodeInfo> = loadWeatherCodes()
 
-    /**
-     * Inicia o fluxo de obtenção de dados meteorológicos numa linha de execução secundária (Worker Thread).
-     *
-     * @param lat Coordenada de latitude.
-     * @param long Coordenada de longitude.
-     */
     fun fetchWeather(lat: Float, long: Float) {
         Thread {
             val weather = repository.fetchWeatherFromApi(lat, long)
@@ -58,6 +52,27 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                 processWeatherdata(weather)
             }
         }.start()
+    }
+
+
+    /**
+     * Processa a entrada de texto do utilizador para extrair latitude e longitude.
+     * Suporta diversos formatos de entrada (espaço, vírgula ou ponto-e-vírgula como separadores).
+     */
+    fun fetchWeatherByCoordinates(input: String) {
+        // Regex para encontrar números (incluindo negativos e decimais com ponto ou vírgula)
+        val numberRegex = Regex("-?\\d+([.,]\\d+)?")
+        val matches = numberRegex.findAll(input).map { it.value }.toList()
+
+        if (matches.size >= 2) {
+            try {
+                // Converte os dois primeiros números encontrados
+                val lat = matches[0].replace(",", ".").toFloat()
+                val long = matches[1].replace(",", ".").toFloat()
+                fetchWeather(lat, long)
+            } catch (e: Exception) {
+            }
+        }
     }
 
     /**
@@ -219,11 +234,11 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 }
-
-/**
- * BindingAdapter: Utilitário para a orquestração de propriedades costumizadas no paradigma Data Binding.
- */
-@BindingAdapter("imageResource")
-fun setImageResource(imageView: ImageView, resource: Int) {
-    imageView.setImageResource(resource)
-}
+//
+///**
+// * BindingAdapter: Utilitário para a orquestração de propriedades costumizadas no paradigma Data Binding.
+// */
+//@BindingAdapter("imageResource")
+//fun setImageResource(imageView: ImageView, resource: Int) {
+//    imageView.setImageResource(resource)
+//}

@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme — dark background matching SpinNet surface -->
+    <style name="Base.Theme.SpinNet" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">#051424</item>
+        <item name="android:statusBarColor">#051424</item>
+        <item name="android:navigationBarColor">#122131</item>
+    </style>
+
+    <style name="Theme.SpinNet" parent="Base.Theme.SpinNet" />
+</resources>

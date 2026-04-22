@@ -1,7 +1,7 @@
 package Section1 // Define o pacote onde esta classe está localizada
 class Cache<K : Any, V : Any> { // Classe genérica Cache que armazena pares chave-valor, onde K e V são tipos não nulos
 
-    private val map = mutableMapOf<K, V>() // Mapa mutável privado que armazena os dados da cache
+    private val map = mutableMapOf<K, V>() // Mapa mutável privado que armazena os dados da cache, diferente de mutableListOf()
 
     fun put(key: K, value: V) { // Função para inserir ou atualizar um valor na cache
         map.put(key, value) // Insere a chave e o valor no mapa
