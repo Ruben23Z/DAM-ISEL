@@ -143,8 +143,7 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_marginBottom="4dp"
-                android:src="@drawable/clear_day"
-                app:imageResource="@{viewModel.weatherIconRes}" />
+                android:src="@drawable/clear_day" />
 
             <!-- Temperature & Status -->
             <LinearLayout
