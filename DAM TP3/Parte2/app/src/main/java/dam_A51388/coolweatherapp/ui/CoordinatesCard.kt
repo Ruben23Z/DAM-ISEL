@@ -1,45 +1,59 @@
 package dam_A51388.coolweatherapp.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun CoordinatesCard(
-    latitude: Float,
-    longitude: Float,
-    onLatitudeChange: (String) -> Unit,
-    onLongitudeChange: (String) -> Unit,
-    onUpdateButtonClick: () -> Unit
+    isVisible: Boolean,
+    initialLat: Float,
+    initialLon: Float,
+    onUpdateLocation: (Float, Float) -> Unit,
+    onClose: () -> Unit
 ) {
+    var latText by remember(initialLat) { mutableStateOf(initialLat.toString()) }
+    var lonText by remember(initialLon) { mutableStateOf(initialLon.toString()) }
 
-    Card {
-
+    AnimatedVisibility(visible = isVisible) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
-            OutlinedTextField(
-                value = latitude.toString(),
-                onValueChange = onLatitudeChange,
-                label = { Text("Latitude") })
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = longitude.toString(),
-                onValueChange = onLongitudeChange,
-                label = { Text("Longitude") })
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(onClick = onUpdateButtonClick) {
-                Text("Update Weather")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = latText,
+                    onValueChange = { latText = it },
+                    modifier = Modifier.weight(1f),
+                    label = { Text("Lat") },
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = lonText,
+                    onValueChange = { lonText = it },
+                    modifier = Modifier.weight(1f),
+                    label = { Text("Lon") },
+                    singleLine = true
+                )
+            }
+            Button(
+                onClick = {
+                    val lat = latText.toFloatOrNull()
+                    val lon = lonText.toFloatOrNull()
+                    if (lat != null && lon != null) {
+                        onUpdateLocation(lat, lon)
+                        onClose()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Atualizar localização")
             }
         }
     }
 }
-
-

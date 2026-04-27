@@ -56,7 +56,7 @@ fun WeatherContent(data: WeatherData, onUpdateLocation: (Float, Float) -> Unit) 
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(10.dp)
     ) {
-        item { HeroCard(data = data, onUpdateLocation = onUpdateLocation) }
+        item { WeatherCard(data = data, onUpdateLocation = onUpdateLocation) }
         item { QuickStatsGrid(data = data) }
         item { HourlyForecastCard(data = data) }
         item { SunCard(data = data) }
