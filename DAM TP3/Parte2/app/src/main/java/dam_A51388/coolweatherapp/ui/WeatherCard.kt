@@ -16,16 +16,18 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dam_A51388.coolweatherapp.R
 import dam_A51388.coolweatherapp.data.WeatherData
 import dam_A51388.coolweatherapp.data.getWeatherIconName
-import dam_A51388.coolweatherapp.data.wmoLabels
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.random.Random
+
 
 @Composable
 fun WeatherCard(
@@ -44,11 +46,13 @@ fun WeatherCard(
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min), // Allow content to expand
+                .height(IntrinsicSize.Min),
             color = MaterialTheme.colorScheme.surfaceVariant,
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
-            Box(modifier = Modifier.fillMaxWidth().heightIn(min = 240.dp)) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 240.dp)) {
                 Canvas(modifier = Modifier.matchParentSize()) {
                     val random = Random(42)
                     repeat(18) {
@@ -89,7 +93,7 @@ fun WeatherCard(
                         IconButton(onClick = { isEditing = !isEditing }) {
                             Icon(
                                 Icons.Default.Edit,
-                                contentDescription = "Edit",
+                                contentDescription = stringResource(R.string.edit_location),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -112,7 +116,9 @@ fun WeatherCard(
                         Image(
                             painter = painterResource(id = iconRes),
                             contentDescription = null,
-                            modifier = Modifier.size(64.dp).padding(bottom = 8.dp)
+                            modifier = Modifier
+                                .size(64.dp)
+                                .padding(bottom = 8.dp)
                         )
                     }
                 }
@@ -124,7 +130,7 @@ fun WeatherCard(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 14.dp)
         ) {
-            val formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("pt", "PT"))
+            val formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", LocalLocale.current.platformLocale)
             val dateStr = LocalDateTime.parse(data.current.time).format(formatter)
 
             Text(text = dateStr, fontSize = 12.sp, color = Color.Gray)
@@ -137,14 +143,15 @@ fun WeatherCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
+            val weatherDescResId = context.resources.getIdentifier("wmo_${data.current.weatherCode}", "string", context.packageName)
             Text(
-                text = wmoLabels[data.current.weatherCode] ?: "Desconhecido",
+                text = if (weatherDescResId != 0) stringResource(weatherDescResId) else stringResource(R.string.desconhecido),
                 fontSize = 15.sp,
                 color = Color.Gray
             )
 
             Text(
-                text = "Sensação térmica ${data.current.apparentTemperature.toInt()}°",
+                text = stringResource(R.string.sensa_o_t_rmica, data.current.apparentTemperature.toInt()),
                 fontSize = 13.sp,
                 color = Color.Gray
             )

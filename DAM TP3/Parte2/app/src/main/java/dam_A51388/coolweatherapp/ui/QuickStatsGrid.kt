@@ -6,7 +6,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -14,9 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dam_A51388.coolweatherapp.R
 import dam_A51388.coolweatherapp.data.WeatherData
 
 @Composable
@@ -25,8 +26,8 @@ fun QuickStatsGrid(data: WeatherData) {
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(modifier = Modifier.weight(1f)) {
                 StatCard(
-                    label = "Vento",
-                    value = "${data.current.windSpeed} km/h",
+                    label = stringResource(R.string.vento),
+                    value = stringResource(R.string.km_h, data.current.windSpeed),
                     subValue = getWindDirectionText(data.current.windDirection)
                 ) {
                     Canvas(modifier = Modifier.size(40.dp)) {
@@ -50,13 +51,16 @@ fun QuickStatsGrid(data: WeatherData) {
             }
             Box(modifier = Modifier.weight(1f)) {
                 StatCard(
-                    label = "Pressão",
+                    label = stringResource(R.string.press_o),
                     value = "${data.current.surfacePressure.toInt()} hPa"
                 ) {
                     val progress = ((data.current.surfacePressure - 980) / (1040 - 980)).coerceIn(0f, 1f)
                     LinearProgressIndicator(
                         progress = { progress },
-                        modifier = Modifier.fillMaxWidth().height(4.dp).clip(CircleShape),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(4.dp)
+                            .clip(CircleShape),
                         color = Color(0xFF378ADD),
                         trackColor = Color.Gray.copy(alpha = 0.2f)
                     )
@@ -67,13 +71,16 @@ fun QuickStatsGrid(data: WeatherData) {
             Box(modifier = Modifier.weight(1f)) {
                 val uv = data.daily.uvIndexMax.firstOrNull() ?: 0f
                 StatCard(
-                    label = "Índice UV",
+                    label = stringResource(R.string.ndice_uv),
                     value = "%.1f".format(uv),
                     subValue = getUvClassification(uv)
                 ) {
                     LinearProgressIndicator(
                         progress = { (uv / 12f).coerceIn(0f, 1f) },
-                        modifier = Modifier.fillMaxWidth().height(4.dp).clip(CircleShape),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(4.dp)
+                            .clip(CircleShape),
                         color = Color(0xFFEF9F27),
                         trackColor = Color.Gray.copy(alpha = 0.2f)
                     )
@@ -81,7 +88,7 @@ fun QuickStatsGrid(data: WeatherData) {
             }
             Box(modifier = Modifier.weight(1f)) {
                 StatCard(
-                    label = "Condição",
+                    label = stringResource(R.string.condi_o),
                     value = getSkyCondition(data.current.weatherCode),
                     subValue = getVisibilityText(data.current.weatherCode)
                 )
@@ -132,34 +139,37 @@ fun StatCard(
 
 // Helpers
 private fun getWindDirectionText(dir: Int): String {
-    val directions = listOf("N", "NE", "L", "SE", "S", "SO", "O", "NO")
+    val directions = listOf("N", "NE", "E", "SE", "S", "SW", "W", "NW")
     val index = ((dir + 22.5) / 45).toInt() % 8
     return "${directions[index]} · $dir°"
 }
 
+@Composable
 private fun getUvClassification(uv: Float): String {
     return when {
-        uv < 3 -> "Baixo"
-        uv < 6 -> "Moderado"
-        uv < 8 -> "Alto"
-        uv < 11 -> "Muito alto"
-        else -> "Extremo"
+        uv < 3 -> stringResource(R.string.uv_low)
+        uv < 6 -> stringResource(R.string.uv_moderate)
+        uv < 8 -> stringResource(R.string.uv_high)
+        uv < 11 -> stringResource(R.string.uv_very_high)
+        else -> stringResource(R.string.uv_extreme)
     }
 }
 
+@Composable
 private fun getSkyCondition(code: Int): String {
     return when (code) {
-        0 -> "Limpo"
-        1, 2 -> "Parcial"
-        3 -> "Nublado"
-        else -> "Encoberto"
+        0 -> stringResource(R.string.sky_clear)
+        1, 2 -> stringResource(R.string.sky_partial)
+        3 -> stringResource(R.string.sky_cloudy)
+        else -> stringResource(R.string.sky_overcast)
     }
 }
 
+@Composable
 private fun getVisibilityText(code: Int): String {
     return when (code) {
-        0, 1 -> "Visibilidade boa"
-        2, 3 -> "Visibilidade média"
-        else -> "Visibilidade reduzida"
+        0, 1 -> stringResource(R.string.vis_good)
+        2, 3 -> stringResource(R.string.vis_medium)
+        else -> stringResource(R.string.vis_low)
     }
 }

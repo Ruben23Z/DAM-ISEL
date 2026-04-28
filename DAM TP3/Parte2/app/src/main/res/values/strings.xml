@@ -1,30 +1,67 @@
 <resources>
-    <string name="app_name">Cool Weather APP</string>
-    <string name="cool_weather_app">Cool Weather APP</string>
-    <string name="app">APP</string>
-    <string name="Cidade">Lisboa</string>
-    <string name="Data">TERÇA-FEIRA, 31 DE MARÇO</string>
-    <string name="Temperatura">30°</string>
-    <string name="Tempo"><![CDATA[SUNNY & CLEAR]]></string>
-    <string name="Humidade">HUMIDITY</string>
-    <string name="PercentagemHumidade">45%</string>
-    <string name="Vento">WIND</string>
-    <string name="Velo_Vento">15 km/h</string>
-    <string name="latitude">LATITUDE</string>
-    <string name="longitude">LONGITUDE</string>
-    <string name="sea_level_pressure">SEA LEVEL PRESSURE</string>
-    <string name="wind_direction">WIND DIRECTION</string>
-    <string name="wind_speed">WIND SPEED</string>
-    <string name="time">TIME</string>
-    <string name="update">UPDATE</string>
-    <string name="input_value">Enter value</string>
-    <string name="_45">45%</string>
-    <string name="altitude">ALTITUDE</string>
-    <string name="pressure">PRESSURE</string>
-    <string name="uv_index">UV INDEX</string>
-    <string name="altitude_value">1200 m</string>
-    <string name="latitude_value">38.76°</string>
-    <string name="pressure_value">1026.4 hPa</string>
-    <string name="wind_direction_value">214°</string>
-    <string name="uv_index_value">6</string>
+
+    <string name="app_name">Cool Weather App</string>
+
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="atualizar_localiza_o">Update location</string>
+
+    <string name="vento">Wind</string>
+    <string name="km_h">%1$.1f km/h</string>
+
+    <string name="press_o">Pressure</string>
+    <string name="ndice_uv">UV Index</string>
+    <string name="condi_o">Condition</string>
+
+    <string name="nascer">Sunrise</string>
+    <string name="luz">Daylight</string>
+    <string name="p_r">Sunset</string>
+
+    <string name="desconhecido">Unknown</string>
+    <string name="sensa_o_t_rmica">Feels like %1$d°</string>
+    <string name="nenhum_dado_dispon_vel">No data available</string>
+    <string name="edit_location">Edit location</string>
+    <string name="error_fetching">Error fetching weather data</string>
+
+    <!-- UV Classifications -->
+    <string name="uv_low">Low</string>
+    <string name="uv_moderate">Moderate</string>
+    <string name="uv_high">High</string>
+    <string name="uv_very_high">Very high</string>
+    <string name="uv_extreme">Extreme</string>
+
+    <!-- Sky Conditions -->
+    <string name="sky_clear">Clear</string>
+    <string name="sky_partial">Partly cloudy</string>
+    <string name="sky_cloudy">Cloudy</string>
+    <string name="sky_overcast">Overcast</string>
+
+    <!-- Visibility -->
+    <string name="vis_good">Good visibility</string>
+    <string name="vis_medium">Medium visibility</string>
+    <string name="vis_low">Reduced visibility</string>
+
+    <!-- WMO Labels -->
+    <string name="wmo_0">Clear sky</string>
+    <string name="wmo_1">Mainly clear</string>
+    <string name="wmo_2">Partly cloudy</string>
+    <string name="wmo_3">Overcast</string>
+    <string name="wmo_45">Fog</string>
+    <string name="wmo_48">Depositing rime fog</string>
+    <string name="wmo_51">Light drizzle</string>
+    <string name="wmo_53">Drizzle</string>
+    <string name="wmo_55">Heavy drizzle</string>
+    <string name="wmo_61">Light rain</string>
+    <string name="wmo_63">Moderate rain</string>
+    <string name="wmo_65">Heavy rain</string>
+    <string name="wmo_71">Light snow</string>
+    <string name="wmo_73">Snow</string>
+    <string name="wmo_75">Heavy snow</string>
+    <string name="wmo_80">Rain showers</string>
+    <string name="wmo_81">Moderate rain showers</string>
+    <string name="wmo_82">Violent rain showers</string>
+    <string name="wmo_95">Thunderstorm</string>
+    <string name="wmo_96">Thunderstorm with hail</string>
+    <string name="wmo_99">Severe thunderstorm</string>
+
 </resources>

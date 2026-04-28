@@ -7,11 +7,12 @@ import dam_A51388.coolweatherapp.ui.WeatherUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class WeatherViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Loading)
+    private val _uiState = MutableStateFlow(WeatherUiState(isLoading = true))
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
 
     private var currentLat = 38.7169f
@@ -21,16 +22,40 @@ class WeatherViewModel : ViewModel() {
         fetchWeather()
     }
 
+    fun updateLatitude(lat: Float) {
+        currentLat = lat
+        _uiState.update { it.copy(latitude = lat) }
+    }
+
+    fun updateLongitude(lon: Float) {
+        currentLon = lon
+        _uiState.update { it.copy(longitude = lon) }
+    }
+
     fun fetchWeather(lat: Float = currentLat, lon: Float = currentLon) {
         currentLat = lat
         currentLon = lon
         viewModelScope.launch {
-            _uiState.value = WeatherUiState.Loading
+            _uiState.update { it.copy(isLoading = true, errorResId = null) }
             val result = WeatherApiClient.getWeather(lat, lon)
             if (result != null) {
-                _uiState.value = WeatherUiState.Success(result)
+                _uiState.update { 
+                    it.copy(
+                        latitude = result.latitude,
+                        longitude = result.longitude,
+                        temperature = result.current.temperature,
+                        windspeed = result.current.windSpeed,
+                        winddirection = result.current.windDirection,
+                        weathercode = result.current.weatherCode,
+                        seaLevelPressure = result.current.surfacePressure,
+                        time = result.current.time,
+                        isDay = result.current.isDay,
+                        isLoading = false,
+                        weatherData = result
+                    )
+                }
             } else {
-                _uiState.value = WeatherUiState.Error("Erro ao obter dados meteorológicos")
+                _uiState.update { it.copy(isLoading = false, errorResId = dam_A51388.coolweatherapp.R.string.error_fetching) }
             }
         }
     }

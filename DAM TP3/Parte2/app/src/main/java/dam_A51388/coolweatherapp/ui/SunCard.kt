@@ -12,9 +12,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dam_A51388.coolweatherapp.R
 import dam_A51388.coolweatherapp.data.WeatherData
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -27,7 +29,9 @@ fun SunCard(data: WeatherData) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Box(modifier = Modifier.fillMaxWidth().height(120.dp)) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val path = Path().apply {
                         moveTo(0f, size.height)
@@ -58,9 +62,9 @@ fun SunCard(data: WeatherData) {
                 }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                SunStatCol("Nascer", LocalDateTime.parse(data.daily.sunrise[0]).format(DateTimeFormatter.ofPattern("HH:mm")))
-                SunStatCol("Luz", "%.1f h".format(java.time.Duration.between(LocalDateTime.parse(data.daily.sunrise[0]), LocalDateTime.parse(data.daily.sunset[0])).toMinutes() / 60f))
-                SunStatCol("Pôr", LocalDateTime.parse(data.daily.sunset[0]).format(DateTimeFormatter.ofPattern("HH:mm")))
+                SunStatCol(stringResource(R.string.nascer), LocalDateTime.parse(data.daily.sunrise[0]).format(DateTimeFormatter.ofPattern("HH:mm")))
+                SunStatCol(stringResource(R.string.luz), "%.1f h".format(java.time.Duration.between(LocalDateTime.parse(data.daily.sunrise[0]), LocalDateTime.parse(data.daily.sunset[0])).toMinutes() / 60f))
+                SunStatCol(stringResource(R.string.p_r), LocalDateTime.parse(data.daily.sunset[0]).format(DateTimeFormatter.ofPattern("HH:mm")))
             }
         }
     }

@@ -13,41 +13,154 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dam_A51388.coolweatherapp.data.*
 import dam_A51388.coolweatherapp.ui.theme.WeatherAppTheme
 import dam_A51388.coolweatherapp.viewmodel.WeatherViewModel
+import android.content.res.Configuration
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import dam_A51388.coolweatherapp.R
 
 @Composable
-fun WeatherUI(viewModel: WeatherViewModel = viewModel()) {
-    val uiState by viewModel.uiState.collectAsState()
+fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
+    val weatherUIState by weatherViewModel.uiState.collectAsState()
+    val latitude = weatherUIState.latitude
+    val longitude = weatherUIState.longitude
+    val temperature = weatherUIState.temperature
+    val windSpeed = weatherUIState.windspeed
+    val windDirection = weatherUIState.winddirection
+    val weathercode = weatherUIState.weathercode
+    val seaLevelPressure = weatherUIState.seaLevelPressure
+    val time = weatherUIState.time
+    
+    val configuration = LocalConfiguration.current
+    val day = weatherUIState.isDay == 1
+    
+    val mapt = getWeatherCodeMap()
+    val wCode = mapt.get(weathercode)
+    val wImage = when (wCode) {
+        WMO_WeatherCode.CLEAR_SKY,
+        WMO_WeatherCode.MAINLY_CLEAR,
+        WMO_WeatherCode.PARTLY_CLOUDY -> if (day) wCode.image + "day"
+        else wCode.image + "night"
+        else -> wCode?.image ?: "mostly_cloudy"
+    }
+    
+    val context = LocalContext.current
+    val wIcon = context.resources.getIdentifier(wImage, "drawable", context.packageName)
+    
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(weatherUIState.errorResId) {
+        weatherUIState.errorResId?.let { resId ->
+            snackbarHostState.showSnackbar(context.getString(resId))
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-            when (val state = uiState) {
-                is WeatherUiState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Color(0xFF378ADD))
-                    }
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)) {
+            if (weatherUIState.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Color(0xFF378ADD))
                 }
-                is WeatherUiState.Success -> {
-                    WeatherContent(
-                        data = state.data,
-                        onUpdateLocation = { lat, lon -> viewModel.fetchWeather(lat, lon) }
+            } else {
+                if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    LandscapeWeatherUI(
+                        wIcon, latitude, longitude, temperature, windSpeed, windDirection, weathercode, seaLevelPressure, time,
+                        onLatitudeChange = { newValue ->
+                            newValue.toFloatOrNull()?.let { weatherViewModel.updateLatitude(it) }
+                        },
+                        onLongitudeChange = { newValue ->
+                            newValue.toFloatOrNull()?.let { weatherViewModel.updateLongitude(it) }
+                        },
+                        onUpdateButtonClick = { weatherViewModel.fetchWeather() },
+                        weatherData = weatherUIState.weatherData
                     )
-                }
-                is WeatherUiState.Error -> {
-                    LaunchedEffect(state.message) {
-                        snackbarHostState.showSnackbar(state.message)
-                    }
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = state.message, color = MaterialTheme.colorScheme.error)
-                    }
+                } else {
+                    PortraitWeatherUI(
+                        wIcon, latitude, longitude, temperature, windSpeed, windDirection, weathercode, seaLevelPressure, time,
+                        onLatitudeChange = { newValue ->
+                            newValue.toFloatOrNull()?.let { weatherViewModel.updateLatitude(it) }
+                        },
+                        onLongitudeChange = { newValue ->
+                            newValue.toFloatOrNull()?.let { weatherViewModel.updateLongitude(it) }
+                        },
+                        onUpdateButtonClick = { weatherViewModel.fetchWeather() },
+                        weatherData = weatherUIState.weatherData
+                    )
                 }
             }
         }
     }
 }
+
+@Composable
+fun PortraitWeatherUI(
+    wIcon: Int,
+    latitude: Float,
+    longitude: Float,
+    temperature: Float,
+    windSpeed: Float,
+    windDirection: Int,
+    weathercode: Int,
+    seaLevelPressure: Float,
+    time: String,
+    onLatitudeChange: (String) -> Unit,
+    onLongitudeChange: (String) -> Unit,
+    onUpdateButtonClick: () -> Unit,
+    weatherData: WeatherData?
+) {
+    if (weatherData != null) {
+        WeatherContent(data = weatherData, onUpdateLocation = { lat, lon ->
+            onLatitudeChange(lat.toString())
+            onLongitudeChange(lon.toString())
+            onUpdateButtonClick()
+        })
+    } else {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Nenhum dado disponível")
+        }
+    }
+}
+
+@Composable
+fun LandscapeWeatherUI(
+    wIcon: Int,
+    latitude: Float,
+    longitude: Float,
+    temperature: Float,
+    windSpeed: Float,
+    windDirection: Int,
+    weathercode: Int,
+    seaLevelPressure: Float,
+    time: String,
+    onLatitudeChange: (String) -> Unit,
+    onLongitudeChange: (String) -> Unit,
+    onUpdateButtonClick: () -> Unit,
+    weatherData: WeatherData?
+) {
+    if (weatherData != null) {
+        WeatherContent(data = weatherData, onUpdateLocation = { lat, lon ->
+            onLatitudeChange(lat.toString())
+            onLongitudeChange(lon.toString())
+            onUpdateButtonClick()
+        })
+    } else {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(stringResource(R.string.nenhum_dado_dispon_vel))
+        }
+    }
+}
+
+
+
+
+
+
+
 
 @Composable
 fun WeatherContent(data: WeatherData, onUpdateLocation: (Float, Float) -> Unit) {

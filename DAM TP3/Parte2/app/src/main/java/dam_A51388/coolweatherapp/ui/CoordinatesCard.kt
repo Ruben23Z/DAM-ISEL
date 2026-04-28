@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dam_A51388.coolweatherapp.R
 
 @Composable
 fun CoordinatesCard(
@@ -30,14 +32,14 @@ fun CoordinatesCard(
                     value = latText,
                     onValueChange = { latText = it },
                     modifier = Modifier.weight(1f),
-                    label = { Text("Lat") },
+                    label = { Text(stringResource(R.string.latitude)) },
                     singleLine = true
                 )
                 OutlinedTextField(
                     value = lonText,
                     onValueChange = { lonText = it },
                     modifier = Modifier.weight(1f),
-                    label = { Text("Lon") },
+                    label = { Text(stringResource(R.string.longitude)) },
                     singleLine = true
                 )
             }
@@ -52,7 +54,7 @@ fun CoordinatesCard(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Atualizar localização")
+                Text(stringResource(R.string.atualizar_localiza_o))
             }
         }
     }

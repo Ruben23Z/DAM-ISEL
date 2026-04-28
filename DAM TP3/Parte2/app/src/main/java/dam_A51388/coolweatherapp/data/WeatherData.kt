@@ -3,6 +3,12 @@ package dam_A51388.coolweatherapp.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
+
+//Representa modelos de dados brutos
+//Obtidos diretamente da API Open-Meteo.
+
+
 @Serializable
 data class WeatherData(
     val latitude: Float,
@@ -42,30 +48,6 @@ data class DailyWeather(
     val sunrise: List<String>,
     val sunset: List<String>,
     @SerialName("uv_index_max") val uvIndexMax: List<Float>
-)
-
-val wmoLabels = mapOf(
-    0 to "Céu limpo",
-    1 to "Maioritariamente limpo",
-    2 to "Parcialmente nublado",
-    3 to "Nublado",
-    45 to "Nevoeiro",
-    48 to "Nevoeiro gelado",
-    51 to "Chuvisco leve",
-    53 to "Chuvisco",
-    55 to "Chuvisco intenso",
-    61 to "Chuva leve",
-    63 to "Chuva moderada",
-    65 to "Chuva intensa",
-    71 to "Neve leve",
-    73 to "Neve",
-    75 to "Neve intensa",
-    80 to "Aguaceiros",
-    81 to "Aguaceiros moderados",
-    82 to "Aguaceiros intensos",
-    95 to "Trovoada",
-    96 to "Trovoada c/ granizo",
-    99 to "Trovoada intensa"
 )
 
 fun getWeatherIconName(code: Int, isDay: Int): String {
