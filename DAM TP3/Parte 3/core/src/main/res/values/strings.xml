@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DogFeed Core</string>
+    <string name="tab_following">Following</string>
+    <string name="tab_for_you">For You dogs</string>
+    <string name="tab_live">LIVE</string>
+    <string name="placeholder_username">@dog</string>
+    <string name="placeholder_description">Beautiful dog…</string>
+    <string name="placeholder_tags">#dogs #puppy</string>
+    <string name="placeholder_likes">Like</string>
+    <string name="like_description">Like this dog</string>
+    <string name="save_description">Save to favorites</string>
+    <string name="save_label">Save</string>
+    <string name="download_description">Download this dog image</string>
+    <string name="download_label">Download</string>
+    <string name="image_content_description">Dog image feed</string>
+    <string name="detail_image_description">Dog detail</string>
+    <string name="avatar_description">User avatar</string>
+    <string name="back_description">Back</string>
+    <string name="thumbnail_description">Favorite thumbnail</string>
+    <string name="stat_likes">Likes</string>
+    <string name="stat_views">Views</string>
+    <string name="share_full_label">Share dog</string>
+    <string name="view_detail_label">View detail</string>
+    <string name="remove_label">Remove</string>
+    <string name="favorites_title">My Favorite Dogs</string>
+    <string name="favorites_queue_label">FIFO Queue — max. 5</string>
+    <string name="no_favorites_label">No favorites. Save a dog!</string>
+    <string name="offline_banner">No connection — showing cache</string>
+    <string name="error_loading">Error loading dog</string>
+    <string name="retry_label">Try again</string>
+    <string name="favorites_full_message">Favorites full! Oldest removed</string>
+    <string name="saved_ok_message">Saved to favorites</string>
+    <string name="download_ok_message">Dog saved to gallery</string>
+</resources>

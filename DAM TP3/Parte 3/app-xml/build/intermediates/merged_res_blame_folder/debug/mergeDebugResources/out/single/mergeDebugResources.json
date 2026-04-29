@@ -1,0 +1,154 @@
+[
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_ic_heart_filled.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/ic_heart_filled.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_detalhes_app.jpeg.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/detalhes_app.jpeg"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_ic_heart_outline.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/ic_heart_outline.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/layout_activity_main.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/layout/activity_main.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/layout-land_item_image_card.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/layout-land/item_image_card.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/xml_backup_rules.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-xxxhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_feed_app.jpeg.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/feed_app.jpeg"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/layout_item_image_card.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/layout/item_image_card.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_ic_star_outline.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/ic_star_outline.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/layout_item_favorite_thumbnail.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/layout/item_favorite_thumbnail.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/xml_data_extraction_rules.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-mdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-xxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-xxhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-mdpi_ic_launcher_foreground.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-mdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-xhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-hdpi_ic_launcher_foreground.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-hdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_ic_back.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/ic_back.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_landscape_app.jpeg.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/landscape_app.jpeg"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-xhdpi_ic_launcher_foreground.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-xhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_ic_launcher_background.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_icon.jpg.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/icon.jpg"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/layout-land_activity_main.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/layout-land/activity_main.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_gradient_bottom_overlay.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/gradient_bottom_overlay.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_tab_active_underline.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/tab_active_underline.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/drawable_ic_download.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/drawable/ic_download.xml"
+    },
+    {
+        "merged": "damA51388.galeriaaleatoria.app-xml-debug-43:/layout_activity_image_details.xml.flat",
+        "source": "damA51388.galeriaaleatoria.app-xml-main-45:/layout/activity_image_details.xml"
+    }
+]

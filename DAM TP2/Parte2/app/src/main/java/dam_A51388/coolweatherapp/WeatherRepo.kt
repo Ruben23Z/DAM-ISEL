@@ -11,12 +11,7 @@ import java.net.URL
  */
 class WeatherRepo {
 
-    /**
-     * Efetua a requisição de informações meteorológicas a partir de coordenadas geográficas.
-     * @param lat Latitude da localização pretendida.
-     * @param long Longitude da localização pretendida.
-     * @return Objeto WeatherData com as informações obtidas ou null em caso de falha.
-     */
+
     fun fetchWeatherFromApi(lat: Float, long: Float): WeatherData? {
         // Envolve a operação num bloco de tratamento de exceções para garantir a robustez do sistema
         return try {

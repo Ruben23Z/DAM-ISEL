@@ -2,60 +2,45 @@
 package Section1
 
 // Define uma classe de dados Vec2 que representa um vetor 2D com coordenadas x e y.
-// Usa 'data class' porque gera automaticamente métodos como equals, hashCode, toString, copy, e destructuring.
-// Implementa Comparable<Vec2> para permitir comparações entre vetores, útil para ordenação ou encontrar máximo/mínimo.
 data class Vec2(val x: Double, val y: Double) : Comparable<Vec2> {
     // Sobrescreve o método compareTo para comparar vetores pela sua magnitude (comprimento).
     // Isso permite usar operadores como >, <, >=, <= entre vetores, comparando seus tamanhos.
     override fun compareTo(other: Vec2): Int {
         // Retorna a comparação das magnitudes: chama magnitude() para calcular o comprimento de cada vetor e compara os valores Double.
+        //Retorna um Int com a convenção padrão: negativo se this < other, zero se iguais, positivo se this > other.
         return this.magnitude().compareTo(other.magnitude())
     }
 }
 
-// Define o operador + para somar dois vetores Vec2.
-// Usa 'operator fun' para sobrecarga de operador, permitindo escrever a + b em vez de a.plus(b), tornando o código mais intuitivo e matemático.
 operator fun Vec2.plus(other: Vec2): Vec2 {
-    // Retorna um novo vetor com as coordenadas somadas: x + x e y + y.
     return Vec2(this.x + other.x, this.y + other.y)
 }
 
-// Define o operador - para subtrair dois vetores Vec2.
-// Similar ao +, usa sobrecarga para subtração vetorial.
+
 operator fun Vec2.minus(other: Vec2): Vec2 {
-    // Retorna um novo vetor com as coordenadas subtraídas: x - x e y - y.
     return Vec2(this.x - other.x, this.y - other.y)
 }
 
 // Define o operador * para multiplicar um vetor por um escalar (Double).
 // Permite escrever v * 2.0 para escalar o vetor
 operator fun Vec2.times(other: Double): Vec2 {
-    // Retorna um novo vetor com cada coordenada multiplicada pelo escalar.
     return Vec2(this.x * other, this.y * other)
 }
 
-// Define o operador * para multiplicar um escalar por um vetor (ordem inversa).
 // Necessário porque Kotlin não permite comutatividade automática; permite escrever 2.0 * v.
 operator fun Double.times(other: Vec2): Vec2 {
-    // Retorna um novo vetor com o escalar multiplicado por cada coordenada.
     return Vec2(this * other.x, this * other.y)
 }
 
-// Define o operador unário - para negar um vetor (inverter sinal).
-// Usa 'unaryMinus' para -v, útil para vetores opostos.
 operator fun Vec2.unaryMinus(): Vec2 {
-    // Retorna um novo vetor com sinais invertidos: -x e -y.
     return Vec2(-this.x, -this.y)
 }
 
 // Define o operador get para acessar coordenadas por índice (0 para x, 1 para y).
 // Permite escrever v[0] para x e v[1] para y, como um array, facilitando iteração ou acesso genérico.
 operator fun Vec2.get(index: Int): Double {
-    // Se o índice for 0, retorna a coordenada x.
     if (index == 0) return this.x
-    // Se o índice for 1, retorna a coordenada y.
     else if (index == 1) return this.y
-    // Caso contrário, lança uma exceção porque índices fora de 0 ou 1 não são válidos para um vetor 2D.
     else throw IndexOutOfBoundsException("Index out of bounds: $index")
 }
 
@@ -63,28 +48,20 @@ operator fun Vec2.get(index: Int): Double {
 operator fun Vec2.component1() = this.x
 operator fun Vec2.component2() = this.y
 
-// Define uma função para calcular a magnitude (comprimento) do vetor.
-// A magnitude é a raiz quadrada da soma dos quadrados das coordenadas, fórmula padrão da geometria euclidiana.
+
 fun Vec2.magnitude(): Double {
-    // Retorna Math.sqrt(x² + y²), que é a distância do vetor à origem.
     return Math.sqrt(this.x * this.x + this.y * this.y)
 }
 
-// Define uma função para calcular o produto escalar (dot product) entre dois vetores.
-// O dot product é usado para medir o ângulo entre vetores ou projeções, fórmula: x1*x2 + y1*y2.
+
 fun Vec2.dot(other: Vec2): Double {
-    // Retorna a soma dos produtos das coordenadas correspondentes.
     return this.x * other.x + this.y * other.y
 }
 
-// Define uma função para normalizar o vetor (torná-lo unitário, magnitude 1).
-// Normalização é útil para direções, divide cada coordenada pela magnitude.
+
 fun Vec2.normalized(): Vec2 {
-    // Calcula a magnitude do vetor.
     val mag = this.magnitude()
-    // Se a magnitude for zero, lança exceção porque não é possível dividir por zero e normalizar um vetor zero não faz sentido.
     if (mag == 0.0) throw IllegalStateException("Cannot normalize zero vector")
-    // Retorna um novo vetor com coordenadas divididas pela magnitude, resultando em magnitude 1.
     return Vec2(this.x / mag, this.y / mag)
 
 }

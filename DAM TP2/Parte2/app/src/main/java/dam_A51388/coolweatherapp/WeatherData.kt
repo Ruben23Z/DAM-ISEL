@@ -41,7 +41,5 @@ data class Hourly(
 )
 
 data class WeatherCodeInfo(
-    val code: Int,
-    val description: String,
-    val imagePrefix: String
+    val code: Int, val description: String, val imagePrefix: String
 )

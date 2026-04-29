@@ -13,19 +13,15 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation(kotlin("stdlib"))
-    
-    // Include the annotations module
+
+
     implementation(project(":annotations"))
-    
-    // Use the annotation processor
     kapt(project(":processor"))
 }
 
 tasks.test {
     useJUnitPlatform()
 }
-
 kotlin {
-    jvmToolchain (22)
+    jvmToolchain(22)
 }
-

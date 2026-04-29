@@ -20,6 +20,13 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -44,9 +51,7 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
     val mapt = getWeatherCodeMap()
     val wCode = mapt.get(weathercode)
     val wImage = when (wCode) {
-        WMO_WeatherCode.CLEAR_SKY,
-        WMO_WeatherCode.MAINLY_CLEAR,
-        WMO_WeatherCode.PARTLY_CLOUDY -> if (day) wCode.image + "day"
+        WMO_WeatherCode.CLEAR_SKY, WMO_WeatherCode.MAINLY_CLEAR, WMO_WeatherCode.PARTLY_CLOUDY -> if (day) wCode.image + "day"
         else wCode.image + "night"
 
         else -> wCode?.image ?: "mostly_cloudy"
@@ -59,13 +64,13 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
-    )
-    { result ->
+    ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data = result.data
-            val lat = data?.getFloatExtra("lat", 0f)
-            val lon = data?.getFloatExtra("lon", 0f)
-            if (lat != null && lon != null) {
+            val lat = data?.getDoubleExtra("lat", 0.0)?.toFloat() ?: 0f
+            val lon = data?.getDoubleExtra("lon", 0.0)?.toFloat() ?: 0f
+            
+            if (lat != 0f || lon != 0f) {
                 weatherViewModel.updateLatitude(lat)
                 weatherViewModel.updateLongitude(lon)
                 weatherViewModel.fetchWeather(lat, lon)
@@ -91,11 +96,7 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            if (weatherUIState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Color(0xFF378ADD))
-                }
-            } else {
+            if (weatherUIState.weatherData != null) {
                 if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     LandscapeWeatherUI(
                         wIcon,
@@ -115,7 +116,8 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
                         },
                         onUpdateButtonClick = { weatherViewModel.fetchWeather() },
                         launcher = launcher,
-                        weatherData = weatherUIState.weatherData
+                        weatherData = weatherUIState.weatherData,
+                        weatherViewModel = weatherViewModel
                     )
                 } else {
                     PortraitWeatherUI(
@@ -136,8 +138,20 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
                         },
                         onUpdateButtonClick = { weatherViewModel.fetchWeather() },
                         launcher = launcher,
-                        weatherData = weatherUIState.weatherData
+                        weatherData = weatherUIState.weatherData,
+                        weatherViewModel = weatherViewModel
                     )
+                }
+            }
+
+            if (weatherUIState.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color(0xFF378ADD))
                 }
             }
         }
@@ -159,14 +173,22 @@ fun PortraitWeatherUI(
     onLongitudeChange: (String) -> Unit,
     onUpdateButtonClick: () -> Unit,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-    weatherData: WeatherData?
+    weatherData: WeatherData?,
+    weatherViewModel: WeatherViewModel
 ) {
+    val state by weatherViewModel.uiState.collectAsState()
     if (weatherData != null) {
-        WeatherContent(data = weatherData, launcher = launcher, onUpdateLocation = { lat, lon ->
-            onLatitudeChange(lat.toString())
-            onLongitudeChange(lon.toString())
-            onUpdateButtonClick()
-        })
+        WeatherContent(
+            data = weatherData,
+            favorites = state.favorites,
+            onFavoriteClick = { weatherViewModel.selectFavorite(it) },
+            onSaveFavorite = { weatherViewModel.addFavourite(it) },
+            launcher = launcher,
+            onUpdateLocation = { lat, lon ->
+                onLatitudeChange(lat.toString())
+                onLongitudeChange(lon.toString())
+                onUpdateButtonClick()
+            })
     } else {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Nenhum dado disponível")
@@ -189,14 +211,24 @@ fun LandscapeWeatherUI(
     onLongitudeChange: (String) -> Unit,
     onUpdateButtonClick: () -> Unit,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-    weatherData: WeatherData?
+    weatherData: WeatherData?,
+    weatherViewModel: WeatherViewModel
 ) {
+    val state by weatherViewModel.uiState.collectAsState()
+
     if (weatherData != null) {
-        WeatherContent(data = weatherData, launcher = launcher, onUpdateLocation = { lat, lon ->
-            onLatitudeChange(lat.toString())
-            onLongitudeChange(lon.toString())
-            onUpdateButtonClick()
-        })
+
+        WeatherContent(
+            data = weatherData,
+            favorites = state.favorites,
+            onFavoriteClick = { weatherViewModel.selectFavorite(it) },
+            onSaveFavorite = { weatherViewModel.addFavourite(it) },
+            launcher = launcher,
+            onUpdateLocation = { lat, lon ->
+                onLatitudeChange(lat.toString())
+                onLongitudeChange(lon.toString())
+                onUpdateButtonClick()
+            })
     } else {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(stringResource(R.string.nenhum_dado_dispon_vel))
@@ -208,18 +240,86 @@ fun LandscapeWeatherUI(
 @Composable
 fun WeatherContent(
     data: WeatherData,
+    favorites: List<FavoriteLocation>,
+    onFavoriteClick: (FavoriteLocation) -> Unit,
+    onSaveFavorite: (String) -> Unit,
     onUpdateLocation: (Float, Float) -> Unit,
-    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>? = null, // Adiciona isto!
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>? = null,
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+    var newName by remember { mutableStateOf("") }
+    // Diálogo simples para pedir o nome
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Guardar Favorito") },
+            text = {
+                OutlinedTextField(
+                    value = newName,
+                    onValueChange = { newName = it },
+                    label = { Text("Nome do local") })
+            },
+            confirmButton = {
+                Button(onClick = {
+                    if (newName.isNotBlank()) {
+                        onSaveFavorite(newName)
+                        newName = ""
+                        showDialog = false
+                    }
+                }) { Text("Guardar") }
+            })
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(10.dp)
     ) {
+        item {
+            FavoritesCard(
+                favorites = favorites,
+                onFavoriteClick = onFavoriteClick,
+                onAddClick = { showDialog = true })
+        }
         item { WeatherCard(data = data, onUpdateLocation = onUpdateLocation, launcher = launcher) }
         item { QuickStatsGrid(data = data) }
         item { HourlyForecastCard(data = data) }
         item { SunCard(data = data) }
+    }
+}
+
+@Composable
+fun FavoritesCard(
+    favorites: List<FavoriteLocation>,
+    onFavoriteClick: (FavoriteLocation) -> Unit,
+    onAddClick: () -> Unit // Botão para adicionar a localização atual
+) {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 5.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Botão para adicionar a localização que está a ver agora
+        item {
+            IconButton(
+                onClick = onAddClick, modifier = Modifier.background(
+                    MaterialTheme.colorScheme.primaryContainer, CircleShape
+                )
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Adicionar Favorito")
+            }
+        }
+
+        // Lista dos favoritos já guardados
+        items(favorites) { fav ->
+            InputChip(
+                selected = false,
+                onClick = { onFavoriteClick(fav) },
+                label = { Text(fav.name) },
+                leadingIcon = { Icon(Icons.Default.Star, null, tint = Color(0xFFFFD700)) })
+        }
     }
 }
 
@@ -229,7 +329,7 @@ fun WeatherPreviewLight() {
     val mockData = getMockWeatherData()
     WeatherAppTheme(darkTheme = false) {
         Surface(color = MaterialTheme.colorScheme.background) {
-            WeatherContent(data = mockData, onUpdateLocation = { _, _ -> })
+            WeatherContent(data = mockData, favorites = emptyList(), onFavoriteClick = {_->}, onSaveFavorite = {} , onUpdateLocation = { _, _ -> })
         }
     }
 }
@@ -240,7 +340,7 @@ fun WeatherPreviewDark() {
     val mockData = getMockWeatherData()
     WeatherAppTheme(darkTheme = true) {
         Surface(color = MaterialTheme.colorScheme.background) {
-            WeatherContent(data = mockData, onUpdateLocation = { _, _ -> })
+            WeatherContent(data = mockData, favorites = emptyList(), onFavoriteClick = {_->}, onSaveFavorite = {} , onUpdateLocation = { _, _ -> })
         }
     }
 }
@@ -291,12 +391,10 @@ private fun getMockWeatherData() = WeatherData(
         weatherCodes = List(24) { 1 },
         precipitationProbability = List(24) { if (it > 15) 10 else 0 },
         windSpeeds = List(24) { 10f },
-        pressures = List(24) { 1013f }
-    ),
+        pressures = List(24) { 1013f }),
     daily = DailyWeather(
         time = listOf("2026-04-27"),
         sunrise = listOf("2026-04-27T06:30"),
         sunset = listOf("2026-04-27T20:30"),
         uvIndexMax = listOf(6.5f)
-    )
-)
+    ))
