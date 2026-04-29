@@ -14,6 +14,8 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun CoordinatesCard(
@@ -27,6 +29,12 @@ fun CoordinatesCard(
     var latText by remember(initialLat) { mutableStateOf(initialLat.toString()) }
     var lonText by remember(initialLon) { mutableStateOf(initialLon.toString()) }
     val context = LocalContext.current
+
+    val lisboaLat = 38.7223f
+    val lisboaLon = -9.1393f
+
+    val portoLat = 41.1579f
+    val portoLon = -8.6291f
 
     AnimatedVisibility(visible = isVisible) {
         Column(
@@ -70,10 +78,10 @@ fun CoordinatesCard(
                     launcher?.launch(intent)
                 }) {
                 Icon(
-                    imageVector = Icons.Filled.Public,
-                    contentDescription = "Mapa"
+                    imageVector = Icons.Filled.Public, contentDescription = "Escolher no Mapa"
                 )
             }
+
         }
     }
 }

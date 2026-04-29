@@ -1,5 +1,6 @@
 package dam_A51388.coolweatherapp.viewmodel
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dam_A51388.coolweatherapp.data.FavoriteLocation
@@ -15,14 +16,38 @@ class WeatherViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeatherUiState(isLoading = true))
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
-    val listaEx = listOf(FavoriteLocation("Lisboa", 38.7169f, -9.1395f), FavoriteLocation("Porto",   41.1499f, -8.6109f))
-    _uiState.update{ it.copy(favorites = listaDeExemplo) }
+
+    private val _favorites = mutableStateListOf(
+        FavoriteLocation("Lisboa", 38.7169f, -9.1395f),
+        FavoriteLocation("Porto", 41.1499f, -8.6109f)
+    )
+    
+    
     private var currentLat = 38.7169f
     private var currentLon = -9.1395f
 
     init {
+        // Atualiza o estado com a lista inicial
+        _uiState.update { it.copy(favorites = _favorites) }
         fetchWeather()
     }
+
+
+    fun addFavourite(name: String ){
+        val currLat= _uiState.value.latitude
+        val currLon = _uiState.value.longitude
+        _favorites.add(FavoriteLocation(name, currLat, currLon))
+//notifica a UI que a lista mudou
+ _uiState.update { it.copy(favorites = _favorites.toList()) }
+    }
+
+    //obtem valores dos favouritos e obtem os valores da localidades
+     fun selectFavorite(fav: FavoriteLocation) {
+        updateLatitude(fav.latitude)
+        updateLongitude(fav.longitude)
+        fetchWeather(fav.latitude, fav.longitude)
+    }
+
 
     fun updateLatitude(lat: Float) {
         currentLat = lat

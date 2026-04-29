@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    kotlin("kapt")
+    kotlin("kapt")// Preferred in Kotlin DSL ( Gradle KTS )
 }
 
 group = "org.example"

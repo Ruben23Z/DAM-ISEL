@@ -1,6 +1,9 @@
 package com.example.app
 import annotations.Greeting
 
+
+//prof
+
 open class MyClass {
     @Greeting("Hello from MyClass!")
     open fun sayHello() {

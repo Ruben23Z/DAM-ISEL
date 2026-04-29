@@ -14,11 +14,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dam_A51388.coolweatherapp.databinding.ActivityMainBinding
 
-/**
- * MainActivity: Controlador principal do ciclo de vida da aplicação. Esta classe é responsável pela
- * coordenação entre a interface de utilizador, os serviços de localização do sistema e a lógica de
- * apresentação (ViewModel).
- */
+
 class MainActivity : AppCompatActivity() {
 
   // Constante de controlo para o protocolo de requisição de permissões
@@ -111,7 +107,9 @@ class MainActivity : AppCompatActivity() {
 
     // Inicialização do cliente de geolocalização e desencadeamento do fluxo de dados
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-    getLocation()
+    if (savedInstanceState == null) {
+        getLocation()
+    }
 
     /**
      * Implementação do Padrão Observer para monitorização do estado meteorológico. Sempre que

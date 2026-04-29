@@ -20,6 +20,7 @@ class Cache<K : Any, V : Any> { // Classe genérica Cache que armazena pares cha
         return map.size // Retorna o número de entradas no mapa
     }
 
+
     fun getOrPut(
         key: K,
         default: () -> V
@@ -47,43 +48,43 @@ class Cache<K : Any, V : Any> { // Classe genérica Cache que armazena pares cha
 
 fun main() {
 
-    println("--- Word frequency cache ---") // Imprime o cabeçalho para a demonstração de cache de frequência de palavras
+    println("--- Word frequency cache ---")
+    val wordCache = Cache<String, Int>()
+    wordCache.put("kotlin", 1)
+    wordCache.put("scala", 1)
+    wordCache.put("haskell", 1)
 
-    val wordCache = Cache<String, Int>() // Cria uma instância de Cache para String e Int
+    println("Size: ${wordCache.size()}")
 
-    wordCache.put("kotlin", 1) // Insere a palavra "kotlin" com frequência 1
-    wordCache.put("scala", 1) // Insere a palavra "scala" com frequência 1
-    wordCache.put("haskell", 1) // Insere a palavra "haskell" com frequência 1
+    println("Frequency of \"kotlin\": ${wordCache.get("kotlin")}")
 
-    println("Size: ${wordCache.size()}") // Imprime o tamanho da cache
+    println("getOrPut \"kotlin\": ${wordCache.getOrPut("kotlin") { 0 }}")
+    println("getOrPut \"java\": ${wordCache.getOrPut("java") { 0 }}")
 
-    println("Frequency of \"kotlin\": ${wordCache.get("kotlin")}") // Imprime a frequência de "kotlin"
+    println("Size after getOrPut: ${wordCache.size()}")
 
-    println("getOrPut \"kotlin\": ${wordCache.getOrPut("kotlin") { 0 }}") // Tenta obter "kotlin", já existe
-    println("getOrPut \"java\": ${wordCache.getOrPut("java") { 0 }}") // Tenta obter "java", não existe, insere 0
 
-    println("Size after getOrPut: ${wordCache.size()}") // Imprime o tamanho após getOrPut
-
-    println("Transform \"kotlin\" (+1): ${wordCache.transform("kotlin") { it + 1 }}") // Transforma a frequência de "kotlin" incrementando 1
+    println("Transform \"kotlin\" (+1): ${wordCache.transform("kotlin") { it + 1 }}")
     println("Transform \"cobol\" (+1): ${wordCache.transform("cobol") { it + 1 }}") // Tenta transformar "cobol", que não existe
 
-    println("Snapshot: ${wordCache.snapshot()}") // Imprime um snapshot da cache
+    println("Snapshot: ${wordCache.snapshot()}")
 
 
-    val filtered = wordCache.filterValues { it > 0 } // Filtra valores maiores que 0
-    println("Filtered: $filtered") // Imprime os valores filtrados
 
-    println("\n--- Id registry cache ---") // Imprime o cabeçalho para a demonstração de cache de registro de IDs
+    val filtered = wordCache.filterValues { it > 0 }
+    println("Filtered: $filtered")
 
-    val idCache = Cache<Int, String>() // Cria uma instância de Cache para Int e String
+    println("\n--- Id registry cache ---")
 
-    idCache.put(1, "Alice") // Insere ID 1 com nome "Alice"
-    idCache.put(2, "Bob") // Insere ID 2 com nome "Bob"
+    val idCache = Cache<Int, String>()
 
-    println("Id 1 -> ${idCache.get(1)}") // Imprime o nome associado ao ID 1
-    println("Id 2 -> ${idCache.get(2)}") // Imprime o nome associado ao ID 2
+    idCache.put(1, "Alice")
+    idCache.put(2, "Bob")
 
-    idCache.evict(1) // Remove o ID 1 da cache
+    println("Id 1 -> ${idCache.get(1)}")
+    println("Id 2 -> ${idCache.get(2)}")
+
+    idCache.evict(1)
 
     println("After evict id 1, size: ${idCache.size()}") // Imprime o tamanho após remoção
     println("Id 1 after evict -> ${idCache.get(1)}") // Tenta obter ID 1 após remoção

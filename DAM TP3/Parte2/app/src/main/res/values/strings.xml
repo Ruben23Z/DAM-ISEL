@@ -63,5 +63,7 @@
     <string name="wmo_95">Thunderstorm</string>
     <string name="wmo_96">Thunderstorm with hail</string>
     <string name="wmo_99">Severe thunderstorm</string>
+    <string name="lisboa">Lisboa</string>
+    <string name="porto">Porto</string>
 
 </resources>

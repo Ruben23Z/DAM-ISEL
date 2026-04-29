@@ -2,7 +2,7 @@ package com.dam
 
 import annotations.Extract
 
-
+//prof
 abstract class DataProcessor(val input: String) {
     @Extract(regex = "Name : (\\w+)")
     abstract fun getName(): String?

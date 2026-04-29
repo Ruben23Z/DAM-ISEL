@@ -76,45 +76,44 @@ fun buildPipeline(block: Pipeline.() -> Unit): Pipeline {
 
 // Função principal para demonstrar o uso do pipeline
 fun main() {
-    // Define uma lista de logs de exemplo
     val logs = listOf(
-        " INFO : server started ", // Log de informação
-        " ERROR : disk full ", // Log de erro
-        " DEBUG : checking config ", // Log de debug
-        " ERROR : out of memory ", // Log de erro
-        " INFO : request received ", // Log de informação
-        " ERROR : connection timeout " // Log de erro
+        " INFO : server started ",
+        " ERROR : disk full ",
+        " DEBUG : checking config ",
+        " ERROR : out of memory ",
+        " INFO : request received ",
+        " ERROR : connection timeout "
     )
 
     // Constrói um pipeline usando a função buildPipeline
     val pipeline = buildPipeline {
         // Adiciona estágio para remover espaços em branco
         addStage("Trim") { list ->
-            list.map { it.trim() } // Aplica trim a cada string da lista
+            list.map { it.trim() }
         }
 
         // Adiciona estágio para filtrar apenas logs de erro
         addStage("Filter errors") { list ->
-            list.filter { it.contains("ERROR") } // Mantém apenas strings que contêm "ERROR"
+            list.filter { it.contains("ERROR") }
         }
 
         // Adiciona estágio para converter para maiúsculas
         addStage("Uppercase") { list ->
-            list.map { it.uppercase() } // Converte cada string para maiúsculas
+            list.map { it.uppercase() }
         }
 
         // Adiciona estágio para adicionar índices aos logs
         addStage("Add index") { list ->
-            list.mapIndexed { index, value -> // Mapeia com índice
-                "${index + 1}. $value" // Adiciona o número do índice no início
+            list.mapIndexed { index, value ->
+                "${index + 1}. $value"
             }
         }
     }
 
-    pipeline.describe() // Descreve os estágios do pipeline
+    pipeline.describe()
 
-    val result = pipeline.execute(logs) // Executa o pipeline nos logs
+    val result = pipeline.execute(logs)
 
-    println("Result:") // Imprime o cabeçalho do resultado
-    result.forEach { println(it) } // Imprime cada linha do resultado
+    println("Result:")
+    result.forEach { println(it) }
 }
