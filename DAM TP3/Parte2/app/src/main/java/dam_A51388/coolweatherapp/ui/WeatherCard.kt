@@ -1,5 +1,8 @@
 package dam_A51388.coolweatherapp.ui
 
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +36,7 @@ import kotlin.random.Random
 @Composable
 fun WeatherCard(
     data: WeatherData,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>? = null, // Adiciona isto!
     onUpdateLocation: (Float, Float) -> Unit
 ) {
     var isEditing by remember { mutableStateOf(false) }
@@ -99,13 +104,13 @@ fun WeatherCard(
                         }
                     }
 
-                    // Extracted CoordinatesCard
                     CoordinatesCard(
                         isVisible = isEditing,
                         initialLat = data.latitude,
                         initialLon = data.longitude,
                         onUpdateLocation = onUpdateLocation,
-                        onClose = { isEditing = false }
+                        launcher = launcher,
+                        onClose = { isEditing = false}
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))

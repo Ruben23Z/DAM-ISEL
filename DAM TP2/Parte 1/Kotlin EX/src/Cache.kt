@@ -1,7 +1,8 @@
 package Section1 // Define o pacote onde esta classe está localizada
 class Cache<K : Any, V : Any> { // Classe genérica Cache que armazena pares chave-valor, onde K e V são tipos não nulos
 
-    private val map = mutableMapOf<K, V>() // Mapa mutável privado que armazena os dados da cache, diferente de mutableListOf()
+    private val map =
+        mutableMapOf<K, V>() // Mapa mutável privado que armazena os dados da cache, diferente de mutableListOf()
 
     fun put(key: K, value: V) { // Função para inserir ou atualizar um valor na cache
         map.put(key, value) // Insere a chave e o valor no mapa
@@ -20,8 +21,9 @@ class Cache<K : Any, V : Any> { // Classe genérica Cache que armazena pares cha
     }
 
     fun getOrPut(
-        key: K, default: () -> V
-    ): V { // Função que obtém o valor se existir, ou calcula e insere um valor padrão
+        key: K,
+        default: () -> V
+    ): V { // Função que obtém o valor se existir, senão retorna o default e insere o valor resultado nessa key
         return map.getOrPut(key, default) // Usa o método getOrPut do mapa para implementar a lógica
     }
 
@@ -67,7 +69,7 @@ fun main() {
 
     println("Snapshot: ${wordCache.snapshot()}") // Imprime um snapshot da cache
 
-    // Challenge
+
     val filtered = wordCache.filterValues { it > 0 } // Filtra valores maiores que 0
     println("Filtered: $filtered") // Imprime os valores filtrados
 

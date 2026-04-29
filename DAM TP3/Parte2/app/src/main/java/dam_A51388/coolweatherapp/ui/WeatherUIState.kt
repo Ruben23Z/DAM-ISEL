@@ -1,5 +1,6 @@
 package dam_A51388.coolweatherapp.ui
 
+import dam_A51388.coolweatherapp.data.FavoriteLocation
 import dam_A51388.coolweatherapp.data.WeatherData
 
 
@@ -18,5 +19,6 @@ data class WeatherUiState(
     val isDay: Int = 1,
     val isLoading: Boolean = false,
     val errorResId: Int? = null,
-    val weatherData: dam_A51388.coolweatherapp.data.WeatherData? = null
+    val weatherData: dam_A51388.coolweatherapp.data.WeatherData? = null,
+    val favorites: List<FavoriteLocation> = emptyList()
 )

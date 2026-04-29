@@ -1,5 +1,7 @@
 package dam_A51388.coolweatherapp.ui
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -14,6 +16,10 @@ import dam_A51388.coolweatherapp.data.*
 import dam_A51388.coolweatherapp.ui.theme.WeatherAppTheme
 import dam_A51388.coolweatherapp.viewmodel.WeatherViewModel
 import android.content.res.Configuration
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -30,10 +36,11 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
     val weathercode = weatherUIState.weathercode
     val seaLevelPressure = weatherUIState.seaLevelPressure
     val time = weatherUIState.time
-    
+
+
     val configuration = LocalConfiguration.current
     val day = weatherUIState.isDay == 1
-    
+
     val mapt = getWeatherCodeMap()
     val wCode = mapt.get(weathercode)
     val wImage = when (wCode) {
@@ -41,17 +48,37 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
         WMO_WeatherCode.MAINLY_CLEAR,
         WMO_WeatherCode.PARTLY_CLOUDY -> if (day) wCode.image + "day"
         else wCode.image + "night"
+
         else -> wCode?.image ?: "mostly_cloudy"
     }
-    
+
     val context = LocalContext.current
     val wIcon = context.resources.getIdentifier(wImage, "drawable", context.packageName)
-    
+
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(weatherUIState.errorResId) {
-        weatherUIState.errorResId?.let { resId ->
-            snackbarHostState.showSnackbar(context.getString(resId))
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    )
+    { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            val lat = data?.getFloatExtra("lat", 0f)
+            val lon = data?.getFloatExtra("lon", 0f)
+            if (lat != null && lon != null) {
+                weatherViewModel.updateLatitude(lat)
+                weatherViewModel.updateLongitude(lon)
+                weatherViewModel.fetchWeather(lat, lon)
+            }
+        }
+
+    }
+
+
+    val errorMessage = weatherUIState.errorResId?.let { stringResource(it) }
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
         }
     }
 
@@ -59,9 +86,11 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             if (weatherUIState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Color(0xFF378ADD))
@@ -69,7 +98,15 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
             } else {
                 if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     LandscapeWeatherUI(
-                        wIcon, latitude, longitude, temperature, windSpeed, windDirection, weathercode, seaLevelPressure, time,
+                        wIcon,
+                        latitude,
+                        longitude,
+                        temperature,
+                        windSpeed,
+                        windDirection,
+                        weathercode,
+                        seaLevelPressure,
+                        time,
                         onLatitudeChange = { newValue ->
                             newValue.toFloatOrNull()?.let { weatherViewModel.updateLatitude(it) }
                         },
@@ -77,11 +114,20 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
                             newValue.toFloatOrNull()?.let { weatherViewModel.updateLongitude(it) }
                         },
                         onUpdateButtonClick = { weatherViewModel.fetchWeather() },
+                        launcher = launcher,
                         weatherData = weatherUIState.weatherData
                     )
                 } else {
                     PortraitWeatherUI(
-                        wIcon, latitude, longitude, temperature, windSpeed, windDirection, weathercode, seaLevelPressure, time,
+                        wIcon,
+                        latitude,
+                        longitude,
+                        temperature,
+                        windSpeed,
+                        windDirection,
+                        weathercode,
+                        seaLevelPressure,
+                        time,
                         onLatitudeChange = { newValue ->
                             newValue.toFloatOrNull()?.let { weatherViewModel.updateLatitude(it) }
                         },
@@ -89,6 +135,7 @@ fun WeatherUI(weatherViewModel: WeatherViewModel = viewModel()) {
                             newValue.toFloatOrNull()?.let { weatherViewModel.updateLongitude(it) }
                         },
                         onUpdateButtonClick = { weatherViewModel.fetchWeather() },
+                        launcher = launcher,
                         weatherData = weatherUIState.weatherData
                     )
                 }
@@ -111,10 +158,11 @@ fun PortraitWeatherUI(
     onLatitudeChange: (String) -> Unit,
     onLongitudeChange: (String) -> Unit,
     onUpdateButtonClick: () -> Unit,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
     weatherData: WeatherData?
 ) {
     if (weatherData != null) {
-        WeatherContent(data = weatherData, onUpdateLocation = { lat, lon ->
+        WeatherContent(data = weatherData, launcher = launcher, onUpdateLocation = { lat, lon ->
             onLatitudeChange(lat.toString())
             onLongitudeChange(lon.toString())
             onUpdateButtonClick()
@@ -140,10 +188,11 @@ fun LandscapeWeatherUI(
     onLatitudeChange: (String) -> Unit,
     onLongitudeChange: (String) -> Unit,
     onUpdateButtonClick: () -> Unit,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
     weatherData: WeatherData?
 ) {
     if (weatherData != null) {
-        WeatherContent(data = weatherData, onUpdateLocation = { lat, lon ->
+        WeatherContent(data = weatherData, launcher = launcher, onUpdateLocation = { lat, lon ->
             onLatitudeChange(lat.toString())
             onLongitudeChange(lon.toString())
             onUpdateButtonClick()
@@ -156,20 +205,18 @@ fun LandscapeWeatherUI(
 }
 
 
-
-
-
-
-
-
 @Composable
-fun WeatherContent(data: WeatherData, onUpdateLocation: (Float, Float) -> Unit) {
+fun WeatherContent(
+    data: WeatherData,
+    onUpdateLocation: (Float, Float) -> Unit,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>? = null, // Adiciona isto!
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(10.dp)
     ) {
-        item { WeatherCard(data = data, onUpdateLocation = onUpdateLocation) }
+        item { WeatherCard(data = data, onUpdateLocation = onUpdateLocation, launcher = launcher) }
         item { QuickStatsGrid(data = data) }
         item { HourlyForecastCard(data = data) }
         item { SunCard(data = data) }
@@ -215,7 +262,32 @@ private fun getMockWeatherData() = WeatherData(
     ),
     hourly = HourlyWeather(
         time = List(24) { "2026-04-27T%02d:00".format(it) },
-        temperatures = listOf(20f, 19f, 18f, 18f, 17f, 17f, 18f, 19f, 21f, 23f, 24f, 25f, 26f, 26f, 25f, 24f, 23f, 22f, 21f, 20f, 19f, 18f, 18f, 17f),
+        temperatures = listOf(
+            20f,
+            19f,
+            18f,
+            18f,
+            17f,
+            17f,
+            18f,
+            19f,
+            21f,
+            23f,
+            24f,
+            25f,
+            26f,
+            26f,
+            25f,
+            24f,
+            23f,
+            22f,
+            21f,
+            20f,
+            19f,
+            18f,
+            18f,
+            17f
+        ),
         weatherCodes = List(24) { 1 },
         precipitationProbability = List(24) { if (it > 15) 10 else 0 },
         windSpeeds = List(24) { 10f },

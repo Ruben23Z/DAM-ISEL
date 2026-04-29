@@ -2,6 +2,7 @@ package dam_A51388.coolweatherapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dam_A51388.coolweatherapp.data.FavoriteLocation
 import dam_A51388.coolweatherapp.data.WeatherApiClient
 import dam_A51388.coolweatherapp.ui.WeatherUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,8 @@ class WeatherViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeatherUiState(isLoading = true))
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
-
+    val listaEx = listOf(FavoriteLocation("Lisboa", 38.7169f, -9.1395f), FavoriteLocation("Porto",   41.1499f, -8.6109f))
+    _uiState.update{ it.copy(favorites = listaDeExemplo) }
     private var currentLat = 38.7169f
     private var currentLon = -9.1395f
 

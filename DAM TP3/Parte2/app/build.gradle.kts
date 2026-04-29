@@ -59,6 +59,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("androidx.compose.material:material-icons-extended")
 
 
     // Compose
@@ -72,7 +73,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.play.services.location)
     implementation(libs.firebase.crashlytics.buildtools)
-
     // Ktor & Serialization
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
