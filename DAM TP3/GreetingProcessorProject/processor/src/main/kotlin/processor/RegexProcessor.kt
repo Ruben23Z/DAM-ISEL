@@ -21,11 +21,13 @@ class RegexProcessor : AbstractProcessor() {
     override fun process(
         annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment
     ): Boolean {
-        val classMethodMap = mutableMapOf<TypeElement, MutableList<ExecutableElement>>()
+        val classMethodMap = mutableMapOf<TypeElement, MutableList<ExecutableElement>>() //Map<Classe, ListaDeMetodos>
+//        DataProcessor1 -> [met1, metodo2]
+//        DataProcessor2 -> [met1, metodo2]
         // Find all methods annotated with @Greeting
         for (element in roundEnv.getElementsAnnotatedWith(Extract::class.java)) { //mudei para o extract annotation
-            if (element is ExecutableElement) {
-                val enclosingClass = element.enclosingElement as TypeElement
+            if (element is ExecutableElement) { //garante que é metodo, pois executabeelement são metodos ou fucnoes
+                val enclosingClass = element.enclosingElement as TypeElement //obtem a classe envolvente
                 classMethodMap.computeIfAbsent(enclosingClass) {
                     mutableListOf()
                 }.add(element)
@@ -37,6 +39,7 @@ class RegexProcessor : AbstractProcessor() {
         }
         return true
     }
+
 
 
     private fun generateKotlinWrapperClass(
@@ -52,19 +55,23 @@ class RegexProcessor : AbstractProcessor() {
             FunSpec.constructorBuilder().addParameter(
                 //define aqui construtor e parametros das devidas variaveis
                 "input",
-                String::class.asTypeName() //----> diz que o tipo é string e converte para kotlinpoeat
+                String::class.asTypeName()  //----> diz que o tipo é string e converte para kotlinpoeat, que é diferente do kotlin normal
             )
                 .build()
         )
-            //define que a classe criada é herdada de DataProcss e é o mesmo que dizer que é do tipo DataProcessor
+            //define que a classe criada é herdada de DataProcess e é o mesmo que dizer que é do tipo DataProcessor, onde da se o nome da classe e o packgae
             .superclass(ClassName(packageName, originalClassName))
 
+
             // para que o input que se recebe tem ainda que ser passado ao pai
-            //obriga que a classe filha  passa argumentos ao construtor da classe pai quando é criada, isto para criar primeiro a classe pai e
+            //obriga que a classe filha passa argumentos ao construtor da classe pai quando é criada, isto para criar primeiro a classe pai e
             //dps a filha
             //) : DataProcessor(input) {
-            .addSuperclassConstructorParameter("input") //
-//faz final e public
+            .addSuperclassConstructorParameter("input")
+
+
+
+            //faz final e public
             .addModifiers(KModifier.PUBLIC, KModifier.FINAL)
 
 
@@ -82,24 +89,20 @@ class RegexProcessor : AbstractProcessor() {
             } //passa os metodos em obj do KotlinPoet
 
 
-            //mudar para extract(identificar o @extract) e o .regex para obter o que esta dentro dos ()
+            //mudar para extract(identificar o @extract) e o .regex para obter o que esta dentro dos ( )
             val regex = method.getAnnotation(Extract::class.java)?.regex ?: "Hello!"
 
             val methodBuilder =
                 FunSpec.builder(methodName).addModifiers(KModifier.OVERRIDE) //PASSA A OVERRIDE
                     .addParameters(parameters)
+
                     // o \ diz ao compilador que as aspas são um caracter especial dentro da string, para meter o " dentro do codigo
                     //senao ficava: "val match = Regex("
 //                    .addStatement("val match = Regex(\"$regex\").find(input)") //altera a expressao e adiciona
                     .addStatement("val match = Regex(%S).find(input)", regex) //para fazer as \ e " de forma auto senao da erro, %S é especifico para aspas e \
                     .addStatement("return match?.groupValues?.get(1)")
-                    .returns(String::class.asTypeName().copy(nullable = true))// do tipo String que pode ser null
-
-
-
-
-
-            classBuilder.addFunction(methodBuilder.build())
+                    .returns(String::class.asTypeName().copy(nullable = true))// o copy(nullable=true) permite que seja do tipo String que pode ser null, e copy pois o typename é imutavel
+                        classBuilder.addFunction(methodBuilder.build())
         }
 
 

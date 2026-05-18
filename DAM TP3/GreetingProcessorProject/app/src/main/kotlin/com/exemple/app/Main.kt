@@ -13,16 +13,12 @@ fun main() {
 
 
     println("\n-------------------------------")
-        val input = "Name : John Address : 123 Street "
+    val input = "Name : John Address : 123 Street "
 // Using the generated DataProcessorExtractor
-        val extractor = DataProcessorExtractor(input)
-        println("Name: ${extractor.getName()}")
-        println("Address: ${extractor.getAddress()}")
+    val extractor = DataProcessorExtractor(input)
+    println("Name: ${extractor.getName()}")
+    println("Address: ${extractor.getAddress()}")
 
-
-
-//            ./gradlew clean
-//            ./gradlew build
 }
 
 
