@@ -41,52 +41,20 @@ The `config.properties` file may contain the following settings:
 - `LOG_LEVEL=...` <span style="color: gray;">// Possible values: OFF, ERROR, WARN, INFO, DEBUG, TRACE; defaults to
   OFF</span>
 
-
-
-
-
-
 ---------------------------------------------------------------------------------------------
 
-# Testes de Temperatura — Tarefa 3.3
+# Configuração dos Testes
 
-## Modelo Utilizado
+Foi testado uma prompt de escrita de um peoma sobre lisboa com três valores de temperatura: 0.1(não permite 0), 0.5 e 1.0, com o objetivo de observar como a
+temperatura afeta as respostas do modelo.
 
-NVIDIA API — `google/gemma-2-2b-it`
+# Prompt
 
----
+"Escreve um pequeno poema sobre Lisboa."
 
-## Configuração dos Testes
+## Temperatura 0,1
 
-Foram utilizados dois prompts distintos, testados com três valores de temperatura: **0,1**, **0,5** e **1,0**.
-
-O objetivo é demonstrar de que forma a temperatura influencia a variabilidade das respostas geradas pelo modelo.
-
----
-
-## Prompt 1 — Factual (baixa variância esperada)
-
-> "What is 15 multiplied by 8?"
-
-| Temperatura | Resposta                     |
-|-------------|------------------------------|
-| 0,0         | "15 multiplied by 8 is 120." |
-| 0,5         | "15 multiplied by 8 is 120." |
-| 1,0         | "15 multiplied by 8 is 120." |
-
-**Conclusão:** Prompts de natureza factual produzem respostas idênticas independentemente da temperatura. A resposta
-correta domina de forma tão expressiva a distribuição de probabilidade dos tokens que a aleatoriedade introduzida pela
-temperatura não tem qualquer efeito observável.
-
----
-
-## Prompt 2 — Criativo (alta variância esperada)
-
-> "Escreve um pequeno poema sobre Lisboa."
-
-### Temperatura 0,0
-
-```
+~~~~
 Lisbon, a city of sun and sea,
 Where history whispers, "Come, be free!"
 The trams hum softly, a gentle beat,
@@ -99,11 +67,11 @@ The Tagus flows, a ribbon of blue,
 Reflecting the city, forever anew.
 Lisbon, a gem, a treasure untold,
 A city of beauty, both young and old.
-```
+~~~~
 
 ### Temperatura 0,5
 
-```
+~~~~
 Lisbon, a city of sun and sea,
 Where history whispers, wild and free.
 Fado's music, a soulful sound,
@@ -114,11 +82,11 @@ Jerónimos, with its grandeur bold,
 Lisbon's story, forever told.
 So come, dear traveler, explore and see,
 The magic of Lisbon, for you and me.
-```
+~~~~
 
 ### Temperatura 1,0
 
-```
+~~~~
 The Tagus flows, a silver thread,
 Through Lisbon's heart, a story spread.
 From Alfama's streets, a melody,
@@ -131,28 +99,14 @@ The sun descends, a fiery glow,
 On Belém Tower, where stories flow.
 From pastel-colored houses, bright and bold,
 Lisbon's charm, a story told.
-```
+~~~~
 
----
 
-## Análise Comparativa
+## Análise observadas
 
-| Temperatura | Características Observadas                                                                                                                                                                |
-|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0,0         | Estrutura mais formulaica e previsível. Escolha de palavras conservadora. O poema termina com um dístico de síntese, padrão recorrente em respostas deterministas.                        |
-| 0,5         | Vocabulário ligeiramente mais variado. Introdução de referências adicionais ("Jerónimos") e de uma interpelação directa ao leitor ("dear traveler"), conferindo maior dinamismo ao texto. |
-| 1,0         | Perspectiva de abertura distinta — o poema inicia com o Tejo em vez de uma descrição geral da cidade. Imagética mais diversificada e estrutura de verso com maior variação.               |
-
----
-
-## Conclusão Geral
-
-Os resultados obtidos demonstram que a temperatura influencia a variabilidade das respostas geradas, ainda que o efeito
-seja mais subtil em modelos de menor dimensão, como o `gemma-2-2b-it`. Nos três poemas produzidos, mantêm-se constantes
-os temas centrais (Tejo, Alfama, Belém, fado, eléctricos) e o esquema de rima AABB, o que sugere que o espaço de geração
-do modelo é relativamente restrito para este tipo de prompt.
-
-A temperatura mais baixa (0.1) favorece respostas deterministas e repetíveis, adequadas a contextos que exigem
-consistência. A temperatura mais elevada (1,0) introduz maior diversidade lexical e estrutural, sendo mais apropriada
-para tarefas criativas. Modelos de maior capacidade evidenciariam divergências mais pronunciadas entre os extremos da
-escala de temperatura.
+Comparando os três poemas, é possível ver algumas diferenças. Com temperatura 0.1 a resposta é mais previsível, pois possui uma 
+estrutura mais simples e vocabulário mais previsivel(como fado, belem,jeronimos, etc). Com 0.5 já se nota uma variação nas palavras, como a referência a Jerónimos e uma
+interação direta ao leitor("dear traveler").
+Com 1.0 o poema começa de forma diferente, abrindo com o Tejo em vez de
+uma descrição geral da cidade, onde apresenta imagens mais variadas. Mas continua a menção aos temas centrais como o Tejo, Alfama, Belém,e
+fado, com o esquema de rimas AABB a manter-se nos três casos, demonstrado uma limitação do modelo.
