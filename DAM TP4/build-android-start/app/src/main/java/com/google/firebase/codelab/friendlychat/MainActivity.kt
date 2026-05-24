@@ -26,18 +26,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.database.FirebaseRecyclerOptions
-import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.codelab.friendlychat.databinding.ActivityMainBinding
 import com.google.firebase.codelab.friendlychat.model.FriendlyMessage
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.database
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.database.database
 import com.google.firebase.storage.storage
-
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var manager: LinearLayoutManager
@@ -61,7 +60,6 @@ class MainActivity : AppCompatActivity() {
 
         // In your Application class or initial Activity:
         FirebaseApp.initializeApp(this)
-
         // Initialize Firebase Auth and check if the user is signed in
         auth = Firebase.auth
         if (auth.currentUser == null) {
@@ -125,13 +123,12 @@ class MainActivity : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
         // Check if user is signed in.
-        if (auth.currentUser == null) {
+        if (!::auth.isInitialized || auth.currentUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(Intent(this, SignInActivity::class.java))
             finish()
             return
         }
-
         //adapter.startListening()
     }
 
