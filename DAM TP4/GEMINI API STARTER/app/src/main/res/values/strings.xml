@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Gemini Sweet AI</string>
+    <string name="title_header">Gemini Sweet AI</string>
+    <string name="subtitle_header">Cakes, Cookies &amp; Recipes Analyzer</string>
+    <string name="image_select_label">1. Select a Cake or Cookie image</string>
+    <string name="prompt_label">2. What would you like to ask?</string>
+    <string name="btn_send">Analyze with Gemini</string>
+    <string name="hint_prompt">Enter custom prompt or select a quick chip below...</string>
+    <string name="loading_response">Whispering to Gemini AI...</string>
+    <string name="api_status_ok">API Status: Ready</string>
+    
+    <!-- Quick suggestion chip prompts -->
+    <string name="chip_recipe">Get Recipe 📜</string>
+    <string name="chip_name">Suggest Name ✨</string>
+    <string name="chip_calories">Estimate Calories 🍎</string>
+    <string name="chip_ingredients">Identify Ingredients 🍫</string>
+    
+    <string name="prompt_recipe">Provide a detailed recipe for this sweet treat, including the step-by-step instructions, ingredients, and baking temperature.</string>
+    <string name="prompt_name">Give a creative, appetizing, and catchy name for this cake or cookie, along with a short, poetic description.</string>
+    <string name="prompt_calories">Analyze this image and estimate the caloric content and main nutritional values per serving, with a friendly tip.</string>
+    <string name="prompt_ingredients">List the visible ingredients and decoration toppings used in this dessert, pointing out potential allergens.</string>
+
+    <string name="history_title">Recent Analysis History</string>
+    <string name="history_empty">No recent analyses yet. Ask Gemini something!</string>
+    <string name="btn_clear_history">Clear History</string>
+</resources>

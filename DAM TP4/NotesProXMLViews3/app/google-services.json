@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "518070986094",
+    "firebase_url": "https://notes-pro-a7f15-default-rtdb.firebaseio.com",
+    "project_id": "notes-pro-a7f15",
+    "storage_bucket": "notes-pro-a7f15.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:518070986094:android:18187054bd6e1707a34d7f",
+        "android_client_info": {
+          "package_name": "com.notes.notesproxmlviews"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7RWjAUNTVjZx6ojurkcd841Ug_jQyZ3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
