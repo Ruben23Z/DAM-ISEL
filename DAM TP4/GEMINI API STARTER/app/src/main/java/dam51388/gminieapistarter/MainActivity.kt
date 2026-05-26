@@ -14,7 +14,6 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -23,8 +22,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.content
+import okhttp3.*
+import okhttp3.sse.EventSource
+import okhttp3.sse.EventSourceListener
+import okhttp3.sse.EventSources
+import okio.ByteString
+import org.json.JSONObject
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
@@ -138,12 +145,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkApiKeyStatus() {
-        val apiKey = BuildConfig.apiKey
-        if (apiKey.isEmpty() || apiKey == "YOUR_API_KEY") {
-            tvApiStatus.text = "API Key: MISSING (Set apiKey in local.properties)"
+        val token = BuildConfig.NVIDIA_TOKEN
+        if (token.isBlank()) {
+            tvApiStatus.text = "NVIDIA Token: MISSING (Set nvidiaToken in local.properties)"
             tvApiStatus.setTextColor(Color.parseColor("#EF4444"))
         } else {
-            tvApiStatus.text = "Gemini API: Ready"
+            tvApiStatus.text = "NVIDIA Token: Configured"
             tvApiStatus.setTextColor(Color.parseColor("#10B981"))
         }
     }
@@ -250,7 +257,97 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun performGeminiAnalysis() {
-        val apiKey = BuildConfig.apiKey
+        val token = BuildConfig.NVIDIA_TOKEN // token loaded from local.properties
+        if (token.isBlank()) {
+            Toast.makeText(this, "NVIDIA token not configured", Toast.LENGTH_LONG).show()
+            return
+        }
+        val promptText = etPrompt.text.toString().trim()
+        if (promptText.isEmpty()) {
+            etPrompt.error = "Please enter a prompt or select a quick option chip above!"
+            return
+        }
+        // Show loader
+        cardResponse.visibility = View.VISIBLE
+        layoutLoading.visibility = View.VISIBLE
+        layoutContent.visibility = View.GONE
+        btnSubmit.isEnabled = false
+
+        lifecycleScope.launch {
+            try {
+                // Load bitmap
+                val bitmap = withContext(Dispatchers.IO) { loadSelectedBitmap() }
+                if (bitmap == null) throw Exception("Could not load/decode selected image.")
+                // Convert to base64
+                val base64Image = withContext(Dispatchers.IO) {
+                    val stream = java.io.ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    android.util.Base64.encodeToString(stream.toByteArray(), android.util.Base64.NO_WRAP)
+                }
+                // Build JSON payload
+                val json = JSONObject()
+                json.put("model", "google/gemma-4-31b-it")
+                val messages = org.json.JSONArray()
+                val userMsg = JSONObject()
+                userMsg.put("role", "user")
+                val contentArray = org.json.JSONArray()
+                // Image part
+                val imageObj = JSONObject()
+                imageObj.put("type", "image_url")
+                val imageUrlObj = JSONObject()
+                imageUrlObj.put("url", "data:image/png;base64,$base64Image")
+                imageObj.put("image_url", imageUrlObj)
+                contentArray.put(imageObj)
+                // Text part
+                val textObj = JSONObject()
+                textObj.put("type", "text")
+                textObj.put("text", promptText)
+                contentArray.put(textObj)
+                userMsg.put("content", contentArray)
+                messages.put(userMsg)
+                json.put("messages", messages)
+                json.put("max_tokens", 1024)
+                json.put("temperature", 0.7)
+                // OkHttp request
+                val client = OkHttpClient()
+                val body = json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+                val request = Request.Builder()
+                    .url("https://integrate.api.nvidia.com/v1/chat/completions")
+                    .addHeader("Authorization", "Bearer $token")
+                    .post(body)
+                    .build()
+                val response = withContext(Dispatchers.IO) { client.newCall(request).execute() }
+                if (!response.isSuccessful) throw Exception("API error: ${response.code}")
+                val respBody = response.body?.string() ?: throw Exception("Empty response body")
+                val respJson = JSONObject(respBody)
+                val answer = respJson.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content")
+                // Update UI
+                tvResponse.text = answer
+                layoutLoading.visibility = View.GONE
+                layoutContent.visibility = View.VISIBLE
+                // Save history
+                val timestamp = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+                val historyItem = HistoryItem(
+                    id = UUID.randomUUID().toString(),
+                    timestamp = timestamp,
+                    imageName = selectedImageName,
+                    customImageUriString = customImageUri?.toString(),
+                    prompt = promptText,
+                    response = answer
+                )
+                historyHelper.saveHistoryItem(historyItem)
+                loadHistoryList()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                tvResponse.text = "Error calling NVIDIA API:\n${e.localizedMessage ?: "Unknown error"}"
+                layoutLoading.visibility = View.GONE
+                layoutContent.visibility = View.VISIBLE
+            } finally {
+                btnSubmit.isEnabled = true
+            }
+        }
+
+        // Legacy Gemini API block removed
         if (apiKey.isEmpty() || apiKey == "YOUR_API_KEY") {
             Toast.makeText(this, "Please configure your API key in local.properties first!", Toast.LENGTH_LONG).show()
             tvResponse.text = "ERROR:\nMissing API Key!\nPlease edit the local.properties file and add:\n\napiKey=YOUR_REAL_API_KEY\n\nthen sync Gradle and run the app."

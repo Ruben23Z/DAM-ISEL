@@ -7,11 +7,7 @@ plugins {
 
 android {
     namespace = "dam51388.gminieapistarter"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 35
 
     val localProperties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
@@ -20,25 +16,25 @@ android {
         localProperties.load(stream)
         stream.close()
     }
-    val apiKey = localProperties.getProperty("apiKey") ?: ""
 
     defaultConfig {
         applicationId = "dam51388.gminieapistarter"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "apiKey", "\"$apiKey\"")
+
+        // Fixed: Kotlin DSL uses double quotes for strings. Single quotes are for single characters.
+        buildConfigField("String", "NVIDIA_TOKEN", "\"${project.findProperty("nvidiaToken") ?: ""}\"")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -58,6 +54,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.google.generativeai)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:okhttp-sse:4.12.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
