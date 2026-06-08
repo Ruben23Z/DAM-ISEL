@@ -33,6 +33,7 @@ class RegexProcessor : AbstractProcessor() {
                 }.add(element)
             }
         }
+
 // Generate wrapper classes for each class containing annotated methods
         for ((classElement, methods) in classMethodMap) {
             generateKotlinWrapperClass(classElement, methods)
@@ -98,12 +99,20 @@ class RegexProcessor : AbstractProcessor() {
 
                     // o \ diz ao compilador que as aspas são um caracter especial dentro da string, para meter o " dentro do codigo
                     //senao ficava: "val match = Regex("
-//                    .addStatement("val match = Regex(\"$regex\").find(input)") //altera a expressao e adiciona
+//                    .addStatement("val match = Regex(\"$regex\").find(input)") //alterada a expressao
+                    //de cima problema deve ser de aspas
+
+
+
                     .addStatement("val match = Regex(%S).find(input)", regex) //para fazer as \ e " de forma auto senao da erro, %S é especifico para aspas e \
                     .addStatement("return match?.groupValues?.get(1)")
                     .returns(String::class.asTypeName().copy(nullable = true))// o copy(nullable=true) permite que seja do tipo String que pode ser null, e copy pois o typename é imutavel
                         classBuilder.addFunction(methodBuilder.build())
         }
+
+
+
+
 
 
 // Build the Kotlin file

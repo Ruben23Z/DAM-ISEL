@@ -3,12 +3,6 @@ package dam_A51388.coolweatherapp.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
-
-//Representa modelos de dados brutos
-//Obtidos diretamente da API Open-Meteo.
-
-
 @Serializable
 data class WeatherData(
     val latitude: Float,

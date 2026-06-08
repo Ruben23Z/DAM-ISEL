@@ -33,13 +33,11 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun WeatherAppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
-        colorScheme = colorScheme,
-        content = content
+        colorScheme = colorScheme, content = content
     )
 }

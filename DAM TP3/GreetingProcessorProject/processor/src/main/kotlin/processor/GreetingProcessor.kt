@@ -25,7 +25,7 @@ class GreetingProcessor : AbstractProcessor() {
     override fun process(
         annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment
     ): Boolean {
-        val classMethodMap = mutableMapOf<TypeElement, MutableList<ExecutableElement>>()
+        val classMethodMap = mutableMapOf<TypeElement, MutableList<ExecutableElement>>() //para todos os metodos por classe
         // Find all methods annotated with @Greeting
         for (element in roundEnv.getElementsAnnotatedWith(Greeting::class.java)) {
             if (element is ExecutableElement) {

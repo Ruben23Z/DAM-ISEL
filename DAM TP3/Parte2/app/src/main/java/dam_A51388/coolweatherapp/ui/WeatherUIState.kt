@@ -4,9 +4,6 @@ import dam_A51388.coolweatherapp.data.FavoriteLocation
 import dam_A51388.coolweatherapp.data.WeatherData
 
 
-
-// Contem dados metereologicos e ainda o estado atual da página
-//Permite que a UI possa aceder diretamente aos dados sem ter que navegar dentro do objeto WeatherData.
 data class WeatherUiState(
     val latitude: Float = 0f,
     val longitude: Float = 0f,

@@ -36,7 +36,7 @@ import kotlin.random.Random
 @Composable
 fun WeatherCard(
     data: WeatherData,
-    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>? = null, // Adiciona isto!
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>? = null,
     onUpdateLocation: (Float, Float) -> Unit
 ) {
     var isEditing by remember { mutableStateOf(false) }

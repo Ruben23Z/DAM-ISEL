@@ -283,8 +283,6 @@ fun WeatherContent(
         }
         item { WeatherCard(data = data, onUpdateLocation = onUpdateLocation, launcher = launcher) }
         item { QuickStatsGrid(data = data) }
-        item { HourlyForecastCard(data = data) }
-        item { SunCard(data = data) }
     }
 }
 
@@ -292,7 +290,7 @@ fun WeatherContent(
 fun FavoritesCard(
     favorites: List<FavoriteLocation>,
     onFavoriteClick: (FavoriteLocation) -> Unit,
-    onAddClick: () -> Unit // Botão para adicionar a localização atual
+    onAddClick: () -> Unit
 ) {
     LazyRow(
         modifier = Modifier
@@ -301,7 +299,7 @@ fun FavoritesCard(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Botão para adicionar a localização que está a ver agora
+        // Botão para adicionar a localização
         item {
             IconButton(
                 onClick = onAddClick, modifier = Modifier.background(
@@ -312,7 +310,6 @@ fun FavoritesCard(
             }
         }
 
-        // Lista dos favoritos já guardados
         items(favorites) { fav ->
             InputChip(
                 selected = false,
