@@ -1,5 +1,6 @@
 package A51388.spinnet
 
+import A51388.spinnet.ui.auth.AuthViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import A51388.spinnet.ui.navigation.SpinNetDestination
 import A51388.spinnet.ui.navigation.SpinNetNavHost
 import A51388.spinnet.ui.theme.SpinNetTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,10 +26,18 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SpinNetApp() {
-    val navController = rememberNavController()
-    var currentDestination by remember { mutableStateOf(SpinNetDestination.Dashboard) }
+    val navController  = rememberNavController()
+    val authViewModel: AuthViewModel = viewModel()
 
-    val onNavigate: (SpinNetDestination) -> Unit = { destination ->
+    // If already logged in, start on Dashboard; otherwise Login
+    val startDestination = if (authViewModel.isLoggedIn())
+        SpinNetDestination.Dashboard
+    else
+        SpinNetDestination.Login
+
+    var currentDestination by remember { mutableStateOf(startDestination) }
+
+    val onNavigate = { destination: SpinNetDestination ->
         currentDestination = destination
         navController.navigate(destination.route) {
             popUpTo(navController.graph.startDestinationId) { saveState = true }
@@ -39,6 +49,8 @@ fun SpinNetApp() {
     SpinNetNavHost(
         navController        = navController,
         currentDestination   = currentDestination,
-        onNavigate           = onNavigate
+        onNavigate           = onNavigate,
+        startDestination     = startDestination,
+        authViewModel        = authViewModel
     )
 }

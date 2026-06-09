@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+/app/gogole-services.json
+firebase.json
+.firebaserc
+/values/strings.xml

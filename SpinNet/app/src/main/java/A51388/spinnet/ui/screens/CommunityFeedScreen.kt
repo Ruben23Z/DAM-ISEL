@@ -34,7 +34,11 @@ private data class FeedPost(
     val likes: Int,
     val comments: Int,
     val category: String,
-    val accentColor: Color
+    val accentColor: Color,
+    val duration: String,
+    val intensity: String,
+    val focus: String,
+    val isTrending: Boolean = false
 )
 
 private val feedPosts = listOf(
@@ -43,30 +47,40 @@ private val feedPosts = listOf(
         author      = "Chen Wei",
         timeAgo     = "2 hours ago",
         description = "A 45-minute multi-ball session focused on weight transfer and generating maximum topspin from the mid-distance.",
-        likes       = 142,
-        comments    = 28,
+        likes       = 245,
+        comments    = 18,
         category    = "FOREHAND",
-        accentColor = NeonGreen
+        accentColor = NeonGreen,
+        duration    = "45 min",
+        intensity   = "High",
+        focus       = "Topspin",
+        isTrending  = true
     ),
     FeedPost(
         title       = "Service Mastery",
         author      = "Elena R.",
         timeAgo     = "5 hours ago",
         description = "Detailed breakdown of the pendulum serve, focusing on wrist snap and disguised spin variations.",
-        likes       = 98,
-        comments    = 15,
+        likes       = 182,
+        comments    = 34,
         category    = "SERVICE",
-        accentColor = VibrantPurple
+        accentColor = VibrantPurple,
+        duration    = "30 min",
+        intensity   = "Low",
+        focus       = "Technique"
     ),
     FeedPost(
         title       = "Dynamic Footwork Foundations",
         author      = "Marcus T.",
         timeAgo     = "1 day ago",
         description = "A grueling shadow play routine to improve side-to-side lateral movement and pivot speed.",
-        likes       = 205,
-        comments    = 43,
+        likes       = 412,
+        comments    = 89,
         category    = "FOOTWORK",
-        accentColor = Tertiary
+        accentColor = Tertiary,
+        duration    = "60 min",
+        intensity   = "Extreme",
+        focus       = "Agility"
     ),
     FeedPost(
         title       = "Backspin Loop Conversion",
@@ -76,7 +90,10 @@ private val feedPosts = listOf(
         likes       = 76,
         comments    = 11,
         category    = "TECHNIQUE",
-        accentColor = NeonGreen
+        accentColor = NeonGreen,
+        duration    = "40 min",
+        intensity   = "Medium",
+        focus       = "Transition"
     ),
 )
 
@@ -289,92 +306,168 @@ private fun FeedCard(post: FeedPost) {
 
     GlassCard(modifier = Modifier.fillMaxWidth()) {
         Column {
-            // Category chip + time
+            // Category chip + trending + time
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(post.accentColor.copy(alpha = 0.15f))
-                        .border(1.dp, post.accentColor.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
-                        .padding(horizontal = 10.dp, vertical = 3.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(post.category, color = post.accentColor, style = MaterialTheme.typography.labelSmall)
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(post.accentColor.copy(alpha = 0.15f))
+                            .border(1.dp, post.accentColor.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                            .padding(horizontal = 10.dp, vertical = 3.dp)
+                    ) {
+                        Text(post.category, color = post.accentColor, style = MaterialTheme.typography.labelSmall)
+                    }
+                    if (post.isTrending) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(Color(0xFFEF4444).copy(alpha = 0.15f))
+                                .border(1.dp, Color(0xFFEF4444).copy(alpha = 0.3f), RoundedCornerShape(20.dp))
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(6.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFEF4444))
+                                )
+                                Text("Trending", color = Color(0xFFEF4444), style = MaterialTheme.typography.labelSmall, fontSize = 9.sp)
+                            }
+                        }
+                    }
                 }
                 Text(post.timeAgo, color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall)
             }
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(12.dp))
 
-            // Title
-            Text(post.title, color = OnSurface, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-
-            // Author
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // Author Info
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 Box(
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        .background(VibrantPurple.copy(alpha = 0.4f)),
+                        .background(post.accentColor.copy(alpha = 0.3f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         post.author.first().toString(),
-                        color = Tertiary,
-                        style = MaterialTheme.typography.labelSmall,
+                        color = post.accentColor,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                 }
-                Spacer(Modifier.width(6.dp))
-                Text("By ${post.author}", color = OnSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                Column {
+                    Text(post.title, color = OnSurface, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("By ${post.author}", color = OnSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                }
             }
-
-            Spacer(Modifier.height(8.dp))
-
-            // Description
-            Text(post.description, color = OnSurface.copy(alpha = 0.8f), style = MaterialTheme.typography.bodySmall)
 
             Spacer(Modifier.height(12.dp))
 
-            HorizontalDivider(color = OutlineVariant.copy(alpha = 0.4f))
+            // Description
+            Text(post.description, color = OnSurface.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyMedium)
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(12.dp))
+
+            // ── Grid metrics ──────────────────────────────────────
+            HorizontalDivider(color = OutlineVariant.copy(alpha = 0.3f))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("DURATION", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall, fontSize = 9.sp)
+                    Text(post.duration, color = OnSurface, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("INTENSITY", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall, fontSize = 9.sp)
+                    Text(post.intensity, color = OnSurface, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("FOCUS", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall, fontSize = 9.sp)
+                    Text(post.focus, color = OnSurface, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                }
+            }
+            HorizontalDivider(color = OutlineVariant.copy(alpha = 0.3f))
+
+            Spacer(Modifier.height(12.dp))
 
             // Actions row
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.Transparent)
-                ) {
-                    IconButton(
-                        onClick = { liked = !liked },
-                        modifier = Modifier.size(32.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.Transparent)
                     ) {
-                        Icon(
-                            if (liked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Like",
-                            tint = if (liked) NeonGreen else OnSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
+                        IconButton(
+                            onClick = { liked = !liked },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                if (liked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                                contentDescription = "Like",
+                                tint = if (liked) NeonGreen else OnSurfaceVariant,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Text(
+                            "${if (liked) post.likes + 1 else post.likes}",
+                            color = if (liked) NeonGreen else OnSurfaceVariant,
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
-                    Text(
-                        "${if (liked) post.likes + 1 else post.likes}",
-                        color = if (liked) NeonGreen else OnSurfaceVariant,
-                        style = MaterialTheme.typography.labelSmall
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.height(32.dp)
+                    ) {
+                        Icon(Icons.Outlined.ChatBubbleOutline, contentDescription = "Comments", tint = OnSurfaceVariant, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text("${post.comments}", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+                
+                Button(
+                    onClick = { /* Add Plan */ },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFEF4444),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.FileDownload,
+                        contentDescription = "Add Plan",
+                        modifier = Modifier.size(16.dp)
                     )
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.ChatBubbleOutline, contentDescription = "Comments", tint = OnSurfaceVariant, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("${post.comments}", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    Text("ADD PLAN", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
-                Spacer(Modifier.weight(1f))
-                Icon(Icons.Outlined.BookmarkBorder, contentDescription = "Save", tint = OnSurfaceVariant, modifier = Modifier.size(18.dp))
             }
         }
     }

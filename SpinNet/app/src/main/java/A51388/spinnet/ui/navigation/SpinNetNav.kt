@@ -4,50 +4,63 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import A51388.spinnet.ui.screens.CommunityFeedScreen
-import A51388.spinnet.ui.screens.DashboardScreen
-import A51388.spinnet.ui.screens.PerformanceProfileScreen
-import A51388.spinnet.ui.screens.RoutinePlannerScreen
+import A51388.spinnet.ui.auth.AuthViewModel
+import A51388.spinnet.ui.screens.*
 
 enum class SpinNetDestination(val route: String) {
+    Login("login"),
+    Register("register"),
     Dashboard("dashboard"),
     RoutinePlanner("routine_planner"),
     Performance("performance"),
-    Community("community")
+    Community("community"),
+    PlayerProfile("player_profile")
 }
 
 @Composable
 fun SpinNetNavHost(
     navController: NavHostController,
     currentDestination: SpinNetDestination,
-    onNavigate: (SpinNetDestination) -> Unit
+    onNavigate: (SpinNetDestination) -> Unit,
+    startDestination: SpinNetDestination,
+    authViewModel: AuthViewModel
 ) {
     NavHost(
         navController = navController,
-        startDestination = SpinNetDestination.Dashboard.route
+        startDestination = startDestination.route
     ) {
-        composable(SpinNetDestination.Dashboard.route) {
-            DashboardScreen(
-                currentDestination = currentDestination,
-                onNavigate = onNavigate
+        composable(SpinNetDestination.Login.route) {
+            LoginScreen(
+                onLoginSuccess = { onNavigate(SpinNetDestination.Dashboard) },
+                onNavigateToRegister = { onNavigate(SpinNetDestination.Register) }
             )
+        }
+        composable(SpinNetDestination.Register.route) {
+            RegisterScreen(
+                onRegisterSuccess = { onNavigate(SpinNetDestination.Dashboard) },
+                onNavigateToLogin = { onNavigate(SpinNetDestination.Login) }
+            )
+        }
+        composable(SpinNetDestination.Dashboard.route) {
+            DashboardScreen(currentDestination = currentDestination, onNavigate = onNavigate)
         }
         composable(SpinNetDestination.RoutinePlanner.route) {
-            RoutinePlannerScreen(
-                currentDestination = currentDestination,
-                onNavigate = onNavigate
-            )
+            RoutinePlannerScreen(currentDestination = currentDestination, onNavigate = onNavigate)
         }
         composable(SpinNetDestination.Performance.route) {
-            PerformanceProfileScreen(
-                currentDestination = currentDestination,
-                onNavigate = onNavigate
-            )
+            PerformanceProfileScreen(currentDestination = currentDestination, onNavigate = onNavigate)
         }
         composable(SpinNetDestination.Community.route) {
-            CommunityFeedScreen(
+            CommunityFeedScreen(currentDestination = currentDestination, onNavigate = onNavigate)
+        }
+        composable(SpinNetDestination.PlayerProfile.route) {
+            PlayerProfileScreen(
                 currentDestination = currentDestination,
-                onNavigate = onNavigate
+                onNavigate         = onNavigate,
+                onLogout = {
+                    authViewModel.signOut()
+                    onNavigate(SpinNetDestination.Login)
+                }
             )
         }
     }
