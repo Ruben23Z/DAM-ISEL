@@ -17,3 +17,4 @@ local.properties
 firebase.json
 .firebaserc
 /values/strings.xml
+SpinNet\app\src\main\res\values\strings.xml
