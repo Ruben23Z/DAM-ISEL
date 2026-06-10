@@ -1,6 +1,7 @@
 package A51388.spinnet
 
 import A51388.spinnet.ui.auth.AuthViewModel
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,8 +12,11 @@ import A51388.spinnet.ui.navigation.SpinNetDestination
 import A51388.spinnet.ui.navigation.SpinNetNavHost
 import A51388.spinnet.ui.theme.SpinNetTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.facebook.CallbackManager
 
 class MainActivity : ComponentActivity() {
+    val callbackManager: CallbackManager = CallbackManager.Factory.create()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -21,6 +25,11 @@ class MainActivity : ComponentActivity() {
                 SpinNetApp()
             }
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 }
 

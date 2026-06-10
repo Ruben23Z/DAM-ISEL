@@ -31,4 +31,7 @@ google-services.json
 keystore.properties
 *.jks
 *.keystore
-SpinNet/app/src/main/res/values/strings.xml
+
+local.properties
+google-services.json
+app/src/main/res/values/secrets.xml

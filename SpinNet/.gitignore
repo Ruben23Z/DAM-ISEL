@@ -13,8 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
-/app/gogole-services.json
+/app/google-services.json
+/app/src/main/res/values/secrets.xml
 firebase.json
 .firebaserc
-/values/strings.xml
-SpinNet\app\src\main\res\values\strings.xml

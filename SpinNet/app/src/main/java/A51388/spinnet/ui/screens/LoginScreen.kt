@@ -1,8 +1,7 @@
 package A51388.spinnet.ui.screens
 
 import android.app.Activity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,11 +26,20 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import kotlinx.coroutines.launch
+import A51388.spinnet.MainActivity
 import A51388.spinnet.R
 import A51388.spinnet.ui.auth.AuthState
 import A51388.spinnet.ui.auth.AuthViewModel
@@ -48,20 +56,34 @@ fun LoginScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    val googleLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                account.idToken?.let { viewModel.signInWithGoogle(it) }
-            } catch (_: ApiException) {
+    // Obter activity para aceder ao callbackManager
+    val activity = context as? MainActivity
+    val callbackManager = activity?.callbackManager
+
+    // Registar callback do Facebook uma única vez
+    DisposableEffect(callbackManager) {
+        if (callbackManager != null) {
+            LoginManager.getInstance().registerCallback(callbackManager,
+                object : FacebookCallback<LoginResult> {
+                    override fun onSuccess(result: LoginResult) {
+                        viewModel.signInWithFacebook(result.accessToken.token)
+                    }
+                    override fun onCancel() {}
+                    override fun onError(error: FacebookException) {
+                        Log.e("FB", error.message ?: "Facebook error")
+                    }
+                }
+            )
+        }
+        onDispose {
+            if (callbackManager != null) {
+                LoginManager.getInstance().unregisterCallback(callbackManager)
             }
         }
     }
@@ -193,26 +215,37 @@ fun LoginScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         HorizontalDivider(modifier = Modifier.weight(1f), color = OutlineVariant)
-                        Text(
-                            "  ou  ",
-                            color = OnSurfaceVariant,
-                            style = MaterialTheme.typography.labelSmall
-                        )
+                        Text("  ou  ", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                         HorizontalDivider(modifier = Modifier.weight(1f), color = OutlineVariant)
                     }
 
                     Spacer(Modifier.height(16.dp))
 
-                    // Botão Google
+                    // ── Google ────────────────────────────────────────────
                     OutlinedButton(
                         onClick = {
-                            val gso =
-                                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                    .requestIdToken(context.getString(R.string.default_web_client_id))
-                                    .requestEmail()
-                                    .build()
-                            val client = GoogleSignIn.getClient(context, gso)
-                            googleLauncher.launch(client.signInIntent)
+                            scope.launch {
+                                try {
+                                    val credentialManager = CredentialManager.create(context)
+                                    val googleIdOption = GetGoogleIdOption.Builder()
+                                        .setFilterByAuthorizedAccounts(false)
+                                        .setServerClientId(context.getString(R.string.default_web_client_id))
+                                        .build()
+                                    val request = GetCredentialRequest.Builder()
+                                        .addCredentialOption(googleIdOption)
+                                        .build()
+                                    val result = credentialManager.getCredential(
+                                        request = request,
+                                        context = context as Activity
+                                    )
+                                    val googleIdToken = GoogleIdTokenCredential
+                                        .createFrom(result.credential.data)
+                                        .idToken
+                                    viewModel.signInWithGoogle(googleIdToken)
+                                } catch (e: GetCredentialException) {
+                                    Log.e("Google", e.message ?: "Credential error")
+                                }
+                            }
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(24.dp),
@@ -227,6 +260,39 @@ fun LoginScreen(
                         )
                         Spacer(Modifier.width(8.dp))
                         Text("Continuar com Google", style = MaterialTheme.typography.labelLarge)
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    // ── Facebook ──────────────────────────────────────────
+                    OutlinedButton(
+                        onClick = {
+                            val activity = context as androidx.activity.ComponentActivity
+                            if (callbackManager != null) {
+                                LoginManager.getInstance().logInWithReadPermissions(
+                                    activity,
+                                    callbackManager,
+                                    listOf("email", "public_profile")
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color(0xFF1877F2)
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp, Color(0xFF1877F2).copy(alpha = 0.4f)
+                        )
+                    ) {
+                        Icon(
+                            Icons.Outlined.AccountCircle,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = Color(0xFF1877F2)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text("Continuar com Facebook", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
