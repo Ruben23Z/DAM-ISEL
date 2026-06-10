@@ -29,9 +29,6 @@ import A51388.spinnet.ui.components.SpinNetBottomBar
 import A51388.spinnet.ui.navigation.SpinNetDestination
 import A51388.spinnet.ui.theme.*
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Data
-// ─────────────────────────────────────────────────────────────────────────────
 
 private data class RoutineEntry(
     val name: String,
@@ -46,34 +43,34 @@ private data class RoutineEntry(
 
 private val routineHistory = listOf(
     RoutineEntry(
-        name       = "High Intensity Forehand Drill",
-        duration   = "45 mins",
-        reps       = 280,
-        whenAgo    = "Yesterday",
-        accuracy   = 98,
-        badge      = "Personal Best",
+        name = "High Intensity Forehand Drill",
+        duration = "45 mins",
+        reps = 280,
+        whenAgo = "Yesterday",
+        accuracy = 98,
+        badge = "Personal Best",
         badgeColor = Secondary,       // red
-        iconTint   = Secondary
+        iconTint = Secondary
     ),
     RoutineEntry(
-        name       = "Backspin Defense Block",
-        duration   = "30 mins",
-        reps       = 150,
-        whenAgo    = "2 days ago",
-        accuracy   = 82,
-        badge      = "Steady Progress",
+        name = "Backspin Defense Block",
+        duration = "30 mins",
+        reps = 150,
+        whenAgo = "2 days ago",
+        accuracy = 82,
+        badge = "Steady Progress",
         badgeColor = Color(0xFF64748B),
-        iconTint   = Tertiary
+        iconTint = Tertiary
     ),
     RoutineEntry(
-        name       = "Precision Service Routine",
-        duration   = "20 mins",
-        reps       = 80,
-        whenAgo    = "4 days ago",
-        accuracy   = 94,
-        badge      = "Gold Standard",
+        name = "Precision Service Routine",
+        duration = "20 mins",
+        reps = 80,
+        whenAgo = "4 days ago",
+        accuracy = 94,
+        badge = "Gold Standard",
         badgeColor = Tertiary,        // blue accent
-        iconTint   = Tertiary
+        iconTint = Tertiary
     ),
 )
 
@@ -90,8 +87,7 @@ fun PerformanceProfileScreen(
 
     Scaffold(
         containerColor = Surface,
-        bottomBar = { SpinNetBottomBar(currentDestination, onNavigate) }
-    ) { padding ->
+        bottomBar = { SpinNetBottomBar(currentDestination, onNavigate) }) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -127,35 +123,35 @@ fun PerformanceProfileScreen(
             ) {
                 // Win Rate
                 KpiCard(
-                    modifier    = Modifier.weight(1f),
-                    icon        = Icons.Outlined.EmojiEvents,
-                    iconTint    = Secondary,
-                    topLabel    = "+2.4% vs LW",
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.EmojiEvents,
+                    iconTint = Secondary,
+                    topLabel = "+2.4% vs LW",
                     topLabelColor = OnSurfaceVariant,
-                    value       = "78%",
-                    valueColor  = OnSurface,
+                    value = "78%",
+                    valueColor = OnSurface,
                     bottomLabel = "WIN RATE"
                 )
                 // Total Drills
                 KpiCard(
-                    modifier    = Modifier.weight(1f),
-                    icon        = Icons.Outlined.FitnessCenter,
-                    iconTint    = Tertiary,
-                    topLabel    = "LIFETIME REPS",
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.FitnessCenter,
+                    iconTint = Tertiary,
+                    topLabel = "LIFETIME REPS",
                     topLabelColor = OnSurfaceVariant,
-                    value       = "1,204",
-                    valueColor  = OnSurface,
+                    value = "1,204",
+                    valueColor = OnSurface,
                     bottomLabel = "TOTAL DRILLS"
                 )
                 // Day Streak
                 KpiCard(
-                    modifier    = Modifier.weight(1f),
-                    icon        = Icons.Outlined.LocalFireDepartment,
-                    iconTint    = Secondary,
-                    topLabel    = "ON FIRE",
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.LocalFireDepartment,
+                    iconTint = Secondary,
+                    topLabel = "ON FIRE",
                     topLabelColor = Secondary,
-                    value       = "12",
-                    valueColor  = Secondary,
+                    value = "12",
+                    valueColor = Secondary,
                     bottomLabel = "DAY STREAK"
                 )
             }
@@ -177,8 +173,18 @@ fun PerformanceProfileScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Box(Modifier.size(10.dp).clip(CircleShape).background(Secondary))
-                            Box(Modifier.size(10.dp).clip(CircleShape).background(Tertiary))
+                            Box(
+                                Modifier
+                                    .size(10.dp)
+                                    .clip(CircleShape)
+                                    .background(Secondary)
+                            )
+                            Box(
+                                Modifier
+                                    .size(10.dp)
+                                    .clip(CircleShape)
+                                    .background(Tertiary)
+                            )
                         }
                     }
                     Spacer(Modifier.height(16.dp))
@@ -207,8 +213,7 @@ fun PerformanceProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Secondary,
-                            contentColor   = Color.White
+                            containerColor = Secondary, contentColor = Color.White
                         ),
                         contentPadding = PaddingValues(vertical = 12.dp)
                     ) {
@@ -294,7 +299,7 @@ private fun KpiCard(
 
 @Composable
 private fun IntensityBars() {
-    val days   = listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
+    val days = listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
     val values = listOf(0.40f, 0.65f, 0.85f, 0.50f, 0.95f, 0.30f, 0.45f)
 
     Row(
@@ -306,13 +311,10 @@ private fun IntensityBars() {
     ) {
         days.zip(values).forEachIndexed { idx, (day, value) ->
             val animated by animateFloatAsState(
-                targetValue  = value,
-                animationSpec = tween(800 + idx * 80),
-                label        = day
+                targetValue = value, animationSpec = tween(800 + idx * 80), label = day
             )
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.weight(1f)
+                horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)
             ) {
                 Box(
                     modifier = Modifier
@@ -320,10 +322,16 @@ private fun IntensityBars() {
                         .fillMaxHeight(animated)
                         .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
                         .background(
-                            if (value >= 0.9f)
-                                Brush.verticalGradient(listOf(Secondary, Secondary.copy(alpha = 0.5f)))
-                            else
-                                Brush.verticalGradient(listOf(Secondary.copy(alpha = 0.4f), Secondary.copy(alpha = 0.15f)))
+                            if (value >= 0.9f) Brush.verticalGradient(
+                                listOf(
+                                    Secondary, Secondary.copy(alpha = 0.5f)
+                                )
+                            )
+                            else Brush.verticalGradient(
+                                listOf(
+                                    Secondary.copy(alpha = 0.4f), Secondary.copy(alpha = 0.15f)
+                                )
+                            )
                         )
                 )
                 Spacer(Modifier.height(4.dp))
@@ -342,15 +350,13 @@ private fun IntensityBars() {
 @Composable
 private fun SpinMasteryBars() {
     val spins = listOf(
-        Triple("Topspin Attack",      0.92f, Tertiary),
-        Triple("Defensive Backspin",  0.68f, Tertiary),
-        Triple("Lateral Side Spin",   0.45f, Tertiary),
+        Triple("Topspin Attack", 0.92f, Tertiary),
+        Triple("Defensive Backspin", 0.68f, Tertiary),
+        Triple("Lateral Side Spin", 0.45f, Tertiary),
     )
     spins.forEach { (label, value, accent) ->
         val animated by animateFloatAsState(
-            targetValue  = value,
-            animationSpec = tween(900),
-            label        = label
+            targetValue = value, animationSpec = tween(900), label = label
         )
         Column(modifier = Modifier.padding(vertical = 5.dp)) {
             Row(
@@ -407,7 +413,7 @@ private fun RoutineHistoryCard(entry: RoutineEntry) {
                 Icon(
                     Icons.Outlined.Bolt,
                     null,
-                    tint   = entry.iconTint,
+                    tint = entry.iconTint,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -464,8 +470,6 @@ private fun RoutineHistoryCard(entry: RoutineEntry) {
 fun PerformanceProfilePreview() {
     SpinNetTheme {
         PerformanceProfileScreen(
-            currentDestination = SpinNetDestination.Performance,
-            onNavigate = {}
-        )
+            currentDestination = SpinNetDestination.Performance, onNavigate = {})
     }
 }

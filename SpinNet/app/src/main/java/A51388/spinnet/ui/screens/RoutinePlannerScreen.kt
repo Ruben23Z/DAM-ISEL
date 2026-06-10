@@ -1,5 +1,6 @@
 package A51388.spinnet.ui.screens
 
+import A51388.spinnet.data.model.Shot
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,27 +26,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import A51388.spinnet.ui.components.GlassCard
+import A51388.spinnet.ui.components.GlassTextField
 import A51388.spinnet.ui.components.SpinNetBottomBar
+import A51388.spinnet.ui.components.NeonButton
 import A51388.spinnet.ui.navigation.SpinNetDestination
 import A51388.spinnet.ui.theme.*
+import A51388.spinnet.ui.planner.RoutineViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Data models
-// ─────────────────────────────────────────────────────────────────────────────
 
 private enum class SpinDir(
     val label: String,
     val spinName: String,
     val icon: ImageVector
 ) {
-    NW("NW", "Left Topspin",    Icons.Outlined.NorthWest),
-    N ("N",  "Top Spin",        Icons.Outlined.North),
-    NE("NE", "Right Topspin",   Icons.Outlined.NorthEast),
-    W ("W",  "Left Side-Spin",  Icons.Outlined.West),
-    E ("E",  "Right Side-Spin", Icons.Outlined.East),
-    SW("SW", "Left Backspin",   Icons.Outlined.SouthWest),
-    S ("S",  "Back Spin",       Icons.Outlined.South),
-    SE("SE", "Right Backspin",  Icons.Outlined.SouthEast),
+    NW("NW", "Left Topspin", Icons.Outlined.NorthWest),
+    N("N", "Top Spin", Icons.Outlined.North),
+    NE("NE", "Right Topspin", Icons.Outlined.NorthEast),
+    W("W", "Left Side-Spin", Icons.Outlined.West),
+    E("E", "Right Side-Spin", Icons.Outlined.East),
+    SW("SW", "Left Backspin", Icons.Outlined.SouthWest),
+    S("S", "Back Spin", Icons.Outlined.South),
+    SE("SE", "Right Backspin", Icons.Outlined.SouthEast),
 }
 
 private data class SeqShot(
@@ -56,25 +59,28 @@ private data class SeqShot(
     val freq: String
 )
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Screen
-// ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
 fun RoutinePlannerScreen(
     currentDestination: SpinNetDestination,
     onNavigate: (SpinNetDestination) -> Unit,
 ) {
+    val routineViewModel: RoutineViewModel = viewModel()
+    val savedRoutines by routineViewModel.routines.collectAsStateWithLifecycle()
+    var routineTitle by remember { mutableStateOf("") }
+
     var selectedZone by remember { mutableStateOf<Int?>(7) }
     var selectedSpin by remember { mutableStateOf(SpinDir.E) }
-    var intensity    by remember { mutableFloatStateOf(0.85f) }
-    var showTable    by remember { mutableStateOf(true) }
-    var sequence     by remember {
-        mutableStateOf(listOf(
-            SeqShot(1, 7,  SpinDir.N, 45, "High"),
-            SeqShot(2, 2,  SpinDir.S, 30, "Low"),
-            SeqShot(3, 15, SpinDir.W, 38, "Med"),
-        ))
+    var intensity by remember { mutableFloatStateOf(0.85f) }
+    var showTable by remember { mutableStateOf(true) }
+    var sequence by remember {
+        mutableStateOf(
+            listOf(
+                SeqShot(1, 7, SpinDir.N, 45, "High"),
+                SeqShot(2, 2, SpinDir.S, 30, "Low"),
+                SeqShot(3, 15, SpinDir.W, 38, "Med"),
+            )
+        )
     }
     val scrollState = rememberScrollState()
 
@@ -128,7 +134,11 @@ fun RoutinePlannerScreen(
                 ) {
                     Icon(Icons.Outlined.History, null, Modifier.size(16.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("LOAD RECENT", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    Text(
+                        "LOAD RECENT",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
 
@@ -156,7 +166,10 @@ fun RoutinePlannerScreen(
                                 .padding(3.dp)
                         ) {
                             Row {
-                                listOf("TABLE" to true, "FLOOR" to false).forEach { (label, isTable) ->
+                                listOf(
+                                    "TABLE" to true,
+                                    "FLOOR" to false
+                                ).forEach { (label, isTable) ->
                                     val active = showTable == isTable
                                     Box(
                                         modifier = Modifier
@@ -195,7 +208,11 @@ fun RoutinePlannerScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(12.dp)
-                                .border(1.5.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(4.dp))
+                                .border(
+                                    1.5.dp,
+                                    Color.White.copy(alpha = 0.18f),
+                                    RoundedCornerShape(4.dp)
+                                )
                         ) {
                             // Center vertical line
                             Box(
@@ -214,14 +231,19 @@ fun RoutinePlannerScreen(
                                     ) {
                                         for (col in 0 until 4) {
                                             val zone = row * 4 + col + 1
-                                            val sel  = zone == selectedZone
+                                            val sel = zone == selectedZone
                                             Box(
                                                 modifier = Modifier
                                                     .weight(1f)
                                                     .fillMaxHeight()
                                                     .border(0.5.dp, Color.White.copy(alpha = 0.06f))
                                                     .background(if (sel) Secondary.copy(alpha = 0.40f) else Color.Transparent)
-                                                    .then(if (sel) Modifier.border(1.5.dp, Secondary) else Modifier)
+                                                    .then(
+                                                        if (sel) Modifier.border(
+                                                            1.5.dp,
+                                                            Secondary
+                                                        ) else Modifier
+                                                    )
                                                     .clickable(
                                                         indication = null,
                                                         interactionSource = remember { MutableInteractionSource() }
@@ -230,7 +252,9 @@ fun RoutinePlannerScreen(
                                             ) {
                                                 Text(
                                                     "$zone",
-                                                    color = if (sel) Color.White else Color.White.copy(alpha = 0.22f),
+                                                    color = if (sel) Color.White else Color.White.copy(
+                                                        alpha = 0.22f
+                                                    ),
                                                     style = MaterialTheme.typography.labelSmall,
                                                     fontWeight = FontWeight.Black,
                                                     fontSize = 10.sp
@@ -258,8 +282,17 @@ fun RoutinePlannerScreen(
                         modifier = Modifier.horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        StatusChip(text = "SELECTING TARGET ZONE", dotColor = Secondary, showDot = true)
-                        StatusChip(text = "GRID: 4×4 GRANULAR", dotColor = Color.Transparent, showDot = false, alpha = 0.5f)
+                        StatusChip(
+                            text = "SELECTING TARGET ZONE",
+                            dotColor = Secondary,
+                            showDot = true
+                        )
+                        StatusChip(
+                            text = "GRID: 4×4 GRANULAR",
+                            dotColor = Color.Transparent,
+                            showDot = false,
+                            alpha = 0.5f
+                        )
                     }
                 }
             }
@@ -313,7 +346,11 @@ fun RoutinePlannerScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("INTENSITY", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                        Text(
+                            "INTENSITY",
+                            color = OnSurfaceVariant,
+                            style = MaterialTheme.typography.labelSmall
+                        )
                         Text(
                             "${(intensity * 100).toInt()}%",
                             color = Tertiary,
@@ -349,27 +386,34 @@ fun RoutinePlannerScreen(
                             onClick = {
                                 selectedZone?.let { z ->
                                     sequence = sequence + SeqShot(
-                                        index    = sequence.size + 1,
-                                        zone     = z,
-                                        spin     = selectedSpin,
+                                        index = sequence.size + 1,
+                                        zone = z,
+                                        spin = selectedSpin,
                                         velocity = listOf(30, 38, 45, 52).random(),
-                                        freq     = listOf("Low", "Med", "High").random()
+                                        freq = listOf("Low", "Med", "High").random()
                                     )
                                 }
                             },
                             enabled = selectedZone != null,
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Secondary, contentColor = Color.White),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Secondary,
+                                contentColor = Color.White
+                            ),
                             contentPadding = PaddingValues(vertical = 12.dp)
                         ) {
-                            Text("ADD TO SEQUENCE", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                            Text(
+                                "ADD TO SEQUENCE",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                         OutlinedButton(
                             onClick = {
                                 selectedZone = (1..16).random()
                                 selectedSpin = SpinDir.values().random()
-                                intensity    = 0.3f + (Math.random() * 0.7f).toFloat()
+                                intensity = 0.3f + (Math.random() * 0.7f).toFloat()
                             },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
@@ -377,7 +421,11 @@ fun RoutinePlannerScreen(
                             border = androidx.compose.foundation.BorderStroke(1.dp, OutlineVariant),
                             contentPadding = PaddingValues(vertical = 12.dp)
                         ) {
-                            Text("RANDOMIZE", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                            Text(
+                                "RANDOMIZE",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
@@ -428,7 +476,11 @@ fun RoutinePlannerScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
-                            .border(2.dp, Color.White.copy(alpha = 0.07f), RoundedCornerShape(16.dp))
+                            .border(
+                                2.dp,
+                                Color.White.copy(alpha = 0.07f),
+                                RoundedCornerShape(16.dp)
+                            )
                             .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
@@ -436,8 +488,18 @@ fun RoutinePlannerScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(Icons.Outlined.AddCircle, null, tint = OnSurfaceVariant.copy(alpha = 0.38f), modifier = Modifier.size(20.dp))
-                            Text("ADD NEXT SHOT", color = OnSurfaceVariant.copy(alpha = 0.38f), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                            Icon(
+                                Icons.Outlined.AddCircle,
+                                null,
+                                tint = OnSurfaceVariant.copy(alpha = 0.38f),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                "ADD NEXT SHOT",
+                                color = OnSurfaceVariant.copy(alpha = 0.38f),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
 
@@ -449,11 +511,18 @@ fun RoutinePlannerScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("TOTAL DURATION", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        Text(
+                            "TOTAL DURATION",
+                            color = OnSurfaceVariant,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
+                        )
                         val totalSecs = sequence.size * 33
                         Text(
                             "%02d:%02d MIN".format(totalSecs / 60, totalSecs % 60),
-                            color = OnSurface, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold
+                            color = OnSurface,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
                         )
                     }
 
@@ -464,24 +533,49 @@ fun RoutinePlannerScreen(
                         enabled = sequence.isNotEmpty(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Secondary, contentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Secondary,
+                            contentColor = Color.White
+                        ),
                         contentPadding = PaddingValues(vertical = 16.dp)
                     ) {
-                        Text("START TRAINING", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(
+                            "START TRAINING",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                     Spacer(Modifier.height(8.dp))
+                    GlassTextField(
+                        value = routineTitle,
+                        onValueChange = { routineTitle = it },
+                        label = "Nome da rotina",
+                        leadingIcon = Icons.Outlined.Edit
+                    )
 
-                    OutlinedButton(
-                        onClick = {},
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = OnSurface),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Outline),
-                        contentPadding = PaddingValues(vertical = 12.dp)
-                    ) {
-                        Text("SAVE ROUTINE", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
-                    }
+                    Spacer(Modifier.height(8.dp))
+                    NeonButton(
+                        onClick = {
+                            if (routineTitle.isNotBlank() && sequence.isNotEmpty()) {
+                                routineViewModel.saveRoutine(
+                                    title = routineTitle,
+                                    shots = sequence.map { s ->
+                                        Shot(
+                                            index = s.index,
+                                            zone = s.zone,
+                                            spinName = s.spin.spinName,
+                                            velocity = s.velocity,
+                                            freq = s.freq
+                                        )
+                                    }
+                                )
+                                sequence = emptyList()
+                                routineTitle = ""
+                            }
+                        },
+                        enabled = routineTitle.isNotBlank() && sequence.isNotEmpty()
+                    ) { Text("SAVE ROUTINE") }
                 }
             }
 
@@ -490,9 +584,6 @@ fun RoutinePlannerScreen(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Sub-composables
-// ─────────────────────────────────────────────────────────────────────────────
 
 private enum class AccentSide { LEFT, TOP }
 
@@ -505,25 +596,46 @@ private fun AccentCard(accentColor: Color, side: AccentSide, content: @Composabl
                 .height(IntrinsicSize.Max)
                 .clip(RoundedCornerShape(16.dp))
         ) {
-            Box(Modifier.width(4.dp).fillMaxHeight().background(accentColor))
+            Box(Modifier
+                .width(4.dp)
+                .fillMaxHeight()
+                .background(accentColor))
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .background(Brush.linearGradient(listOf(Color(0xFF282A2E).copy(alpha = 0.85f), Color(0xFF0D1C2D).copy(alpha = 0.90f))))
+                    .background(
+                        Brush.linearGradient(
+                            listOf(
+                                Color(0xFF282A2E).copy(alpha = 0.85f),
+                                Color(0xFF0D1C2D).copy(alpha = 0.90f)
+                            )
+                        )
+                    )
                     .border(1.dp, GlassBorder)
                     .padding(16.dp)
             ) { content() }
         }
+
         AccentSide.TOP -> Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
         ) {
-            Box(Modifier.fillMaxWidth().height(4.dp).background(accentColor))
+            Box(Modifier
+                .fillMaxWidth()
+                .height(4.dp)
+                .background(accentColor))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Brush.linearGradient(listOf(Color(0xFF282A2E).copy(alpha = 0.85f), Color(0xFF0D1C2D).copy(alpha = 0.90f))))
+                    .background(
+                        Brush.linearGradient(
+                            listOf(
+                                Color(0xFF282A2E).copy(alpha = 0.85f),
+                                Color(0xFF0D1C2D).copy(alpha = 0.90f)
+                            )
+                        )
+                    )
                     .border(1.dp, GlassBorder)
                     .padding(16.dp)
             ) { content() }
@@ -540,49 +652,98 @@ private fun StatusChip(text: String, dotColor: Color, showDot: Boolean, alpha: F
             .border(1.dp, OutlineVariant, RoundedCornerShape(8.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             if (showDot) {
-                Box(Modifier.size(8.dp).clip(CircleShape).background(dotColor))
+                Box(Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(dotColor))
             }
-            Text(text, color = OnSurface.copy(alpha = alpha), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Medium, maxLines = 1)
+            Text(
+                text,
+                color = OnSurface.copy(alpha = alpha),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1
+            )
         }
     }
 }
 
 @Composable
-private fun SpinWheel(selected: SpinDir, onSelect: (SpinDir) -> Unit, modifier: Modifier = Modifier) {
+private fun SpinWheel(
+    selected: SpinDir,
+    onSelect: (SpinDir) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val cells: List<SpinDir?> = listOf(
-        SpinDir.NW, SpinDir.N,  SpinDir.NE,
-        SpinDir.W,  null,       SpinDir.E,
-        SpinDir.SW, SpinDir.S,  SpinDir.SE,
+        SpinDir.NW, SpinDir.N, SpinDir.NE,
+        SpinDir.W, null, SpinDir.E,
+        SpinDir.SW, SpinDir.S, SpinDir.SE,
     )
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         for (row in 0 until 3) {
             Row(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 for (col in 0 until 3) {
                     val dir = cells[row * 3 + col]
                     if (dir == null) {
-                        Box(modifier = Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Box(
-                                modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.White).border(2.dp, Color.White.copy(alpha = 0.25f), CircleShape),
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White)
+                                    .border(2.dp, Color.White.copy(alpha = 0.25f), CircleShape),
                                 contentAlignment = Alignment.Center
-                            ) { Text("●", color = Color(0xFF2A2A2A), style = MaterialTheme.typography.titleSmall) }
+                            ) {
+                                Text(
+                                    "●",
+                                    color = Color(0xFF2A2A2A),
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                            }
                         }
                     } else {
                         val isSel = dir == selected
                         Box(
                             modifier = Modifier
-                                .weight(1f).fillMaxHeight()
+                                .weight(1f)
+                                .fillMaxHeight()
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(if (isSel) Secondary else SurfaceContainerLow)
-                                .border(1.dp, if (isSel) Secondary else Color.White.copy(alpha = 0.05f), RoundedCornerShape(10.dp))
-                                .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) { onSelect(dir) },
+                                .border(
+                                    1.dp,
+                                    if (isSel) Secondary else Color.White.copy(alpha = 0.05f),
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() }) {
+                                    onSelect(
+                                        dir
+                                    )
+                                },
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(dir.icon, dir.label, tint = if (isSel) Color.White else OnSurfaceVariant, modifier = Modifier.size(22.dp))
+                            Icon(
+                                dir.icon,
+                                dir.label,
+                                tint = if (isSel) Color.White else OnSurfaceVariant,
+                                modifier = Modifier.size(22.dp)
+                            )
                         }
                     }
                 }
@@ -599,26 +760,65 @@ private fun ShotCard(shot: SeqShot, onRemove: () -> Unit) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(SurfaceContainerLow)
-            .border(1.dp, if (isFirst) Secondary.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+            .border(
+                1.dp,
+                if (isFirst) Secondary.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.05f),
+                RoundedCornerShape(16.dp)
+            )
             .padding(14.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
             Box(
-                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).background(if (isFirst) Secondary.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f)),
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(
+                        if (isFirst) Secondary.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f)
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                Text("${shot.index}", color = if (isFirst) Secondary else Color(0xFF64748B), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black)
+                Text(
+                    "${shot.index}",
+                    color = if (isFirst) Secondary else Color(0xFF64748B),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Black
+                )
             }
             Column(modifier = Modifier.weight(1f)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Zone ${shot.zone}", color = OnSurface, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                    Text(shot.spin.spinName, color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "Zone ${shot.zone}",
+                        color = OnSurface,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        shot.spin.spinName,
+                        color = OnSurfaceVariant,
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
                 Spacer(Modifier.height(2.dp))
-                Text("Velocity: ${shot.velocity}m/s • Freq: ${shot.freq}", color = Tertiary, style = MaterialTheme.typography.labelSmall)
+                Text(
+                    "Velocity: ${shot.velocity}m/s • Freq: ${shot.freq}",
+                    color = Tertiary,
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
             IconButton(onClick = onRemove, modifier = Modifier.size(28.dp)) {
-                Icon(Icons.Outlined.Close, "Remove", tint = OnSurfaceVariant, modifier = Modifier.size(18.dp))
+                Icon(
+                    Icons.Outlined.Close,
+                    "Remove",
+                    tint = OnSurfaceVariant,
+                    modifier = Modifier.size(18.dp)
+                )
             }
         }
     }
@@ -628,6 +828,8 @@ private fun ShotCard(shot: SeqShot, onRemove: () -> Unit) {
 @Composable
 fun RoutinePlannerPreview() {
     SpinNetTheme {
-        RoutinePlannerScreen(currentDestination = SpinNetDestination.RoutinePlanner, onNavigate = {})
+        RoutinePlannerScreen(
+            currentDestination = SpinNetDestination.RoutinePlanner,
+            onNavigate = {})
     }
 }
