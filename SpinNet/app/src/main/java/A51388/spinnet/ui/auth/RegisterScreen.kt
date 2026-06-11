@@ -1,4 +1,4 @@
-package A51388.spinnet.ui.screens
+package A51388.spinnet.ui.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,11 +38,11 @@ fun RegisterScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    var username         by remember { mutableStateOf("") }
-    var email            by remember { mutableStateOf("") }
-    var password         by remember { mutableStateOf("") }
-    var confirmPassword  by remember { mutableStateOf("") }
-    var passwordVisible  by remember { mutableStateOf(false) }
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     var passwordMismatch by remember { mutableStateOf(false) }
 
     LaunchedEffect(state) {
@@ -61,60 +61,89 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 28.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 28.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(64.dp))
 
-            Text("SPINNET", color = NeonGreen, style = MaterialTheme.typography.displayLarge,
-                letterSpacing = 6.sp, fontWeight = FontWeight.ExtraBold)
+            Text(
+                "SPINNET",
+                color = NeonGreen,
+                style = MaterialTheme.typography.displayLarge,
+                letterSpacing = 6.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
             Spacer(Modifier.height(4.dp))
-            Text("Cria a tua conta", color = OnSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+            Text(
+                "Cria a tua conta",
+                color = OnSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center
+            )
 
             Spacer(Modifier.height(40.dp))
 
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
-                    Text("Registar", color = OnSurface,
-                        style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Registar",
+                        color = OnSurface,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
                     Spacer(Modifier.height(4.dp))
-                    Text("Começa o teu percurso", color = OnSurfaceVariant,
-                        style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        "Começa o teu percurso",
+                        color = OnSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
 
                     Spacer(Modifier.height(24.dp))
 
-                    GlassTextField(value = username, onValueChange = { username = it },
-                        label = "Nome de utilizador", leadingIcon = Icons.Outlined.Person)
-
-                    Spacer(Modifier.height(12.dp))
-
-                    GlassTextField(value = email, onValueChange = { email = it },
-                        label = "Email", leadingIcon = Icons.Outlined.Email,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        isError = state is AuthState.Error)
-
-                    Spacer(Modifier.height(12.dp))
-
                     GlassTextField(
-                        value = password, onValueChange = { password = it; passwordMismatch = false },
-                        label = "Password", leadingIcon = Icons.Outlined.Lock,
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        isError = passwordMismatch,
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
-                                    contentDescription = null, tint = OnSurfaceVariant)
-                            }
-                        }
+                        value = username,
+                        onValueChange = { username = it },
+                        label = "Nome de utilizador",
+                        leadingIcon = Icons.Outlined.Person
                     )
 
                     Spacer(Modifier.height(12.dp))
 
                     GlassTextField(
-                        value = confirmPassword, onValueChange = { confirmPassword = it; passwordMismatch = false },
-                        label = "Confirmar Password", leadingIcon = Icons.Outlined.Lock,
+                        value = email,
+                        onValueChange = { email = it },
+                        label = "Email",
+                        leadingIcon = Icons.Outlined.Email,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        isError = state is AuthState.Error
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    GlassTextField(
+                        value = password,
+                        onValueChange = { password = it; passwordMismatch = false },
+                        label = "Password",
+                        leadingIcon = Icons.Outlined.Lock,
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        isError = passwordMismatch,
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                                    contentDescription = null,
+                                    tint = OnSurfaceVariant
+                                )
+                            }
+                        })
+
+                    Spacer(Modifier.height(12.dp))
+
+                    GlassTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it; passwordMismatch = false },
+                        label = "Confirmar Password",
+                        leadingIcon = Icons.Outlined.Lock,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         isError = passwordMismatch
@@ -122,13 +151,19 @@ fun RegisterScreen(
 
                     if (passwordMismatch) {
                         Spacer(Modifier.height(8.dp))
-                        Text("As passwords não coincidem", color = Error,
-                            style = MaterialTheme.typography.labelSmall)
+                        Text(
+                            "As passwords não coincidem",
+                            color = Error,
+                            style = MaterialTheme.typography.labelSmall
+                        )
                     }
                     if (state is AuthState.Error) {
                         Spacer(Modifier.height(8.dp))
-                        Text((state as AuthState.Error).message, color = Error,
-                            style = MaterialTheme.typography.labelSmall)
+                        Text(
+                            (state as AuthState.Error).message,
+                            color = Error,
+                            style = MaterialTheme.typography.labelSmall
+                        )
                     }
 
                     Spacer(Modifier.height(24.dp))
@@ -138,13 +173,15 @@ fun RegisterScreen(
                             if (password != confirmPassword) passwordMismatch = true
                             else viewModel.register(email, password, username)
                         },
-                        enabled = username.isNotBlank() && email.isNotBlank()
-                                && password.isNotBlank() && state !is AuthState.Loading,
+                        enabled = username.isNotBlank() && email.isNotBlank() && password.isNotBlank() && state !is AuthState.Loading,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         if (state is AuthState.Loading) {
-                            CircularProgressIndicator(modifier = Modifier.size(18.dp),
-                                color = Color.Black, strokeWidth = 2.dp)
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                color = Color.Black,
+                                strokeWidth = 2.dp
+                            )
                         } else {
                             Text("CRIAR CONTA", style = MaterialTheme.typography.labelLarge)
                         }
@@ -155,10 +192,16 @@ fun RegisterScreen(
             Spacer(Modifier.height(24.dp))
 
             Row(horizontalArrangement = Arrangement.Center) {
-                Text("Já tens conta? ", color = OnSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall)
-                Text("Iniciar Sessão", color = NeonGreen,
-                    style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold,
+                Text(
+                    "Já tens conta? ",
+                    color = OnSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    "Iniciar Sessão",
+                    color = NeonGreen,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable { onNavigateToLogin() })
             }
 

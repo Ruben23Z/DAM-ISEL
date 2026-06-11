@@ -1,4 +1,4 @@
-package A51388.spinnet.ui.screens
+package A51388.spinnet.ui.auth
 
 import android.app.Activity
 import android.util.Log
@@ -62,24 +62,24 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // Obter activity para aceder ao callbackManager
+    //activity para o callbackManager
     val activity = context as? MainActivity
     val callbackManager = activity?.callbackManager
 
-    // Registar callback do Facebook uma única vez
+    // Regista callback do Faceboo, so uma vez
     DisposableEffect(callbackManager) {
         if (callbackManager != null) {
-            LoginManager.getInstance().registerCallback(callbackManager,
-                object : FacebookCallback<LoginResult> {
+            LoginManager.getInstance().registerCallback(
+                callbackManager, object : FacebookCallback<LoginResult> {
                     override fun onSuccess(result: LoginResult) {
                         viewModel.signInWithFacebook(result.accessToken.token)
                     }
+
                     override fun onCancel() {}
                     override fun onError(error: FacebookException) {
                         Log.e("FB", error.message ?: "Facebook error")
                     }
-                }
-            )
+                })
         }
         onDispose {
             if (callbackManager != null) {
@@ -100,8 +100,7 @@ fun LoginScreen(
             .fillMaxSize()
             .background(
                 Brush.radialGradient(
-                    colors = listOf(Color(0xFF1B365D), Surface),
-                    radius = 900f
+                    colors = listOf(Color(0xFF1B365D), Surface), radius = 900f
                 )
             )
     ) {
@@ -109,8 +108,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 28.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 28.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(72.dp))
 
@@ -177,8 +175,7 @@ fun LoginScreen(
                                     tint = OnSurfaceVariant
                                 )
                             }
-                        }
-                    )
+                        })
 
                     if (state is AuthState.Error) {
                         Spacer(Modifier.height(8.dp))
@@ -193,8 +190,7 @@ fun LoginScreen(
 
                     NeonButton(
                         onClick = { viewModel.login(email, password) },
-                        enabled = email.isNotBlank() && password.isNotBlank()
-                                && state !is AuthState.Loading,
+                        enabled = email.isNotBlank() && password.isNotBlank() && state !is AuthState.Loading,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         if (state is AuthState.Loading) {
@@ -215,13 +211,17 @@ fun LoginScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         HorizontalDivider(modifier = Modifier.weight(1f), color = OutlineVariant)
-                        Text("  ou  ", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                        Text(
+                            "  ou  ",
+                            color = OnSurfaceVariant,
+                            style = MaterialTheme.typography.labelSmall
+                        )
                         HorizontalDivider(modifier = Modifier.weight(1f), color = OutlineVariant)
                     }
 
                     Spacer(Modifier.height(16.dp))
 
-                    // ── Google ────────────────────────────────────────────
+                    //Google
                     OutlinedButton(
                         onClick = {
                             scope.launch {
@@ -232,15 +232,12 @@ fun LoginScreen(
                                         .setServerClientId(context.getString(R.string.default_web_client_id))
                                         .build()
                                     val request = GetCredentialRequest.Builder()
-                                        .addCredentialOption(googleIdOption)
-                                        .build()
+                                        .addCredentialOption(googleIdOption).build()
                                     val result = credentialManager.getCredential(
-                                        request = request,
-                                        context = context as Activity
+                                        request = request, context = context as Activity
                                     )
-                                    val googleIdToken = GoogleIdTokenCredential
-                                        .createFrom(result.credential.data)
-                                        .idToken
+                                    val googleIdToken =
+                                        GoogleIdTokenCredential.createFrom(result.credential.data).idToken
                                     viewModel.signInWithGoogle(googleIdToken)
                                 } catch (e: GetCredentialException) {
                                     Log.e("Google", e.message ?: "Credential error")
@@ -264,15 +261,13 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    // ── Facebook ──────────────────────────────────────────
+                    // Face
                     OutlinedButton(
                         onClick = {
                             val activity = context as androidx.activity.ComponentActivity
                             if (callbackManager != null) {
                                 LoginManager.getInstance().logInWithReadPermissions(
-                                    activity,
-                                    callbackManager,
-                                    listOf("email", "public_profile")
+                                    activity, callbackManager, listOf("email", "public_profile")
                                 )
                             }
                         },
@@ -310,8 +305,7 @@ fun LoginScreen(
                     color = NeonGreen,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { onNavigateToRegister() }
-                )
+                    modifier = Modifier.clickable { onNavigateToRegister() })
             }
 
             Spacer(Modifier.height(32.dp))

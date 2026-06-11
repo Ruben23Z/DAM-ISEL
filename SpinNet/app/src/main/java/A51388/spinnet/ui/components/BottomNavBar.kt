@@ -17,58 +17,57 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import A51388.spinnet.ui.navigation.SpinNetDestination
 import A51388.spinnet.ui.theme.Secondary
 import A51388.spinnet.ui.theme.OnSurfaceVariant
 import A51388.spinnet.ui.theme.SurfaceContainer
 
 data class NavItem(
-    val label: String,
-    val icon: ImageVector,
-    val destination: SpinNetDestination
+    val label: String, val icon: ImageVector, val destination: SpinNetDestination
 )
 
 val navItems = listOf(
-    NavItem("Training",  Icons.Default.FitnessCenter, SpinNetDestination.Dashboard),
-    NavItem("Planner",   Icons.Default.GridView,      SpinNetDestination.RoutinePlanner),
-    NavItem("Stats",     Icons.Default.BarChart,      SpinNetDestination.Performance),
-    NavItem("Community", Icons.Default.People,         SpinNetDestination.Community),
-    NavItem("Profile",   Icons.Default.Person,         SpinNetDestination.PlayerProfile),
+    NavItem("Training", Icons.Default.FitnessCenter, SpinNetDestination.Dashboard),
+    NavItem("Planner", Icons.Default.GridView, SpinNetDestination.RoutinePlanner),
+    NavItem("Stats", Icons.Default.BarChart, SpinNetDestination.Performance),
+    NavItem("Community", Icons.Default.People, SpinNetDestination.Community),
+    NavItem("Profile", Icons.Default.Person, SpinNetDestination.PlayerProfile),
 )
 
 @Composable
 fun SpinNetBottomBar(
-    currentDestination: SpinNetDestination,
-    onNavigate: (SpinNetDestination) -> Unit
+    currentDestination: SpinNetDestination, onNavigate: (SpinNetDestination) -> Unit
 ) {
     NavigationBar(
-        containerColor = SurfaceContainer,
-        tonalElevation = 0.dp
+        containerColor = SurfaceContainer, tonalElevation = 0.dp
     ) {
         navItems.forEach { item ->
             val selected = currentDestination == item.destination
             NavigationBarItem(
-                selected  = selected,
-                onClick   = { onNavigate(item.destination) },
+                selected = selected,
+                onClick = { onNavigate(item.destination) },
                 icon = {
                     Icon(
-                        imageVector     = item.icon,
+                        imageVector = item.icon,
                         contentDescription = item.label,
-                        modifier        = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 },
                 label = {
                     Text(
-                        text  = item.label.uppercase(),
-                        style = androidx.compose.material3.MaterialTheme.typography.labelSmall
+                        text = item.label.uppercase(),
+                        style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                        fontSize = 9.sp,
+                        maxLines = 1
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor   = Secondary,
-                    selectedTextColor   = Secondary,
+                    selectedIconColor = Secondary,
+                    selectedTextColor = Secondary,
                     unselectedIconColor = OnSurfaceVariant,
                     unselectedTextColor = OnSurfaceVariant,
-                    indicatorColor      = Color(0xFF2A0A10)
+                    indicatorColor = Color(0xFF2A0A10)
                 )
             )
         }

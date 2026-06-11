@@ -6,7 +6,10 @@ data class Routine(
     val title: String = "",
     val uid: String = "",
     val shots: List<Shot> = emptyList(),
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val scheduledAt: Long? = null,
+    val isPublic: Boolean = false //para feed
+
 )
 
 data class Shot(

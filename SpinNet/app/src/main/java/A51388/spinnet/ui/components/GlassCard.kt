@@ -17,10 +17,6 @@ import A51388.spinnet.ui.theme.GlassBorder
 import A51388.spinnet.ui.theme.GlassFill
 import A51388.spinnet.ui.theme.SurfaceContainerHigh
 
-/**
- * Glassmorphism card — translucent surface with 1 px white-border.
- * Matches the Stitch "Glass Cards" component spec.
- */
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
@@ -41,11 +37,8 @@ fun GlassCard(
                 )
             )
             .border(
-                width = 1.dp,
-                color = GlassBorder,
-                shape = shape
+                width = 1.dp, color = GlassBorder, shape = shape
             )
-            .padding(innerPadding),
-        content = content
+            .padding(innerPadding), content = content
     )
 }

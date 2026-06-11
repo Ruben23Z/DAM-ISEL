@@ -1,4 +1,4 @@
-package A51388.spinnet.ui.screens
+package A51388.spinnet.ui.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,10 +28,6 @@ import A51388.spinnet.ui.components.GlassCard
 import A51388.spinnet.ui.components.SpinNetBottomBar
 import A51388.spinnet.ui.navigation.SpinNetDestination
 import A51388.spinnet.ui.theme.*
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  i18n strings  (PT ↔ EN)
-// ─────────────────────────────────────────────────────────────────────────────
 
 private data class ProfileStrings(
     val playerProfile: String,
@@ -64,88 +60,83 @@ private data class ProfileStrings(
 )
 
 private val stringsEN = ProfileStrings(
-    playerProfile      = "Player Profile",
-    personalInfo       = "Personal Information",
-    fullName           = "Full Name",
-    email              = "Email",
-    club               = "Club",
-    country            = "Country",
-    memberSince        = "Member Since",
-    equipment          = "Equipment",
-    racket             = "Racket",
-    forehandRubber     = "FH Rubber",
-    backhandRubber     = "BH Rubber",
-    appSettings        = "App Settings",
-    language           = "Language",
-    notifications      = "Notifications",
-    hapticFeedback     = "Haptic Feedback",
-    account            = "Account",
-    editProfile        = "Edit Profile",
-    changePassword     = "Change Password",
-    privacySettings    = "Privacy Settings",
-    helpSupport        = "Help & Support",
-    logout             = "Log Out",
+    playerProfile = "Player Profile",
+    personalInfo = "Personal Information",
+    fullName = "Full Name",
+    email = "Email",
+    club = "Club",
+    country = "Country",
+    memberSince = "Member Since",
+    equipment = "Equipment",
+    racket = "Racket",
+    forehandRubber = "FH Rubber",
+    backhandRubber = "BH Rubber",
+    appSettings = "App Settings",
+    language = "Language",
+    notifications = "Notifications",
+    hapticFeedback = "Haptic Feedback",
+    account = "Account",
+    editProfile = "Edit Profile",
+    changePassword = "Change Password",
+    privacySettings = "Privacy Settings",
+    helpSupport = "Help & Support",
+    logout = "Log Out",
     logoutConfirmTitle = "Log Out?",
-    logoutConfirmMsg   = "You will be returned to the login screen.",
-    cancel             = "Cancel",
-    confirm            = "Log Out",
-    appVersion         = "SpinNet v1.0.0",
-    level              = "Advanced · Penhold"
+    logoutConfirmMsg = "You will be returned to the login screen.",
+    cancel = "Cancel",
+    confirm = "Log Out",
+    appVersion = "SpinNet v1.0.0",
+    level = "Advanced · Penhold"
 )
 
 private val stringsPT = ProfileStrings(
-    playerProfile      = "Perfil do Jogador",
-    personalInfo       = "Informações Pessoais",
-    fullName           = "Nome Completo",
-    email              = "Email",
-    club               = "Clube",
-    country            = "País",
-    memberSince        = "Membro Desde",
-    equipment          = "Equipamento",
-    racket             = "Raquete",
-    forehandRubber     = "Borracha DT",
-    backhandRubber     = "Borracha RE",
-    appSettings        = "Definições",
-    language           = "Idioma",
-    notifications      = "Notificações",
-    hapticFeedback     = "Vibração",
-    account            = "Conta",
-    editProfile        = "Editar Perfil",
-    changePassword     = "Alterar Password",
-    privacySettings    = "Privacidade",
-    helpSupport        = "Ajuda e Suporte",
-    logout             = "Terminar Sessão",
+    playerProfile = "Perfil do Jogador",
+    personalInfo = "Informações Pessoais",
+    fullName = "Nome Completo",
+    email = "Email",
+    club = "Clube",
+    country = "País",
+    memberSince = "Membro Desde",
+    equipment = "Equipamento",
+    racket = "Raquete",
+    forehandRubber = "Borracha DT",
+    backhandRubber = "Borracha RE",
+    appSettings = "Definições",
+    language = "Idioma",
+    notifications = "Notificações",
+    hapticFeedback = "Vibração",
+    account = "Conta",
+    editProfile = "Editar Perfil",
+    changePassword = "Alterar Password",
+    privacySettings = "Privacidade",
+    helpSupport = "Ajuda e Suporte",
+    logout = "Terminar Sessão",
     logoutConfirmTitle = "Terminar Sessão?",
-    logoutConfirmMsg   = "Será redirecionado para o ecrã de login.",
-    cancel             = "Cancelar",
-    confirm            = "Terminar",
-    appVersion         = "SpinNet v1.0.0",
-    level              = "Avançado · Caneta"
+    logoutConfirmMsg = "Será redirecionado para o ecrã de login.",
+    cancel = "Cancelar",
+    confirm = "Terminar",
+    appVersion = "SpinNet v1.0.0",
+    level = "Avançado · Caneta"
 )
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  Screen
-// ─────────────────────────────────────────────────────────────────────────────
-
 @Composable
 fun PlayerProfileScreen(
     currentDestination: SpinNetDestination,
     onNavigate: (SpinNetDestination) -> Unit,
     onLogout: () -> Unit
 ) {
-    var isPortuguese      by remember { mutableStateOf(false) }
-    var notificationsOn   by remember { mutableStateOf(true) }
-    var hapticOn          by remember { mutableStateOf(true) }
-    var showLogoutDialog  by remember { mutableStateOf(false) }
+    var isPortuguese by remember { mutableStateOf(false) }
+    var notificationsOn by remember { mutableStateOf(true) }
+    var hapticOn by remember { mutableStateOf(true) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     val s = if (isPortuguese) stringsPT else stringsEN
     val scrollState = rememberScrollState()
 
     if (showLogoutDialog) {
         LogoutConfirmDialog(
-            title   = s.logoutConfirmTitle,
+            title = s.logoutConfirmTitle,
             message = s.logoutConfirmMsg,
-            cancel  = s.cancel,
+            cancel = s.cancel,
             confirm = s.confirm,
             onDismiss = { showLogoutDialog = false },
             onConfirm = {
@@ -166,7 +157,6 @@ fun PlayerProfileScreen(
                 .verticalScroll(scrollState)
                 .padding(padding)
         ) {
-            // ── Profile hero header ─────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,7 +169,6 @@ fun PlayerProfileScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // Avatar circle with initials
                     Box(
                         modifier = Modifier
                             .size(88.dp)
@@ -211,7 +200,6 @@ fun PlayerProfileScreen(
                         style = MaterialTheme.typography.bodySmall
                     )
                     Spacer(Modifier.height(10.dp))
-                    // Level badge
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
@@ -223,7 +211,12 @@ fun PlayerProfileScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            Icon(Icons.Outlined.Bolt, null, tint = Tertiary, modifier = Modifier.size(14.dp))
+                            Icon(
+                                Icons.Outlined.Bolt,
+                                null,
+                                tint = Tertiary,
+                                modifier = Modifier.size(14.dp)
+                            )
                             Text(
                                 "PRO TIER",
                                 color = Tertiary,
@@ -231,7 +224,10 @@ fun PlayerProfileScreen(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp
                             )
-                            Box(Modifier.size(6.dp).clip(CircleShape).background(Tertiary))
+                            Box(Modifier
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(Tertiary))
                         }
                     }
                 }
@@ -239,27 +235,25 @@ fun PlayerProfileScreen(
 
             Column(modifier = Modifier.padding(horizontal = 20.dp)) {
 
-                // ── Personal Information ──────────────────────────────────
                 ProfileSection(title = s.personalInfo) {
-                    InfoRow(Icons.Outlined.Person,    s.fullName,    "Alex \"The Spinner\" Chen")
-                    InfoRow(Icons.Outlined.Email,     s.email,       "alex.chen@spinnet.com")
-                    InfoRow(Icons.Outlined.Groups,    s.club,        "SP Table Tennis Club")
-                    InfoRow(Icons.Outlined.Flag,      s.country,     "Portugal 🇵🇹")
+                    InfoRow(Icons.Outlined.Person, s.fullName, "Alex \"The Spinner\" Chen")
+                    InfoRow(Icons.Outlined.Email, s.email, "alex.chen@spinnet.com")
+                    InfoRow(Icons.Outlined.Groups, s.club, "SP Table Tennis Club")
+                    InfoRow(Icons.Outlined.Flag, s.country, "Portugal 🇵🇹")
                     InfoRow(Icons.Outlined.CalendarToday, s.memberSince, "Janeiro 2024")
                 }
 
                 Spacer(Modifier.height(16.dp))
 
-                // ── Equipment ─────────────────────────────────────────────
                 ProfileSection(title = s.equipment) {
-                    InfoRow(Icons.Outlined.FitnessCenter, s.racket,         "Butterfly Viscaria")
-                    InfoRow(Icons.Outlined.Circle,            s.forehandRubber, "Tenergy 05 (2.1mm)")
-                    InfoRow(Icons.Outlined.Circle,            s.backhandRubber, "Dignics 09C (2.1mm)")
+                    InfoRow(Icons.Outlined.FitnessCenter, s.racket, "Butterfly Viscaria")
+                    InfoRow(Icons.Outlined.Circle, s.forehandRubber, "Tenergy 05 (2.1mm)")
+                    InfoRow(Icons.Outlined.Circle, s.backhandRubber, "Dignics 09C (2.1mm)")
                 }
 
                 Spacer(Modifier.height(16.dp))
 
-                // ── App Settings ──────────────────────────────────────────
+
                 ProfileSection(title = s.appSettings) {
                     // Language toggle PT / EN
                     GlassCard(modifier = Modifier.fillMaxWidth(), innerPadding = 14.dp) {
@@ -272,8 +266,17 @@ fun PlayerProfileScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                Icon(Icons.Outlined.Language, null, tint = Secondary, modifier = Modifier.size(20.dp))
-                                Text(s.language, color = OnSurface, style = MaterialTheme.typography.bodyMedium)
+                                Icon(
+                                    Icons.Outlined.Language,
+                                    null,
+                                    tint = Secondary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text(
+                                    s.language,
+                                    color = OnSurface,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
                             }
                             // PT ↔ EN pill toggle
                             Box(
@@ -312,8 +315,8 @@ fun PlayerProfileScreen(
                     Spacer(Modifier.height(8.dp))
 
                     ToggleRow(
-                        icon    = Icons.Outlined.Notifications,
-                        label   = s.notifications,
+                        icon = Icons.Outlined.Notifications,
+                        label = s.notifications,
                         checked = notificationsOn,
                         onToggle = { notificationsOn = it }
                     )
@@ -321,8 +324,8 @@ fun PlayerProfileScreen(
                     Spacer(Modifier.height(8.dp))
 
                     ToggleRow(
-                        icon    = Icons.Outlined.Vibration,
-                        label   = s.hapticFeedback,
+                        icon = Icons.Outlined.Vibration,
+                        label = s.hapticFeedback,
                         checked = hapticOn,
                         onToggle = { hapticOn = it }
                     )
@@ -330,31 +333,44 @@ fun PlayerProfileScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                // ── Account ───────────────────────────────────────────────
                 ProfileSection(title = s.account) {
-                    ClickableRow(icon = Icons.Outlined.Edit,    label = s.editProfile,     onClick = {})
-                    ClickableRow(icon = Icons.Outlined.Lock,    label = s.changePassword,  onClick = {})
-                    ClickableRow(icon = Icons.Outlined.Security, label = s.privacySettings, onClick = {})
-                    ClickableRow(icon = Icons.Outlined.HelpOutline, label = s.helpSupport, onClick = {}, showDivider = false)
+                    ClickableRow(icon = Icons.Outlined.Edit, label = s.editProfile, onClick = {})
+                    ClickableRow(icon = Icons.Outlined.Lock, label = s.changePassword, onClick = {})
+                    ClickableRow(
+                        icon = Icons.Outlined.Security,
+                        label = s.privacySettings,
+                        onClick = {})
+                    ClickableRow(
+                        icon = Icons.Outlined.HelpOutline,
+                        label = s.helpSupport,
+                        onClick = {},
+                        showDivider = false
+                    )
                 }
 
                 Spacer(Modifier.height(24.dp))
 
-                // ── Logout ────────────────────────────────────────────────
                 Button(
                     onClick = { showLogoutDialog = true },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Secondary.copy(alpha = 0.12f),
-                        contentColor   = Secondary
+                        contentColor = Secondary
                     ),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Secondary.copy(alpha = 0.4f)),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        Secondary.copy(alpha = 0.4f)
+                    ),
                     contentPadding = PaddingValues(vertical = 14.dp)
                 ) {
                     Icon(Icons.Outlined.Logout, null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text(s.logout, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                    Text(
+                        s.logout,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -372,10 +388,6 @@ fun PlayerProfileScreen(
         }
     }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  Sub-composables
-// ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
 private fun ProfileSection(title: String, content: @Composable ColumnScope.() -> Unit) {
@@ -402,8 +414,18 @@ private fun InfoRow(icon: ImageVector, label: String, value: String) {
         ) {
             Icon(icon, null, tint = Secondary, modifier = Modifier.size(20.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(label, color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
-                Text(value, color = OnSurface, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                Text(
+                    label,
+                    color = OnSurfaceVariant,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 10.sp
+                )
+                Text(
+                    value,
+                    color = OnSurface,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }
@@ -411,14 +433,22 @@ private fun InfoRow(icon: ImageVector, label: String, value: String) {
 }
 
 @Composable
-private fun ToggleRow(icon: ImageVector, label: String, checked: Boolean, onToggle: (Boolean) -> Unit) {
+private fun ToggleRow(
+    icon: ImageVector,
+    label: String,
+    checked: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
     GlassCard(modifier = Modifier.fillMaxWidth(), innerPadding = 14.dp) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 Icon(icon, null, tint = Secondary, modifier = Modifier.size(20.dp))
                 Text(label, color = OnSurface, style = MaterialTheme.typography.bodyMedium)
             }
@@ -426,8 +456,8 @@ private fun ToggleRow(icon: ImageVector, label: String, checked: Boolean, onTogg
                 checked = checked,
                 onCheckedChange = onToggle,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor   = Color.White,
-                    checkedTrackColor   = Secondary,
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = Secondary,
                     uncheckedThumbColor = OnSurfaceVariant,
                     uncheckedTrackColor = SurfaceContainerHighest
                 )
@@ -457,11 +487,19 @@ private fun ClickableRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 Icon(icon, null, tint = Secondary, modifier = Modifier.size(20.dp))
                 Text(label, color = OnSurface, style = MaterialTheme.typography.bodyMedium)
             }
-            Icon(Icons.Outlined.ChevronRight, null, tint = OnSurfaceVariant, modifier = Modifier.size(18.dp))
+            Icon(
+                Icons.Outlined.ChevronRight,
+                null,
+                tint = OnSurfaceVariant,
+                modifier = Modifier.size(18.dp)
+            )
         }
     }
     if (showDivider) Spacer(Modifier.height(6.dp))
@@ -487,15 +525,28 @@ private fun LogoutConfirmDialog(
                 Icon(
                     Icons.Outlined.Logout,
                     null,
-                    tint   = Secondary,
+                    tint = Secondary,
                     modifier = Modifier.size(36.dp)
                 )
                 Spacer(Modifier.height(12.dp))
-                Text(title, color = OnSurface, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(
+                    title,
+                    color = OnSurface,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
                 Spacer(Modifier.height(8.dp))
-                Text(message, color = OnSurfaceVariant, style = MaterialTheme.typography.bodySmall, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                Text(
+                    message,
+                    color = OnSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
                 Spacer(Modifier.height(24.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     OutlinedButton(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
@@ -508,7 +559,10 @@ private fun LogoutConfirmDialog(
                         onClick = onConfirm,
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Secondary, contentColor = Color.White)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Secondary,
+                            contentColor = Color.White
+                        )
                     ) { Text(confirm, fontWeight = FontWeight.Bold) }
                 }
             }
@@ -523,7 +577,7 @@ fun PlayerProfilePreview() {
         PlayerProfileScreen(
             currentDestination = SpinNetDestination.PlayerProfile,
             onNavigate = {},
-            onLogout   = {}
+            onLogout = {}
         )
     }
 }

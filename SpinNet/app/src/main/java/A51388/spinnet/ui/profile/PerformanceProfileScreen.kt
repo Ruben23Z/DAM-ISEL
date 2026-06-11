@@ -1,4 +1,4 @@
-package A51388.spinnet.ui.screens
+package A51388.spinnet.ui.profile
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -49,7 +49,7 @@ private val routineHistory = listOf(
         whenAgo = "Yesterday",
         accuracy = 98,
         badge = "Personal Best",
-        badgeColor = Secondary,       // red
+        badgeColor = Secondary,
         iconTint = Secondary
     ),
     RoutineEntry(
@@ -69,14 +69,10 @@ private val routineHistory = listOf(
         whenAgo = "4 days ago",
         accuracy = 94,
         badge = "Gold Standard",
-        badgeColor = Tertiary,        // blue accent
+        badgeColor = Tertiary,
         iconTint = Tertiary
     ),
 )
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  Screen
-// ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
 fun PerformanceProfileScreen(
@@ -98,7 +94,6 @@ fun PerformanceProfileScreen(
         ) {
             Spacer(Modifier.height(24.dp))
 
-            // ── Header ──────────────────────────────────────────────────────
             Text(
                 "PERFORMANCE CORE",
                 color = Secondary,
@@ -116,7 +111,6 @@ fun PerformanceProfileScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // ── KPI Bento Grid ───────────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -132,7 +126,6 @@ fun PerformanceProfileScreen(
                     valueColor = OnSurface,
                     bottomLabel = "WIN RATE"
                 )
-                // Total Drills
                 KpiCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Outlined.FitnessCenter,
@@ -143,7 +136,6 @@ fun PerformanceProfileScreen(
                     valueColor = OnSurface,
                     bottomLabel = "TOTAL DRILLS"
                 )
-                // Day Streak
                 KpiCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Outlined.LocalFireDepartment,
@@ -158,7 +150,6 @@ fun PerformanceProfileScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // ── Training Intensity Chart ─────────────────────────────────────
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     Row(
@@ -194,7 +185,6 @@ fun PerformanceProfileScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // ── Spin Mastery ─────────────────────────────────────────────────
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     Text(
@@ -229,7 +219,6 @@ fun PerformanceProfileScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // ── Routine History ──────────────────────────────────────────────
             Text(
                 "Routine History",
                 color = OnSurface,
@@ -246,10 +235,6 @@ fun PerformanceProfileScreen(
         }
     }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  Sub-composables
-// ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
 private fun KpiCard(

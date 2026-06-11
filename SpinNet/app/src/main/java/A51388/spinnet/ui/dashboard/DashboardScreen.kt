@@ -1,4 +1,4 @@
-package A51388.spinnet.ui.screens
+package A51388.spinnet.ui.dashboard
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -34,12 +34,13 @@ import A51388.spinnet.ui.navigation.SpinNetDestination
 import A51388.spinnet.ui.theme.*
 
 data class DrillItem(
-    val name: String,
-    val duration: String,
-    val accuracy: Int,
-    val tag: String
+    val name: String, val duration: String, val accuracy: Int, val tag: String
 )
 
+
+
+
+//DPS APAGAR
 private val recentDrills = listOf(
     DrillItem("Heavy Topspin Loop", "45 min", 94, "FOREHAND"),
     DrillItem("Backspin Defense", "30 min", 81, "BACKHAND"),
@@ -48,28 +49,23 @@ private val recentDrills = listOf(
 
 @Composable
 fun DashboardScreen(
-    currentDestination: SpinNetDestination,
-    onNavigate: (SpinNetDestination) -> Unit
+    currentDestination: SpinNetDestination, onNavigate: (SpinNetDestination) -> Unit
 ) {
     val scrollState = rememberScrollState()
     var showRescheduleDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = Surface,
-        bottomBar = {
+        containerColor = Surface, bottomBar = {
             SpinNetBottomBar(
-                currentDestination = currentDestination,
-                onNavigate = onNavigate
+                currentDestination = currentDestination, onNavigate = onNavigate
             )
-        }
-    ) { padding ->
+        }) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(Color(0xFF1A1A3E), Surface),
-                        radius = 800f
+                        colors = listOf(Color(0xFF1A1A3E), Surface), radius = 800f
                     )
                 )
                 .verticalScroll(scrollState)
@@ -78,7 +74,6 @@ fun DashboardScreen(
         ) {
             Spacer(Modifier.height(24.dp))
 
-            // ── Header ─────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,11 +100,9 @@ fun DashboardScreen(
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-                
-                // Streak Card
+
                 GlassCard(
-                    modifier = Modifier.wrapContentSize(),
-                    innerPadding = 10.dp
+                    modifier = Modifier.wrapContentSize(), innerPadding = 10.dp
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -142,7 +135,6 @@ fun DashboardScreen(
 
             Spacer(Modifier.height(28.dp))
 
-            // ── Topspin Mastery Card ─────────────────────────────
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     Row(
@@ -175,7 +167,7 @@ fun DashboardScreen(
                     HorizontalDivider(color = OutlineVariant.copy(alpha = 0.3f))
                     Spacer(Modifier.height(10.dp))
 
-                    // ── Resume / Reschedule actions ──────────────
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -186,8 +178,7 @@ fun DashboardScreen(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Secondary,
-                                contentColor = Color.White
+                                containerColor = Secondary, contentColor = Color.White
                             ),
                             contentPadding = PaddingValues(vertical = 10.dp)
                         ) {
@@ -204,7 +195,6 @@ fun DashboardScreen(
                             )
                         }
 
-                        // RESCHEDULE button
                         OutlinedButton(
                             onClick = { showRescheduleDialog = true },
                             modifier = Modifier.weight(1f),
@@ -231,22 +221,19 @@ fun DashboardScreen(
                 }
             }
 
-            // ── Reschedule Dialog ─────────────────────────────────
             if (showRescheduleDialog) {
                 RescheduleDialog(onDismiss = { showRescheduleDialog = false })
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // ── Stats Quick View Grid ───────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Ball Speed Card
                 GlassCard(
-                    modifier = Modifier.weight(1f),
-                    innerPadding = 16.dp
+                    modifier = Modifier.weight(1f), innerPadding = 16.dp
                 ) {
                     Column {
                         Row(
@@ -301,10 +288,8 @@ fun DashboardScreen(
                     }
                 }
 
-                // Spin Consistency Card
                 GlassCard(
-                    modifier = Modifier.weight(1f),
-                    innerPadding = 16.dp
+                    modifier = Modifier.weight(1f), innerPadding = 16.dp
                 ) {
                     Column {
                         Row(
@@ -362,7 +347,6 @@ fun DashboardScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // ── Spin Focus Vectors Card ──────────────────────────
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     Text(
@@ -377,7 +361,6 @@ fun DashboardScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // ── Recent Drills ────────────────────────────────────
             Text(
                 text = "RECENT DRILLS",
                 color = OnSurfaceVariant,
@@ -395,14 +378,10 @@ fun DashboardScreen(
 }
 
 
-// ── Sub-composables ──────────────────────────────────────────────────────────
-
 @Composable
 private fun LinearProgressIndicatorCard(progress: Float, label: String) {
     val animatedProgress by animateFloatAsState(
-        targetValue = progress,
-        animationSpec = tween(1000),
-        label = "progress"
+        targetValue = progress, animationSpec = tween(1000), label = "progress"
     )
     Column {
         LinearProgressIndicator(
@@ -422,9 +401,7 @@ private fun LinearProgressIndicatorCard(progress: Float, label: String) {
 @Composable
 private fun ArcProgressRing(progress: Float, size: androidx.compose.ui.unit.Dp) {
     val animatedProgress by animateFloatAsState(
-        targetValue = progress,
-        animationSpec = tween(1200),
-        label = "arc"
+        targetValue = progress, animationSpec = tween(1200), label = "arc"
     )
     Box(
         modifier = Modifier
@@ -444,14 +421,9 @@ private fun ArcProgressRing(progress: Float, size: androidx.compose.ui.unit.Dp) 
                 drawArc(
                     brush = Brush.sweepGradient(
                         listOf(NeonGreen, VibrantPurple)
-                    ),
-                    startAngle = 135f,
-                    sweepAngle = sweep,
-                    useCenter = false,
-                    style = stroke
+                    ), startAngle = 135f, sweepAngle = sweep, useCenter = false, style = stroke
                 )
-            },
-        contentAlignment = Alignment.Center
+            }, contentAlignment = Alignment.Center
     ) {
         Text(
             text = "${(animatedProgress * 100).toInt()}%",
@@ -472,9 +444,7 @@ private fun SpinVectorBars() {
     )
     vectors.forEach { (label, value) ->
         val animated by animateFloatAsState(
-            targetValue = value,
-            animationSpec = tween(900),
-            label = label
+            targetValue = value, animationSpec = tween(900), label = label
         )
         Row(
             modifier = Modifier
@@ -512,8 +482,7 @@ private fun SpinVectorBars() {
 @Composable
 private fun DrillCard(drill: DrillItem) {
     GlassCard(
-        modifier = Modifier.fillMaxWidth(),
-        innerPadding = 14.dp
+        modifier = Modifier.fillMaxWidth(), innerPadding = 14.dp
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -555,8 +524,7 @@ private fun DrillCard(drill: DrillItem) {
                     .background(
                         if (drill.accuracy >= 90) NeonGreen.copy(alpha = 0.15f)
                         else VibrantPurple.copy(alpha = 0.15f)
-                    ),
-                contentAlignment = Alignment.Center
+                    ), contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "${drill.accuracy}%",
@@ -574,13 +542,10 @@ private fun DrillCard(drill: DrillItem) {
 fun DashboardPreview() {
     SpinNetTheme {
         DashboardScreen(
-            currentDestination = SpinNetDestination.Dashboard,
-            onNavigate = {}
-        )
+            currentDestination = SpinNetDestination.Dashboard, onNavigate = {})
     }
 }
 
-// ── Reschedule Dialog ─────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -589,15 +554,13 @@ private fun RescheduleDialog(onDismiss: () -> Unit) {
     val intensityOptions = listOf("Light", "Moderate", "High", "Extreme")
     val dayOptions = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-    var selectedDuration  by remember { mutableStateOf("45 min") }
+    var selectedDuration by remember { mutableStateOf("45 min") }
     var selectedIntensity by remember { mutableStateOf("High") }
-    var selectedDays      by remember { mutableStateOf(setOf("Mon", "Wed", "Fri")) }
+    var selectedDays by remember { mutableStateOf(setOf("Mon", "Wed", "Fri")) }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = SurfaceContainerHigh,
-            tonalElevation = 4.dp
+            shape = RoundedCornerShape(20.dp), color = SurfaceContainerHigh, tonalElevation = 4.dp
         ) {
             Column(
                 modifier = Modifier.padding(20.dp)
@@ -672,7 +635,6 @@ private fun RescheduleDialog(onDismiss: () -> Unit) {
 
                 Spacer(Modifier.height(16.dp))
 
-                // Intensity picker
                 Text(
                     "INTENSITY",
                     color = OnSurfaceVariant,
@@ -710,7 +672,6 @@ private fun RescheduleDialog(onDismiss: () -> Unit) {
 
                 Spacer(Modifier.height(16.dp))
 
-                // Day-of-week picker
                 Text(
                     "TRAINING DAYS",
                     color = OnSurfaceVariant,
@@ -733,11 +694,10 @@ private fun RescheduleDialog(onDismiss: () -> Unit) {
                                 .background(bgColor)
                                 .clickable(
                                     indication = null,
-                                    interactionSource = remember { MutableInteractionSource() }
-                                ) {
-                                    selectedDays = if (isSelected) selectedDays - day else selectedDays + day
-                                },
-                            contentAlignment = Alignment.Center
+                                    interactionSource = remember { MutableInteractionSource() }) {
+                                    selectedDays =
+                                        if (isSelected) selectedDays - day else selectedDays + day
+                                }, contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = day.take(1),
@@ -750,8 +710,6 @@ private fun RescheduleDialog(onDismiss: () -> Unit) {
                 }
 
                 Spacer(Modifier.height(24.dp))
-
-                // Action buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -770,8 +728,7 @@ private fun RescheduleDialog(onDismiss: () -> Unit) {
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Secondary,
-                            contentColor = Color.White
+                            containerColor = Secondary, contentColor = Color.White
                         )
                     ) {
                         Icon(
@@ -780,7 +737,11 @@ private fun RescheduleDialog(onDismiss: () -> Unit) {
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("CONFIRM", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                        Text(
+                            "CONFIRM",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }

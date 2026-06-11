@@ -17,10 +17,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import A51388.spinnet.ui.theme.NeonGreen
 
-/**
- * Neon Green Button with a "bloom" glow effect.
- * Matches the Stitch primary button spec.
- */
 @Composable
 fun NeonButton(
     onClick: () -> Unit,
@@ -40,7 +36,7 @@ fun NeonButton(
                     .background(NeonGreen.copy(alpha = 0.3f), RoundedCornerShape(24.dp))
             )
         }
-        
+
         Button(
             onClick = onClick,
             enabled = enabled,
