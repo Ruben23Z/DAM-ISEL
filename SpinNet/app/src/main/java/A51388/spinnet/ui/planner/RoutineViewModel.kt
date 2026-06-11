@@ -68,12 +68,12 @@ class RoutineViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 db.collection("users").document(uid).collection("routines").add(
-                        mapOf(
-                            "title" to "${routine.title} (copy)",
-                            "shots" to routine.shots,
-                            "createdAt" to System.currentTimeMillis()
-                        )
-                    ).await()
+                    mapOf(
+                        "title" to "${routine.title} (copy)",
+                        "shots" to routine.shots,
+                        "createdAt" to System.currentTimeMillis()
+                    )
+                ).await()
                 _cloneSuccess.value = "${routine.title} adicionado ao teu plano!"
             } catch (e: Exception) {
                 _cloneSuccess.value = "Erro: ${e.localizedMessage}"
@@ -110,5 +110,41 @@ class RoutineViewModel : ViewModel() {
 
     fun clearCloneMessage() {
         _cloneSuccess.value = null
+    }
+
+
+    //Training session
+    fun completeSession(
+        routineId: String,
+        routineTitle: String,
+        durationMinutes: Int,
+        reps: Int,
+        accuracy: Int,
+        racketSide: String
+    ) {
+        if (uid.isEmpty()) return
+
+        viewModelScope.launch {
+            try {
+                val sessionMap = mapOf(
+                    "uid" to uid,
+                    "routineId" to routineId,
+                    "routineTitle" to routineTitle,
+                    "durationMinutes" to durationMinutes,
+                    "reps" to reps,
+                    "accuracy" to accuracy,
+                    "completedAt" to System.currentTimeMillis(),
+                    "racketSide" to racketSide
+                )
+
+                db.collection("users")
+                    .document(uid)
+                    .collection("sessions")
+                    .add(sessionMap).await()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 }

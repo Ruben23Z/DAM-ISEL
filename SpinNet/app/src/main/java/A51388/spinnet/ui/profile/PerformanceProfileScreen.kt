@@ -3,19 +3,15 @@ package A51388.spinnet.ui.profile
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,61 +20,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import A51388.spinnet.data.model.TrainingSession
 import A51388.spinnet.ui.components.GlassCard
 import A51388.spinnet.ui.components.SpinNetBottomBar
 import A51388.spinnet.ui.navigation.SpinNetDestination
 import A51388.spinnet.ui.theme.*
-
-
-private data class RoutineEntry(
-    val name: String,
-    val duration: String,
-    val reps: Int,
-    val whenAgo: String,
-    val accuracy: Int,
-    val badge: String,
-    val badgeColor: Color,
-    val iconTint: Color
-)
-
-private val routineHistory = listOf(
-    RoutineEntry(
-        name = "High Intensity Forehand Drill",
-        duration = "45 mins",
-        reps = 280,
-        whenAgo = "Yesterday",
-        accuracy = 98,
-        badge = "Personal Best",
-        badgeColor = Secondary,
-        iconTint = Secondary
-    ),
-    RoutineEntry(
-        name = "Backspin Defense Block",
-        duration = "30 mins",
-        reps = 150,
-        whenAgo = "2 days ago",
-        accuracy = 82,
-        badge = "Steady Progress",
-        badgeColor = Color(0xFF64748B),
-        iconTint = Tertiary
-    ),
-    RoutineEntry(
-        name = "Precision Service Routine",
-        duration = "20 mins",
-        reps = 80,
-        whenAgo = "4 days ago",
-        accuracy = 94,
-        badge = "Gold Standard",
-        badgeColor = Tertiary,
-        iconTint = Tertiary
-    ),
-)
+import androidx.compose.foundation.border
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun PerformanceProfileScreen(
     currentDestination: SpinNetDestination,
     onNavigate: (SpinNetDestination) -> Unit,
+    viewModel: PerformanceViewModel = viewModel()
 ) {
+    val stats by viewModel.stats.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     Scaffold(
@@ -103,7 +62,7 @@ fun PerformanceProfileScreen(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Alex \"The Spinner\" Chen",
+                "Estatísticas",
                 color = OnSurface,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
@@ -115,71 +74,131 @@ fun PerformanceProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Win Rate
+                // evolução semanal
+                val growthSign = if (stats.volumeGrowthPercentage >= 0) "+" else ""
                 KpiCard(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Outlined.EmojiEvents,
+                    icon = Icons.Outlined.TrendingUp,
                     iconTint = Secondary,
-                    topLabel = "+2.4% vs LW",
+                    topLabel = "EVOLUÇÃO",
+
                     topLabelColor = OnSurfaceVariant,
-                    value = "78%",
-                    valueColor = OnSurface,
-                    bottomLabel = "WIN RATE"
+                    value = "$growthSign${stats.volumeGrowthPercentage}%",
+                    valueColor = if (stats.volumeGrowthPercentage >= 0) Secondary else Color.Red,
+                    bottomLabel = "VOL. SEMANAL"
                 )
+
+                // total de treinos
                 KpiCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Outlined.FitnessCenter,
                     iconTint = Tertiary,
-                    topLabel = "LIFETIME REPS",
+                    topLabel = "LIFETIME",
                     topLabelColor = OnSurfaceVariant,
-                    value = "1,204",
+                    value = "${stats.totalDrills}",
                     valueColor = OnSurface,
                     bottomLabel = "TOTAL DRILLS"
                 )
+
+                //streakatual
                 KpiCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Outlined.LocalFireDepartment,
                     iconTint = Secondary,
-                    topLabel = "ON FIRE",
-                    topLabelColor = Secondary,
-                    value = "12",
-                    valueColor = Secondary,
+                    topLabel = if (stats.dayStreak > 0) "ON FIRE" else "INACTIVE",
+                    topLabelColor = if (stats.dayStreak > 0) Secondary else OnSurfaceVariant,
+                    value = "${stats.dayStreak}",
+                    valueColor = if (stats.dayStreak > 0) Secondary else OnSurface,
                     bottomLabel = "DAY STREAK"
                 )
             }
 
             Spacer(Modifier.height(16.dp))
 
+            Text(
+                "Insights de Rotina",
+                color = OnSurface,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(Modifier.height(10.dp))
+
+            GlassCard(modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    val totalHours = stats.timeTrained / 3_600_000L
+                    val totalMinutes = (stats.timeTrained % 3_600_000L) / 60_000L
+                    val weekHours = stats.timeTrainedThisWeek / 3_600_000L
+                    val weekMinutes = (stats.timeTrainedThisWeek % 3_600_000L) / 60_000L
+
+                    StatRow(
+                        label = "Tempo Total Treinado", value = "${totalHours}h ${totalMinutes}m"
+                    )
+                    StatRow(
+                        label = "Tempo Treinado (Esta Semana)", value = "${weekHours}h ${weekMinutes}m"
+                    )
+                    StatRow(
+                        label = "Média por Sessão",
+                        value = "${stats.averageSessionDurationMinutes} min"
+                    )
+                    StatRow(
+                        label = "Treino mais Longo", value = "${stats.longestSessionMinutes} min"
+                    )
+                    StatRow(
+                        label = "Dias Ativos (Este Mês)",
+                        value = "${stats.activeDaysThisMonth} dias"
+                    )
+                    StatRow(
+                        label = "Melhor Ofensiva Histórica", value = "${stats.bestDayStreak} dias"
+                    )
+                    StatRow(label = "Lado Preferido da Raquete", value = stats.racketPreferredSide)
+
+                    val hiatoText = when (stats.daysSinceLastSession) {
+                        0 -> "Treinou hoje!"
+                        1 -> "Ontem"
+                        else -> "Há ${stats.daysSinceLastSession} dias"
+                    }
+                    StatRow(label = "Último Treino", value = hiatoText)
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "Training Intensity",
-                            color = OnSurface,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Box(
-                                Modifier
-                                    .size(10.dp)
-                                    .clip(CircleShape)
-                                    .background(Secondary)
-                            )
-                            Box(
-                                Modifier
-                                    .size(10.dp)
-                                    .clip(CircleShape)
-                                    .background(Tertiary)
-                            )
-                        }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    IntensityBars()
+                    Text(
+                        "Atividade Semanal",
+                        color = OnSurface,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Minutos de treino nos últimos 7 dias",
+                        color = OnSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    WeeklyActivityChart(sessions = stats.recentSessions)
+                }
+            }
+
+            GlassCard(modifier = Modifier.fillMaxWidth()) {
+                Column {
+                    Text(
+                        "Calendário de Treinos",
+                        color = OnSurface,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Visualização das sessões efetuadas este mês",
+                        color = OnSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    TrainingCalendarGrid(sessions = stats.recentSessions)
                 }
             }
 
@@ -188,37 +207,46 @@ fun PerformanceProfileScreen(
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     Text(
-                        "Spin Mastery",
+                        "Distribuição por Rotina",
                         color = OnSurface,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Percentagem de treinos por tipo de rotina",
+                        color = OnSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     Spacer(Modifier.height(14.dp))
-                    SpinMasteryBars()
-                    Spacer(Modifier.height(16.dp))
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
-                    Spacer(Modifier.height(12.dp))
-                    Button(
-                        onClick = {},
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Secondary, contentColor = Color.White
-                        ),
-                        contentPadding = PaddingValues(vertical = 12.dp)
-                    ) {
-                        Text(
-                            "UPGRADE MASTERY",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
-                        )
-                    }
+                    RoutineDistributionChart(sessions = stats.recentSessions)
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
+            GlassCard(modifier = Modifier.fillMaxWidth()) {
+                Column {
+                    Text(
+                        "Equilíbrio de Raquete",
+                        color = OnSurface,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Distribuição de jogadas entre Forehand e Backhand",
+                        color = OnSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    RacketSideBalanceChart(sessions = stats.recentSessions)
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // historico de sessoes recentes
             Text(
                 "Routine History",
                 color = OnSurface,
@@ -226,13 +254,55 @@ fun PerformanceProfileScreen(
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(Modifier.height(10.dp))
-            routineHistory.forEach { entry ->
-                RoutineHistoryCard(entry)
-                Spacer(Modifier.height(8.dp))
+
+            if (stats.recentSessions.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Outlined.FitnessCenter,
+                            null,
+                            tint = OnSurfaceVariant,
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            "Sem sessões registadas.",
+                            color = OnSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            } else {
+                stats.recentSessions.forEach { session ->
+                    SessionHistoryCard(session)
+                    Spacer(Modifier.height(8.dp))
+                }
             }
 
             Spacer(Modifier.height(24.dp))
         }
+    }
+}
+
+@Composable
+private fun StatRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, color = OnSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+        Text(
+            value,
+            color = OnSurface,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -259,8 +329,9 @@ private fun KpiCard(
                     topLabel,
                     color = topLabelColor,
                     style = MaterialTheme.typography.labelSmall,
-                    fontSize = 8.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 7.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
                 )
             }
             Spacer(Modifier.height(16.dp))
@@ -269,7 +340,8 @@ private fun KpiCard(
                 color = valueColor,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                fontSize = 28.sp
+                fontSize = 24.sp,
+                maxLines = 1
             )
             Text(
                 bottomLabel,
@@ -283,48 +355,94 @@ private fun KpiCard(
 }
 
 @Composable
-private fun IntensityBars() {
-    val days = listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
-    val values = listOf(0.40f, 0.65f, 0.85f, 0.50f, 0.95f, 0.30f, 0.45f)
+private fun WeeklyActivityChart(sessions: List<TrainingSession>) {
+    val dailyVolumes = (0..6).map { i ->
+        val dayCal = java.util.Calendar.getInstance()
+        dayCal.add(java.util.Calendar.DAY_OF_YEAR, -i)
+        
+        // Start of that day
+        dayCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+        dayCal.set(java.util.Calendar.MINUTE, 0)
+        dayCal.set(java.util.Calendar.SECOND, 0)
+        dayCal.set(java.util.Calendar.MILLISECOND, 0)
+        val start = dayCal.timeInMillis
+        val end = start + 86_400_000L
+        
+        val volume = sessions.filter { it.completedAt in start..<end }.sumOf { it.durationMinutes }
+        val dayLabel = when (dayCal.get(java.util.Calendar.DAY_OF_WEEK)) {
+            java.util.Calendar.SUNDAY -> "D"
+            java.util.Calendar.MONDAY -> "S"
+            java.util.Calendar.TUESDAY -> "T"
+            java.util.Calendar.WEDNESDAY -> "Q"
+            java.util.Calendar.THURSDAY -> "Q"
+            java.util.Calendar.FRIDAY -> "S"
+            java.util.Calendar.SATURDAY -> "S"
+            else -> ""
+        }
+        dayLabel to volume
+    }.reversed()
+
+    val maxVolume = dailyVolumes.maxOfOrNull { it.second }?.coerceAtLeast(1) ?: 1
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(96.dp),
+            .height(130.dp)
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Bottom
     ) {
-        days.zip(values).forEachIndexed { idx, (day, value) ->
-            val animated by animateFloatAsState(
-                targetValue = value, animationSpec = tween(800 + idx * 80), label = day
+        dailyVolumes.forEach { (day, volume) ->
+            val heightPercentage = volume.toFloat() / maxVolume.toFloat()
+            val animatedHeightPercentage by animateFloatAsState(
+                targetValue = heightPercentage,
+                animationSpec = tween(900),
+                label = "barHeight"
             )
+
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
             ) {
+                if (volume > 0) {
+                    Text(
+                        "${volume}m",
+                        color = Secondary,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 9.sp
+                    )
+                    Spacer(Modifier.height(4.dp))
+                }
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .fillMaxHeight(animated)
+                        .height(80.dp)
+                        .fillMaxWidth(0.4f)
                         .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
-                        .background(
-                            if (value >= 0.9f) Brush.verticalGradient(
-                                listOf(
-                                    Secondary, Secondary.copy(alpha = 0.5f)
+                        .background(SurfaceContainerHighest)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight(animatedHeightPercentage)
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = if (volume > 0) {
+                                        listOf(Secondary, Secondary.copy(alpha = 0.4f))
+                                    } else {
+                                        listOf(Color.Transparent, Color.Transparent)
+                                    }
                                 )
                             )
-                            else Brush.verticalGradient(
-                                listOf(
-                                    Secondary.copy(alpha = 0.4f), Secondary.copy(alpha = 0.15f)
-                                )
-                            )
-                        )
-                )
-                Spacer(Modifier.height(4.dp))
+                            .align(Alignment.BottomCenter)
+                    )
+                }
+                Spacer(Modifier.height(6.dp))
                 Text(
                     day,
-                    color = OnSurfaceVariant,
+                    color = if (volume > 0) OnSurface else OnSurfaceVariant,
                     style = MaterialTheme.typography.labelSmall,
-                    fontSize = 9.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -333,88 +451,41 @@ private fun IntensityBars() {
 }
 
 @Composable
-private fun SpinMasteryBars() {
-    val spins = listOf(
-        Triple("Topspin Attack", 0.92f, Tertiary),
-        Triple("Defensive Backspin", 0.68f, Tertiary),
-        Triple("Lateral Side Spin", 0.45f, Tertiary),
-    )
-    spins.forEach { (label, value, accent) ->
-        val animated by animateFloatAsState(
-            targetValue = value, animationSpec = tween(900), label = label
-        )
-        Column(modifier = Modifier.padding(vertical = 5.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(label, color = OnSurface, style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    "${(value * 100).toInt()}%",
-                    color = accent,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(Modifier.height(6.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(7.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(SurfaceContainerHighest)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(animated)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(
-                            Brush.horizontalGradient(listOf(Tertiary.copy(alpha = 0.7f), Tertiary))
-                        )
-                )
-            }
-        }
+private fun SessionHistoryCard(session: TrainingSession) {
+    val dateStr = remember(session.completedAt) {
+        if (session.completedAt == 0L) "—"
+        else SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(session.completedAt))
     }
-}
+    val accentColor = if (session.accuracy >= 90) Secondary else Tertiary
 
-@Composable
-private fun RoutineHistoryCard(entry: RoutineEntry) {
     GlassCard(modifier = Modifier.fillMaxWidth(), innerPadding = 14.dp) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Icon square
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(entry.iconTint.copy(alpha = 0.15f)),
+                    .background(accentColor.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    Icons.Outlined.Bolt,
-                    null,
-                    tint = entry.iconTint,
-                    modifier = Modifier.size(22.dp)
-                )
+                Icon(Icons.Outlined.Bolt, null, tint = accentColor, modifier = Modifier.size(22.dp))
             }
 
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    entry.name,
+                    session.routineTitle.ifBlank { "Sessão de treino" },
                     color = OnSurface,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    "${entry.duration} • ${entry.reps} reps • ${entry.whenAgo}",
+                    "${session.durationMinutes} min • ${session.reps} reps • $dateStr",
                     color = OnSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -424,14 +495,14 @@ private fun RoutineHistoryCard(entry: RoutineEntry) {
 
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    "${entry.accuracy}% Accuracy",
+                    "${session.accuracy}%",
                     color = OnSurface,
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    entry.badge,
-                    color = entry.badgeColor,
+                    if (session.accuracy >= 90) "Excelente" else "Bom",
+                    color = accentColor,
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Bold
@@ -439,7 +510,6 @@ private fun RoutineHistoryCard(entry: RoutineEntry) {
             }
 
             Spacer(Modifier.width(8.dp))
-
             Icon(
                 Icons.Outlined.ChevronRight,
                 null,
@@ -450,11 +520,232 @@ private fun RoutineHistoryCard(entry: RoutineEntry) {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF111317)
 @Composable
-fun PerformanceProfilePreview() {
-    SpinNetTheme {
-        PerformanceProfileScreen(
-            currentDestination = SpinNetDestination.Performance, onNavigate = {})
+private fun TrainingCalendarGrid(sessions: List<TrainingSession>) {
+    val calendar = java.util.Calendar.getInstance()
+    val currentMonth = calendar.get(java.util.Calendar.MONTH)
+    val currentYear = calendar.get(java.util.Calendar.YEAR)
+
+    val trainedDays = sessions.mapNotNull { session ->
+        val cal = java.util.Calendar.getInstance().apply { timeInMillis = session.completedAt }
+        if (cal.get(java.util.Calendar.MONTH) == currentMonth && cal.get(java.util.Calendar.YEAR) == currentYear) {
+            cal.get(java.util.Calendar.DAY_OF_MONTH)
+        } else null
+    }.toSet()
+
+    val tempCal = java.util.Calendar.getInstance()
+    tempCal.set(java.util.Calendar.YEAR, currentYear)
+    tempCal.set(java.util.Calendar.MONTH, currentMonth)
+    tempCal.set(java.util.Calendar.DAY_OF_MONTH, 1)
+    val firstDayOfWeek = tempCal.get(java.util.Calendar.DAY_OF_WEEK)
+    val maxDays = tempCal.getActualMaximum(java.util.Calendar.DAY_OF_MONTH)
+
+    val monthName = when (currentMonth) {
+        java.util.Calendar.JANUARY -> "Janeiro"
+        java.util.Calendar.FEBRUARY -> "Fevereiro"
+        java.util.Calendar.MARCH -> "Março"
+        java.util.Calendar.APRIL -> "Abril"
+        java.util.Calendar.MAY -> "Maio"
+        java.util.Calendar.JUNE -> "Junho"
+        java.util.Calendar.JULY -> "Julho"
+        java.util.Calendar.AUGUST -> "Agosto"
+        java.util.Calendar.SEPTEMBER -> "Setembro"
+        java.util.Calendar.OCTOBER -> "Outubro"
+        java.util.Calendar.NOVEMBER -> "Novembro"
+        java.util.Calendar.DECEMBER -> "Dezembro"
+        else -> ""
+    }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+        Text(
+            "$monthName $currentYear",
+            color = OnSurface,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        val weekdays = listOf("Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            weekdays.forEach { day ->
+                Text(
+                    day,
+                    color = OnSurfaceVariant,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 10.sp,
+                    modifier = Modifier.width(32.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+        }
+
+        Spacer(Modifier.height(6.dp))
+
+        val startOffset = if (firstDayOfWeek == java.util.Calendar.SUNDAY) 6 else firstDayOfWeek - 2
+        val totalCells = maxDays + startOffset
+        val rowsCount = (totalCells + 6) / 7
+
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            for (row in 0 until rowsCount) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    for (col in 0..6) {
+                        val cellIndex = row * 7 + col
+                        val dayNumber = cellIndex - startOffset + 1
+                        
+                        if (dayNumber in 1..maxDays) {
+                            val didTrain = trainedDays.contains(dayNumber)
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(
+                                        if (didTrain) Secondary else SurfaceContainerHighest
+                                    )
+                                    .border(
+                                        1.dp,
+                                        if (didTrain) Secondary else Color.White.copy(alpha = 0.05f),
+                                        RoundedCornerShape(6.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "$dayNumber",
+                                    color = if (didTrain) Color.Black else OnSurface,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        } else {
+                            Box(modifier = Modifier.size(32.dp))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RoutineDistributionChart(sessions: List<TrainingSession>) {
+    val total = sessions.size.coerceAtLeast(1)
+    val grouped = sessions.groupBy { it.routineTitle.ifBlank { "Sem Título" } }
+        .mapValues { it.value.size }
+        .toList()
+        .sortedByDescending { it.second }
+        .take(3)
+
+    if (grouped.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxWidth().height(80.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Sem rotinas registadas.", color = OnSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+        }
+        return
+    }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+    ) {
+        grouped.forEachIndexed { index, (title, count) ->
+            val percentage = (count.toFloat() / total.toFloat() * 100).toInt()
+            val animatedPercentage by animateFloatAsState(
+                targetValue = count.toFloat() / total.toFloat(),
+                animationSpec = tween(900),
+                label = "routineBarHeight"
+            )
+            val barColor = if (index == 0) Secondary else if (index == 1) Tertiary else OnSurfaceVariant
+
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(title, color = OnSurface, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+                    Text("$count treinos ($percentage%)", color = barColor, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                }
+                Spacer(Modifier.height(4.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(SurfaceContainerHighest)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(animatedPercentage)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(barColor)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RacketSideBalanceChart(sessions: List<TrainingSession>) {
+    val total = sessions.size.coerceAtLeast(1)
+    val forehandCount = sessions.count { it.racketSide.equals("Forehand", ignoreCase = true) }
+    val backhandCount = sessions.count { it.racketSide.equals("Backhand", ignoreCase = true) }
+    val otherCount = total - forehandCount - backhandCount
+    
+    val fhPercentage = (forehandCount.toFloat() / total.toFloat() * 100).toInt()
+    val bhPercentage = (backhandCount.toFloat() / total.toFloat() * 100).toInt()
+    val otherPercentage = 100 - fhPercentage - bhPercentage
+    
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Forehand ($fhPercentage%)", color = Secondary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+            Text("Backhand ($bhPercentage%)", color = Tertiary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+        }
+        
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(12.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(SurfaceContainerHighest)
+        ) {
+            if (forehandCount > 0) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(forehandCount.toFloat().coerceAtLeast(0.1f))
+                        .background(Secondary)
+                )
+            }
+            if (backhandCount > 0) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(backhandCount.toFloat().coerceAtLeast(0.1f))
+                        .background(Tertiary)
+                )
+            }
+            if (otherCount > 0 && otherCount != total) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(otherCount.toFloat().coerceAtLeast(0.1f))
+                        .background(OnSurfaceVariant.copy(alpha = 0.4f))
+                )
+            }
+        }
     }
 }
