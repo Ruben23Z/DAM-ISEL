@@ -10,5 +10,6 @@ data class TrainingSession(
     val reps: Int = 0,
     val accuracy: Int = 0,
     val completedAt: Long = 0L,
-    val racketSide: String = ""
+    val racketSide: String = "",
+    val notes: String = ""
 )

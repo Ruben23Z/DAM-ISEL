@@ -3,6 +3,7 @@ package A51388.spinnet.ui.dashboard
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -28,31 +29,45 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import A51388.spinnet.data.model.Routine
+import A51388.spinnet.data.model.TrainingSession
 import A51388.spinnet.ui.components.GlassCard
 import A51388.spinnet.ui.components.SpinNetBottomBar
 import A51388.spinnet.ui.navigation.SpinNetDestination
+import A51388.spinnet.ui.planner.RoutineViewModel
+import A51388.spinnet.ui.profile.PerformanceViewModel
+import A51388.spinnet.ui.profile.PlayerProfileViewModel
 import A51388.spinnet.ui.theme.*
 
 data class DrillItem(
     val name: String, val duration: String, val accuracy: Int, val tag: String
 )
 
-
-
-
-//DPS APAGAR
-private val recentDrills = listOf(
-    DrillItem("Heavy Topspin Loop", "45 min", 94, "FOREHAND"),
-    DrillItem("Backspin Defense", "30 min", 81, "BACKHAND"),
-    DrillItem("Pendulum Serve Drill", "20 min", 88, "SERVICE"),
-)
-
 @Composable
 fun DashboardScreen(
-    currentDestination: SpinNetDestination, onNavigate: (SpinNetDestination) -> Unit
+    currentDestination: SpinNetDestination,
+    onNavigate: (SpinNetDestination) -> Unit,
+    routineViewModel: RoutineViewModel = viewModel()
 ) {
+    val performanceViewModel: PerformanceViewModel = viewModel()
+    val playerProfileViewModel: PlayerProfileViewModel = viewModel()
+
+    val profileState by playerProfileViewModel.profile.collectAsStateWithLifecycle()
+    val statsState by performanceViewModel.stats.collectAsStateWithLifecycle()
+    val routinesState by routineViewModel.routines.collectAsStateWithLifecycle()
+
+    val username = profileState?.username ?: "Alex"
+    val streakDays = statsState.dayStreak
+    val growth = statsState.volumeGrowthPercentage
+
+    val activeRoutine = routinesState.firstOrNull()
+
+    val peakSpeed = if (statsState.recentSessions.isEmpty()) 118 else 95 + (statsState.totalDrills * 3) % 25
+    val spinConsistency = if (statsState.recentSessions.isEmpty()) 2450 else 2100 + (statsState.recentSessions.map { it.accuracy }.average().toInt() * 5)
+
     val scrollState = rememberScrollState()
-    var showRescheduleDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = Surface, bottomBar = {
@@ -89,13 +104,13 @@ fun DashboardScreen(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Welcome back, Alex",
+                        text = "Welcome back, $username",
                         color = OnSurface,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Your performance is up 12% this week.",
+                        text = if (growth >= 0) "Your performance is up $growth% recently." else "Your performance is down ${-growth}% recently.",
                         color = OnSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -123,7 +138,7 @@ fun DashboardScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "14 DAYS",
+                                text = "$streakDays DAYS",
                                 color = Tertiary,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.ExtraBold
@@ -135,6 +150,9 @@ fun DashboardScreen(
 
             Spacer(Modifier.height(28.dp))
 
+            val trainingPlans by routineViewModel.trainingPlans.collectAsStateWithLifecycle()
+            val activePlan = trainingPlans.firstOrNull()
+
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     Row(
@@ -144,208 +162,138 @@ fun DashboardScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "ACTIVE SESSION",
+                                text = "ACTIVE TRAINING PLAN",
                                 color = Tertiary,
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(Modifier.height(6.dp))
                             Text(
-                                text = "Heavy Topspin\nMastery",
+                                text = activePlan?.title ?: "No Training Plans Available",
                                 color = OnSurface,
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(Modifier.height(12.dp))
-                            LinearProgressIndicatorCard(progress = 0.68f, label = "68% complete")
+                            LinearProgressIndicatorCard(
+                                progress = if (activePlan != null) 1.0f else 0.0f,
+                                label = if (activePlan != null) "Ready to run: ${activePlan.routines.size} exercises" else "Go to My Routines to create a plan"
+                            )
                         }
                         Spacer(Modifier.width(16.dp))
-                        ArcProgressRing(progress = 0.68f, size = 90.dp)
+                        ArcProgressRing(progress = if (activePlan != null) 1.0f else 0.0f, size = 90.dp)
                     }
 
                     Spacer(Modifier.height(14.dp))
                     HorizontalDivider(color = OutlineVariant.copy(alpha = 0.3f))
                     Spacer(Modifier.height(10.dp))
 
+                    var showPlanSelector by remember { mutableStateOf(false) }
+                    var selectedPlanForTraining by remember { mutableStateOf<A51388.spinnet.data.model.TrainingPlan?>(null) }
+
+                    if (showPlanSelector) {
+                        AlertDialog(
+                            onDismissRequest = { showPlanSelector = false },
+                            containerColor = Color(0xFF10172A),
+                            shape = RoundedCornerShape(20.dp),
+                            title = {
+                                Text(
+                                    "Selecionar Plano de Treino",
+                                    color = OnSurface,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            text = {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = 300.dp)
+                                        .verticalScroll(rememberScrollState()),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    if (trainingPlans.isEmpty()) {
+                                        Text("Nenhum plano disponível. Cria um plano na aba de Planos.", color = OnSurfaceVariant)
+                                    }
+                                    trainingPlans.forEach { plan ->
+                                        val isSel = selectedPlanForTraining?.id == plan.id
+                                        GlassCard(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable { selectedPlanForTraining = plan }
+                                                .border(
+                                                    1.dp,
+                                                    if (isSel) Secondary else Color.Transparent,
+                                                    RoundedCornerShape(12.dp)
+                                                ),
+                                            innerPadding = 12.dp
+                                        ) {
+                                            Column {
+                                                Text(plan.title, color = OnSurface, fontWeight = FontWeight.Bold)
+                                                Text("${plan.routines.size} exercícios", color = OnSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        selectedPlanForTraining?.let { plan ->
+                                            routineViewModel.activeTrainingPlan.value = plan
+                                            routineViewModel.activeTrainingRoutine.value = null
+                                            showPlanSelector = false
+                                            onNavigate(SpinNetDestination.TrainingSession)
+                                        }
+                                    },
+                                    enabled = selectedPlanForTraining != null,
+                                    colors = ButtonDefaults.buttonColors(containerColor = Secondary)
+                                ) {
+                                    Text("CONFIRMAR E INICIAR", color = Color.White, fontWeight = FontWeight.Bold)
+                                }
+                            },
+                            dismissButton = {
+                                OutlinedButton(onClick = { showPlanSelector = false }) {
+                                    Text("CANCELAR")
+                                }
+                            }
+                        )
+                    }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        // RESUME button
                         Button(
-                            onClick = { /* navigate to session */ },
-                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                showPlanSelector = true
+                            },
+                            modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Secondary, contentColor = Color.White
                             ),
-                            contentPadding = PaddingValues(vertical = 10.dp)
+                            contentPadding = PaddingValues(vertical = 12.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.PlayArrow,
                                 contentDescription = null,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(20.dp)
                             )
-                            Spacer(Modifier.width(6.dp))
+                            Spacer(Modifier.width(8.dp))
                             Text(
-                                "RESUME",
+                                "START TRAINING",
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Bold
                             )
                         }
-
-                        OutlinedButton(
-                            onClick = { showRescheduleDialog = true },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = OnSurface
-                            ),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, OutlineVariant),
-                            contentPadding = PaddingValues(vertical = 10.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.CalendarToday,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(Modifier.width(6.dp))
-                            Text(
-                                "RESCHEDULE",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-
-            if (showRescheduleDialog) {
-                RescheduleDialog(onDismiss = { showRescheduleDialog = false })
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Ball Speed Card
-                GlassCard(
-                    modifier = Modifier.weight(1f), innerPadding = 16.dp
-                ) {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Speed,
-                                contentDescription = "Speed",
-                                tint = Secondary,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(Secondary.copy(alpha = 0.15f))
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                            ) {
-                                Text(
-                                    text = "FASTEST",
-                                    color = Secondary,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontSize = 8.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                        Spacer(Modifier.height(16.dp))
-                        Text(
-                            text = "PEAK BALL SPEED",
-                            color = OnSurfaceVariant,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Row(verticalAlignment = Alignment.Bottom) {
-                            Text(
-                                text = "118",
-                                color = OnSurface,
-                                style = MaterialTheme.typography.headlineLarge,
-                                fontWeight = FontWeight.Black
-                            )
-                            Spacer(Modifier.width(4.dp))
-                            Text(
-                                text = "MPH",
-                                color = OnSurfaceVariant,
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
-                        }
-                    }
-                }
-
-                GlassCard(
-                    modifier = Modifier.weight(1f), innerPadding = 16.dp
-                ) {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Analytics,
-                                contentDescription = "Analytics",
-                                tint = NeonGreen,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(NeonGreen.copy(alpha = 0.15f))
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                            ) {
-                                Text(
-                                    text = "+4.2%",
-                                    color = NeonGreen,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontSize = 8.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                        Spacer(Modifier.height(16.dp))
-                        Text(
-                            text = "SPIN CONSISTENCY",
-                            color = OnSurfaceVariant,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Row(verticalAlignment = Alignment.Bottom) {
-                            Text(
-                                text = "2,450",
-                                color = OnSurface,
-                                style = MaterialTheme.typography.headlineLarge,
-                                fontWeight = FontWeight.Black
-                            )
-                            Spacer(Modifier.width(4.dp))
-                            Text(
-                                text = "RPM",
-                                color = OnSurfaceVariant,
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
-                        }
                     }
                 }
             }
 
             Spacer(Modifier.height(16.dp))
+
+            Spacer(Modifier.height(8.dp))
 
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
@@ -367,16 +315,29 @@ fun DashboardScreen(
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(bottom = 10.dp)
             )
-            recentDrills.forEach { drill ->
-                DrillCard(drill = drill)
-                Spacer(Modifier.height(10.dp))
+
+            if (statsState.recentSessions.isEmpty()) {
+                GlassCard(modifier = Modifier.fillMaxWidth()) {
+                    Text("Sem treinos recentes. Começa a treinar para ver estatísticas!", color = OnSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                }
+            } else {
+                statsState.recentSessions.forEach { session ->
+                    DrillCard(
+                        drill = DrillItem(
+                            name = session.routineTitle,
+                            duration = "${session.durationMinutes} min",
+                            accuracy = session.accuracy,
+                            tag = session.racketSide.uppercase()
+                        )
+                    )
+                    Spacer(Modifier.height(10.dp))
+                }
             }
 
             Spacer(Modifier.height(16.dp))
         }
     }
 }
-
 
 @Composable
 private fun LinearProgressIndicatorCard(progress: Float, label: String) {
@@ -409,7 +370,6 @@ private fun ArcProgressRing(progress: Float, size: androidx.compose.ui.unit.Dp) 
             .drawBehind {
                 val stroke = Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round)
                 val sweep = animatedProgress * 270f
-                // track
                 drawArc(
                     color = SurfaceContainerHighest,
                     startAngle = 135f,
@@ -417,14 +377,13 @@ private fun ArcProgressRing(progress: Float, size: androidx.compose.ui.unit.Dp) 
                     useCenter = false,
                     style = stroke
                 )
-                // fill
                 drawArc(
                     brush = Brush.sweepGradient(
                         listOf(NeonGreen, VibrantPurple)
                     ), startAngle = 135f, sweepAngle = sweep, useCenter = false, style = stroke
                 )
             }, contentAlignment = Alignment.Center
-    ) {
+        ) {
         Text(
             text = "${(animatedProgress * 100).toInt()}%",
             color = NeonGreen,
@@ -547,204 +506,3 @@ fun DashboardPreview() {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun RescheduleDialog(onDismiss: () -> Unit) {
-    val durationOptions = listOf("15 min", "30 min", "45 min", "60 min", "90 min")
-    val intensityOptions = listOf("Light", "Moderate", "High", "Extreme")
-    val dayOptions = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-
-    var selectedDuration by remember { mutableStateOf("45 min") }
-    var selectedIntensity by remember { mutableStateOf("High") }
-    var selectedDays by remember { mutableStateOf(setOf("Mon", "Wed", "Fri")) }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(20.dp), color = SurfaceContainerHigh, tonalElevation = 4.dp
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
-                // Header
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "RESCHEDULE",
-                            color = Tertiary,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Heavy Topspin Mastery",
-                            color = OnSurface,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    IconButton(onClick = onDismiss, modifier = Modifier.size(32.dp)) {
-                        Icon(
-                            Icons.Outlined.Close,
-                            contentDescription = "Close",
-                            tint = OnSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(20.dp))
-
-                // Duration picker
-                Text(
-                    "SESSION DURATION",
-                    color = OnSurfaceVariant,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    durationOptions.forEach { opt ->
-                        val isSelected = opt == selectedDuration
-                        FilterChip(
-                            selected = isSelected,
-                            onClick = { selectedDuration = opt },
-                            label = {
-                                Text(opt, style = MaterialTheme.typography.labelSmall)
-                            },
-                            shape = RoundedCornerShape(8.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Secondary.copy(alpha = 0.2f),
-                                selectedLabelColor = Secondary,
-                                containerColor = SurfaceContainerHighest,
-                                labelColor = OnSurfaceVariant
-                            ),
-                            border = FilterChipDefaults.filterChipBorder(
-                                enabled = true,
-                                selected = isSelected,
-                                selectedBorderColor = Secondary.copy(alpha = 0.6f),
-                                borderColor = OutlineVariant
-                            )
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                Text(
-                    "INTENSITY",
-                    color = OnSurfaceVariant,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    intensityOptions.forEach { opt ->
-                        val isSelected = opt == selectedIntensity
-                        FilterChip(
-                            selected = isSelected,
-                            onClick = { selectedIntensity = opt },
-                            label = {
-                                Text(opt, style = MaterialTheme.typography.labelSmall)
-                            },
-                            shape = RoundedCornerShape(8.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Tertiary.copy(alpha = 0.2f),
-                                selectedLabelColor = Tertiary,
-                                containerColor = SurfaceContainerHighest,
-                                labelColor = OnSurfaceVariant
-                            ),
-                            border = FilterChipDefaults.filterChipBorder(
-                                enabled = true,
-                                selected = isSelected,
-                                selectedBorderColor = Tertiary.copy(alpha = 0.6f),
-                                borderColor = OutlineVariant
-                            )
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                Text(
-                    "TRAINING DAYS",
-                    color = OnSurfaceVariant,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    dayOptions.forEach { day ->
-                        val isSelected = day in selectedDays
-                        val bgColor = if (isSelected) Secondary else SurfaceContainerHighest
-                        val textColor = if (isSelected) Color.White else OnSurfaceVariant
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(bgColor)
-                                .clickable(
-                                    indication = null,
-                                    interactionSource = remember { MutableInteractionSource() }) {
-                                    selectedDays =
-                                        if (isSelected) selectedDays - day else selectedDays + day
-                                }, contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = day.take(1),
-                                color = textColor,
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(24.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = OnSurface),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, OutlineVariant)
-                    ) {
-                        Text("CANCEL", style = MaterialTheme.typography.labelMedium)
-                    }
-                    Button(
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Secondary, contentColor = Color.White
-                        )
-                    ) {
-                        Icon(
-                            Icons.Outlined.Check,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            "CONFIRM",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-        }
-    }
-}

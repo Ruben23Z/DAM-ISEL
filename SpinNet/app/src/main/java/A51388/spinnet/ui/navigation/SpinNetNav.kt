@@ -10,6 +10,8 @@ import A51388.spinnet.ui.auth.RegisterScreen
 import A51388.spinnet.ui.dashboard.DashboardScreen
 import A51388.spinnet.ui.planner.RoutinePlannerScreen
 import A51388.spinnet.ui.planner.MyRoutinesScreen
+import A51388.spinnet.ui.planner.RoutineViewModel
+import A51388.spinnet.ui.planner.TrainingSessionScreen
 import A51388.spinnet.ui.community.CommunityFeedScreen
 import A51388.spinnet.ui.profile.PerformanceProfileScreen
 import A51388.spinnet.ui.profile.PlayerProfileScreen
@@ -22,7 +24,8 @@ enum class SpinNetDestination(val route: String) {
     Performance("performance"),
     Community("community"),
     PlayerProfile("player_profile"),
-    MyRoutines("my_routines")
+    MyRoutines("my_routines"),
+    TrainingSession("training_session")
 }
 
 @Composable
@@ -31,7 +34,8 @@ fun SpinNetNavHost(
     currentDestination: SpinNetDestination,
     onNavigate: (SpinNetDestination) -> Unit,
     startDestination: SpinNetDestination,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    routineViewModel: RoutineViewModel
 ) {
     NavHost(
         navController = navController, startDestination = startDestination.route
@@ -47,10 +51,18 @@ fun SpinNetNavHost(
                 onNavigateToLogin = { onNavigate(SpinNetDestination.Login) })
         }
         composable(SpinNetDestination.Dashboard.route) {
-            DashboardScreen(currentDestination = currentDestination, onNavigate = onNavigate)
+            DashboardScreen(
+                currentDestination = currentDestination,
+                onNavigate = onNavigate,
+                routineViewModel = routineViewModel
+            )
         }
         composable(SpinNetDestination.RoutinePlanner.route) {
-            RoutinePlannerScreen(currentDestination = currentDestination, onNavigate = onNavigate)
+            RoutinePlannerScreen(
+                currentDestination = currentDestination,
+                onNavigate = onNavigate,
+                routineViewModel = routineViewModel
+            )
         }
         composable(SpinNetDestination.Performance.route) {
             PerformanceProfileScreen(
@@ -58,7 +70,11 @@ fun SpinNetNavHost(
             )
         }
         composable(SpinNetDestination.Community.route) {
-            CommunityFeedScreen(currentDestination = currentDestination, onNavigate = onNavigate)
+            CommunityFeedScreen(
+                currentDestination = currentDestination,
+                onNavigate = onNavigate,
+                routineViewModel = routineViewModel
+            )
         }
         composable(SpinNetDestination.PlayerProfile.route) {
             PlayerProfileScreen(
@@ -69,7 +85,15 @@ fun SpinNetNavHost(
         }
         composable(SpinNetDestination.MyRoutines.route) {
             MyRoutinesScreen(
-                currentDestination = currentDestination, onNavigate = onNavigate
+                currentDestination = currentDestination,
+                onNavigate = onNavigate,
+                viewModel = routineViewModel
+            )
+        }
+        composable(SpinNetDestination.TrainingSession.route) {
+            TrainingSessionScreen(
+                onNavigate = onNavigate,
+                routineViewModel = routineViewModel
             )
         }
     }

@@ -1,6 +1,7 @@
 package A51388.spinnet
 
 import A51388.spinnet.ui.auth.AuthViewModel
+import A51388.spinnet.ui.planner.RoutineViewModel
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -51,6 +52,7 @@ class MainActivity : ComponentActivity() {
 fun SpinNetApp() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
+    val routineViewModel: RoutineViewModel = viewModel()
 
     val startDestination = if (authViewModel.isLoggedIn()) SpinNetDestination.Dashboard
     else SpinNetDestination.Login
@@ -71,6 +73,7 @@ fun SpinNetApp() {
         currentDestination = currentDestination,
         onNavigate = onNavigate,
         startDestination = startDestination,
-        authViewModel = authViewModel
+        authViewModel = authViewModel,
+        routineViewModel = routineViewModel
     )
 }

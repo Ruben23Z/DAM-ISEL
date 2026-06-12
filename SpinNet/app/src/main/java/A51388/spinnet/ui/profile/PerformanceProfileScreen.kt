@@ -27,6 +27,9 @@ import A51388.spinnet.ui.components.GlassCard
 import A51388.spinnet.ui.components.SpinNetBottomBar
 import A51388.spinnet.ui.navigation.SpinNetDestination
 import A51388.spinnet.ui.theme.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.border
 import java.text.SimpleDateFormat
 import java.util.*
@@ -454,68 +457,243 @@ private fun WeeklyActivityChart(sessions: List<TrainingSession>) {
 private fun SessionHistoryCard(session: TrainingSession) {
     val dateStr = remember(session.completedAt) {
         if (session.completedAt == 0L) "—"
-        else SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(session.completedAt))
+        else SimpleDateFormat("dd MMM yyyy  HH:mm", Locale.getDefault()).format(Date(session.completedAt))
     }
-    val accentColor = if (session.accuracy >= 90) Secondary else Tertiary
+    val accentColor = when {
+        session.accuracy >= 85 -> NeonGreen
+        session.accuracy >= 60 -> Tertiary
+        else -> Secondary
+    }
+    val qualityLabel = when {
+        session.accuracy >= 85 -> "Excelente"
+        session.accuracy >= 60 -> "Bom"
+        else -> "A melhorar"
+    }
 
-    GlassCard(modifier = Modifier.fillMaxWidth(), innerPadding = 14.dp) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(accentColor.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
+    var expanded by remember { mutableStateOf(false) }
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (expanded) 90f else 0f,
+        animationSpec = tween(200),
+        label = "chevron"
+    )
+
+    GlassCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { expanded = !expanded },
+        innerPadding = 14.dp
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // ── Header row ──
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(Icons.Outlined.Bolt, null, tint = accentColor, modifier = Modifier.size(22.dp))
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(accentColor.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Outlined.Bolt, null, tint = accentColor, modifier = Modifier.size(20.dp))
+                }
+
+                Spacer(Modifier.width(12.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        session.routineTitle.ifBlank { "Sessão de treino" },
+                        color = OnSurface,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        "${session.durationMinutes} min • ${session.reps} reps • $dateStr",
+                        color = OnSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+                Spacer(Modifier.width(8.dp))
+
+                // Accuracy badge
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(accentColor.copy(alpha = 0.15f))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        "${session.accuracy}%",
+                        color = accentColor,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(Modifier.width(6.dp))
+
+                Icon(
+                    Icons.Outlined.ChevronRight,
+                    null,
+                    tint = OnSurfaceVariant,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .graphicsLayer { rotationZ = chevronRotation }
+                )
             }
 
-            Spacer(Modifier.width(12.dp))
+            // ── Expanded feedback detail ──
+            if (expanded) {
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = OutlineVariant.copy(alpha = 0.3f))
+                Spacer(Modifier.height(12.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    session.routineTitle.ifBlank { "Sessão de treino" },
-                    color = OnSurface,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    "${session.durationMinutes} min • ${session.reps} reps • $dateStr",
-                    color = OnSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            Spacer(Modifier.width(12.dp))
-
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    "${session.accuracy}%",
-                    color = OnSurface,
+                    "FEEDBACK DA SESSÃO",
+                    color = Secondary,
                     style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
                 )
-                Text(
-                    if (session.accuracy >= 90) "Excelente" else "Bom",
-                    color = accentColor,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+                Spacer(Modifier.height(10.dp))
 
-            Spacer(Modifier.width(8.dp))
-            Icon(
-                Icons.Outlined.ChevronRight,
-                null,
-                tint = OnSurfaceVariant,
-                modifier = Modifier.size(20.dp)
-            )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Accuracy detail
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(SurfaceContainerLow)
+                            .border(1.dp, OutlineVariant, RoundedCornerShape(10.dp))
+                            .padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "${session.accuracy}%",
+                            color = accentColor,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            "PRECISÃO",
+                            color = OnSurfaceVariant,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                        Text(
+                            qualityLabel,
+                            color = accentColor,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    // Racket side
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(SurfaceContainerLow)
+                            .border(1.dp, OutlineVariant, RoundedCornerShape(10.dp))
+                            .padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Outlined.SportsTennis,
+                            null,
+                            tint = Tertiary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            session.racketSide.ifBlank { "—" },
+                            color = OnSurface,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "RAQUETE",
+                            color = OnSurfaceVariant,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+
+                    // Duration
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(SurfaceContainerLow)
+                            .border(1.dp, OutlineVariant, RoundedCornerShape(10.dp))
+                            .padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "${session.durationMinutes}m",
+                            color = OnSurface,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            "DURAÇÃO",
+                            color = OnSurfaceVariant,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                        Text(
+                            "${session.reps} reps",
+                            color = OnSurfaceVariant,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+
+                // Notes (only if present)
+                if (session.notes.isNotBlank()) {
+                    Spacer(Modifier.height(10.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(SurfaceContainerLow)
+                            .border(1.dp, OutlineVariant, RoundedCornerShape(10.dp))
+                            .padding(12.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                Icons.Outlined.EditNote,
+                                null,
+                                tint = OnSurfaceVariant,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                "Notas",
+                                color = OnSurfaceVariant,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            session.notes,
+                            color = OnSurface,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
         }
     }
 }

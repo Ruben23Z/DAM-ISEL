@@ -62,8 +62,8 @@ private data class SeqShot(
 fun RoutinePlannerScreen(
     currentDestination: SpinNetDestination,
     onNavigate: (SpinNetDestination) -> Unit,
+    routineViewModel: RoutineViewModel = viewModel()
 ) {
-    val routineViewModel: RoutineViewModel = viewModel()
     val communityViewModel: CommunityViewModel = viewModel()
 
     val cloneMessage by routineViewModel.cloneSuccess.collectAsStateWithLifecycle()
@@ -92,16 +92,15 @@ fun RoutinePlannerScreen(
     val savedRoutines by routineViewModel.routines.collectAsStateWithLifecycle()
     var routineTitle by remember { mutableStateOf("") }
 
-    var selectedZone by remember { mutableStateOf<Int?>(7) }
+    var selectedZone by remember { mutableStateOf<Int?>(3) }
     var selectedSpin by remember { mutableStateOf(SpinDir.E) }
     var intensity by remember { mutableFloatStateOf(0.85f) }
-    var showTable by remember { mutableStateOf(true) }
     var sequence by remember {
         mutableStateOf(
             listOf(
-                SeqShot(1, 7, SpinDir.N, 45, "High"),
-                SeqShot(2, 2, SpinDir.S, 30, "Low"),
-                SeqShot(3, 15, SpinDir.W, 38, "Med"),
+                SeqShot(1, 3, SpinDir.N, 45, "High"),
+                SeqShot(2, 11, SpinDir.S, 30, "Low"),
+                SeqShot(3, 6, SpinDir.W, 38, "Med"),
             )
         )
     }
@@ -183,69 +182,31 @@ fun RoutinePlannerScreen(
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.SemiBold
                         )
-                        // TABLE
-
-                        Box(
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(SurfaceContainerLowest)
-                                .border(1.dp, OutlineVariant, CircleShape)
-                                .padding(3.dp)
-                        ) {
-                            Row {
-                                listOf(
-                                    "TABLE" to true, "FLOOR" to false
-                                ).forEach { (label, isTable) ->
-                                    val active = showTable == isTable
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(CircleShape)
-                                            .background(if (active) Secondary else Color.Transparent)
-                                            .clickable(
-                                                indication = null,
-                                                interactionSource = remember { MutableInteractionSource() }) {
-                                                showTable = isTable
-                                            }
-                                            .padding(horizontal = 14.dp, vertical = 6.dp)) {
-                                        Text(
-                                            label,
-                                            color = if (active) Color.White else OnSurfaceVariant,
-                                            style = MaterialTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-                                }
-                            }
-                        }
                     }
 
                     Spacer(Modifier.height(16.dp))
 
-                    //mesa (4×4)
+                    //mesa (4×4) — Zonas 1-8 = meu lado (esq) | Zonas 9-16 = lado adversário (dir)
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(3f / 2f)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF0A0F1A))
-                            .border(2.dp, Secondary.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                            .background(Color(0xFF0F172A))
+                            .border(3.dp, Color.White, RoundedCornerShape(12.dp))
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(12.dp)
-                                .border(
-                                    1.5.dp,
-                                    Color.White.copy(alpha = 0.18f),
-                                    RoundedCornerShape(4.dp)
-                                )
+                                .padding(2.dp)
                         ) {
+                            // Net separator vertical (linha de rede)
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.Center)
                                     .fillMaxHeight()
-                                    .width(1.dp)
-                                    .background(Color.White.copy(alpha = 0.15f))
+                                    .width(6.dp)
+                                    .background(Color.White)
                             )
                             Column(modifier = Modifier.fillMaxSize()) {
                                 for (row in 0 until 4) {
@@ -255,52 +216,71 @@ fun RoutinePlannerScreen(
                                             .fillMaxWidth()
                                     ) {
                                         for (col in 0 until 4) {
-                                            val zone = row * 4 + col + 1
+                                            // Zones 1-8 = player side (left cols 0-1), 9-16 = opponent side (right cols 2-3)
+                                            val zone = if (col < 2) row * 2 + col + 1 else row * 2 + (col - 2) + 9
+                                            val isPlayerSide = col < 2
                                             val sel = zone == selectedZone
                                             Box(
                                                 modifier = Modifier
                                                     .weight(1f)
                                                     .fillMaxHeight()
-                                                    .border(0.5.dp, Color.White.copy(alpha = 0.06f))
-                                                    .background(if (sel) Secondary.copy(alpha = 0.40f) else Color.Transparent)
+                                                    .border(
+                                                        0.5.dp,
+                                                        if (isPlayerSide) Secondary.copy(alpha = 0.12f)
+                                                        else Tertiary.copy(alpha = 0.12f)
+                                                    )
+                                                    .background(
+                                                        if (sel) (if (isPlayerSide) Secondary else Tertiary).copy(alpha = 0.55f)
+                                                        else if (isPlayerSide) Secondary.copy(alpha = 0.04f)
+                                                        else Tertiary.copy(alpha = 0.04f)
+                                                    )
                                                     .then(
                                                         if (sel) Modifier.border(
-                                                            1.5.dp, Secondary
+                                                            2.dp,
+                                                            if (isPlayerSide) Secondary else Tertiary
                                                         ) else Modifier
                                                     )
                                                     .clickable(
                                                         indication = null,
-                                                        interactionSource = remember { MutableInteractionSource() }) {
-                                                        selectedZone = zone
-                                                    }, contentAlignment = Alignment.Center
+                                                        interactionSource = remember { MutableInteractionSource() }
+                                                    ) { selectedZone = zone },
+                                                contentAlignment = Alignment.Center
                                             ) {
                                                 Text(
                                                     "$zone",
-                                                    color = if (sel) Color.White else Color.White.copy(
-                                                        alpha = 0.22f
-                                                    ),
+                                                    color = if (sel) Color.White
+                                                    else if (isPlayerSide) Secondary.copy(alpha = 0.75f)
+                                                    else Tertiary.copy(alpha = 0.75f),
                                                     style = MaterialTheme.typography.labelSmall,
                                                     fontWeight = FontWeight.Black,
-                                                    fontSize = 10.sp
+                                                    fontSize = 11.sp
                                                 )
                                             }
                                         }
-                                    }
-                                    if (row == 1) {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(2.dp)
-                                                .background(Color.White.copy(alpha = 0.38f))
-                                        )
                                     }
                                 }
                             }
                         }
                     }
 
-                    Spacer(Modifier.height(14.dp))
+                    Spacer(Modifier.height(10.dp))
 
+                    // Legend
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Box(Modifier.size(8.dp).clip(androidx.compose.foundation.shape.CircleShape).background(Secondary))
+                            Text("MEU LADO (1-8)", color = Secondary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Box(Modifier.size(8.dp).clip(androidx.compose.foundation.shape.CircleShape).background(Tertiary))
+                            Text("ADVERSÁRIO (9-16)", color = Tertiary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    Spacer(Modifier.height(4.dp))
 
                     Row(
                         modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -308,12 +288,6 @@ fun RoutinePlannerScreen(
                     ) {
                         StatusChip(
                             text = "SELECTING TARGET ZONE", dotColor = Secondary, showDot = true
-                        )
-                        StatusChip(
-                            text = "GRID: 4×4 GRANULAR",
-                            dotColor = Color.Transparent,
-                            showDot = false,
-                            alpha = 0.5f
                         )
                     }
                 }
@@ -430,8 +404,18 @@ fun RoutinePlannerScreen(
                         }
                         OutlinedButton(
                             onClick = {
-                                selectedZone = (1..16).random()
-                                selectedSpin = SpinDir.values().random()
+                                val playerZones = (1..8).toList()
+                                val opponentZones = (9..16).toList()
+
+                                // KEY FIX: read selectedZone first (updated by previous Randomize click),
+                                // then fall back to last sequence item. This gives true alternation on
+                                // repeated Randomize clicks without needing to add to sequence each time.
+                                val currentZone = selectedZone
+                                    ?: sequence.lastOrNull()?.zone
+                                    ?: playerZones.random()
+                                val currentIsPlayer = currentZone in playerZones
+                                selectedZone = if (currentIsPlayer) opponentZones.random() else playerZones.random()
+                                selectedSpin = SpinDir.entries.random()
                                 intensity = 0.3f + (Math.random() * 0.7f).toFloat()
                             },
                             modifier = Modifier.weight(1f),
@@ -523,29 +507,68 @@ fun RoutinePlannerScreen(
                     HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
                     Spacer(Modifier.height(12.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            "TOTAL DURATION",
-                            color = OnSurfaceVariant,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        val totalSecs = sequence.size * 33
-                        Text(
-                            "%02d:%02d MIN".format(totalSecs / 60, totalSecs % 60),
-                            color = OnSurface,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold
+                    var showReviewDialog by remember { mutableStateOf(false) }
+                    if (showReviewDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showReviewDialog = false },
+                            containerColor = Color(0xFF10172A),
+                            shape = RoundedCornerShape(20.dp),
+                            title = {
+                                Text(
+                                    "Review Sequence",
+                                    color = OnSurface,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            text = {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = 300.dp)
+                                        .verticalScroll(rememberScrollState()),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    sequence.forEach { s ->
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(SurfaceContainerLow)
+                                                .padding(10.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                "Shot ${s.index}: Zone ${s.zone}",
+                                                color = OnSurface,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(
+                                                s.spin.spinName,
+                                                color = Tertiary,
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = { showReviewDialog = false },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Secondary)
+                                ) {
+                                    Text("Fechar", color = Color.White)
+                                }
+                            }
                         )
                     }
 
-                    Spacer(Modifier.height(12.dp))
-
                     Button(
-                        onClick = {},
+                        onClick = {
+                            showReviewDialog = true
+                        },
                         enabled = sequence.isNotEmpty(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
@@ -555,7 +578,7 @@ fun RoutinePlannerScreen(
                         contentPadding = PaddingValues(vertical = 16.dp)
                     ) {
                         Text(
-                            "START TRAINING",
+                            "REVIEW",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -565,7 +588,7 @@ fun RoutinePlannerScreen(
                     GlassTextField(
                         value = routineTitle,
                         onValueChange = { routineTitle = it },
-                        label = "Nome da rotina",
+                        label = "Nome do exercício",
                         leadingIcon = Icons.Outlined.Edit
                     )
 
@@ -587,7 +610,7 @@ fun RoutinePlannerScreen(
                                 routineTitle = ""
                             }
                         }, enabled = routineTitle.isNotBlank() && sequence.isNotEmpty()
-                    ) { Text("SAVE ROUTINE") }
+                    ) { Text("SAVE EXERCISE") }
 
                     if (savedRoutines.isNotEmpty()) {
                         Spacer(Modifier.height(24.dp))

@@ -34,16 +34,18 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 fun CommunityFeedScreen(
     currentDestination: SpinNetDestination,
     onNavigate: (SpinNetDestination) -> Unit,
+    routineViewModel: RoutineViewModel = viewModel()
 ) {
     val communityViewModel: CommunityViewModel = viewModel()
-    val routineViewModel: RoutineViewModel = viewModel()
     val feed by communityViewModel.feed.collectAsStateWithLifecycle()
+    val sharedPlans by communityViewModel.sharedPlans.collectAsStateWithLifecycle()
     val cloneMessage by routineViewModel.cloneSuccess.collectAsStateWithLifecycle()
     val actionMessage by communityViewModel.actionMessage.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val currentUid = communityViewModel.currentUid
 
     var selectedTab by remember { mutableIntStateOf(0) }
+    var feedSubTab by remember { mutableIntStateOf(0) }
     val scrollState = rememberScrollState()
     val tabs = listOf("Feed", "Network", "Alerts")
 
@@ -79,7 +81,6 @@ fun CommunityFeedScreen(
                 )
                 .padding(padding)
         ) {
-            // nome da app, título e pesquisa
             Column(modifier = Modifier.padding(horizontal = 20.dp)) {
                 Spacer(Modifier.height(24.dp))
                 Row(
@@ -117,7 +118,7 @@ fun CommunityFeedScreen(
                     }
                 }
                 Text(
-                    text = "Descobre rotinas partilhadas pela comunidade SpinNet.",
+                    text = "Descobre rotinas e planos partilhados pela comunidade SpinNet.",
                     color = OnSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -155,37 +156,98 @@ fun CommunityFeedScreen(
 
                 when (selectedTab) {
                     0 -> {
-                        if (feed.isEmpty()) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 64.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(
-                                        Icons.Outlined.PeopleOutline,
-                                        contentDescription = null,
-                                        tint = OnSurfaceVariant,
-                                        modifier = Modifier.size(48.dp)
+                        TabRow(
+                            selectedTabIndex = feedSubTab,
+                            containerColor = Color.Transparent,
+                            contentColor = Secondary,
+                            indicator = { tabPositions ->
+                                TabRowDefaults.SecondaryIndicator(
+                                    modifier = Modifier.tabIndicatorOffset(tabPositions[feedSubTab]),
+                                    color = Secondary
+                                )
+                            }
+                        ) {
+                            Tab(
+                                selected = feedSubTab == 0,
+                                onClick = { feedSubTab = 0 },
+                                text = { Text("ROTINAS", fontWeight = FontWeight.Bold) }
+                            )
+                            Tab(
+                                selected = feedSubTab == 1,
+                                onClick = { feedSubTab = 1 },
+                                text = { Text("PLANOS DE TREINO", fontWeight = FontWeight.Bold) }
+                            )
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        if (feedSubTab == 0) {
+                            if (feed.isEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 64.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Icon(
+                                            Icons.Outlined.PeopleOutline,
+                                            contentDescription = null,
+                                            tint = OnSurfaceVariant,
+                                            modifier = Modifier.size(48.dp)
+                                        )
+                                        Spacer(Modifier.height(12.dp))
+                                        Text(
+                                            "Ainda não há rotinas partilhadas.",
+                                            color = OnSurfaceVariant,
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
+                                }
+                            } else {
+                                feed.forEach { routine ->
+                                    CommunityRoutineCard(
+                                        routine = routine,
+                                        routineViewModel = routineViewModel,
+                                        communityViewModel = communityViewModel,
+                                        isOwner = routine.sharedBy == currentUid
                                     )
                                     Spacer(Modifier.height(12.dp))
-                                    Text(
-                                        "Ainda não há rotinas partilhadas.",
-                                        color = OnSurfaceVariant,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
                                 }
                             }
                         } else {
-                            feed.forEach { routine ->
-                                CommunityRoutineCard(
-                                    routine = routine,
-                                    routineViewModel = routineViewModel,
-                                    communityViewModel = communityViewModel,
-                                    isOwner = routine.sharedBy == currentUid
-                                )
-                                Spacer(Modifier.height(12.dp))
+                            if (sharedPlans.isEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 64.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Icon(
+                                            Icons.Outlined.ListAlt,
+                                            contentDescription = null,
+                                            tint = OnSurfaceVariant,
+                                            modifier = Modifier.size(48.dp)
+                                        )
+                                        Spacer(Modifier.height(12.dp))
+                                        Text(
+                                            "Ainda não há planos partilhados.",
+                                            color = OnSurfaceVariant,
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
+                                }
+                            } else {
+                                sharedPlans.forEach { plan ->
+                                    CommunityPlanCard(
+                                        plan = plan,
+                                        routineViewModel = routineViewModel,
+                                        communityViewModel = communityViewModel,
+                                        isOwner = (plan["sharedBy"] as? String) == currentUid
+                                    )
+                                    Spacer(Modifier.height(12.dp))
+                                }
                             }
                         }
                     }
@@ -285,13 +347,11 @@ private fun CommunityRoutineCard(
 
     GlassCard(modifier = Modifier.fillMaxWidth()) {
         Column {
-            //avatar, título e shots
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Avatar
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -424,7 +484,6 @@ private fun CommunityRoutineCard(
             HorizontalDivider(color = OutlineVariant.copy(alpha = 0.3f))
             Spacer(Modifier.height(10.dp))
 
-            // Descricao do autor
             if (!routine.description.isNullOrBlank()) {
                 Text(
                     text = routine.description,
@@ -434,7 +493,6 @@ private fun CommunityRoutineCard(
                 )
             }
 
-            // Stats do shots, zonas e spin
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -514,6 +572,125 @@ private fun CommunityRoutineCard(
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CommunityPlanCard(
+    plan: Map<String, Any>,
+    routineViewModel: RoutineViewModel,
+    communityViewModel: CommunityViewModel,
+    isOwner: Boolean
+) {
+    val title = plan["title"] as? String ?: "Plan"
+    val desc = plan["description"] as? String ?: ""
+    val rawRoutines = plan["routines"] as? List<Map<String, Any>> ?: emptyList()
+    val planId = plan["id"] as? String ?: ""
+    val sharedBy = plan["sharedBy"] as? String ?: ""
+
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            containerColor = Color(0xFF1A1F2E),
+            shape = RoundedCornerShape(20.dp),
+            title = { Text("Apagar publicação?", color = OnSurface, fontWeight = FontWeight.Bold) },
+            text = { Text("Esta ação é irreversível. O plano de treino é removido do feed para todos.", color = OnSurfaceVariant, style = MaterialTheme.typography.bodySmall) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        communityViewModel.unsharePlan(planId)
+                        showDeleteConfirm = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFCF6679)),
+                    shape = RoundedCornerShape(10.dp)
+                ) { Text("Apagar", color = Color.White, fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancelar", color = OnSurfaceVariant) }
+            })
+    }
+
+    GlassCard(modifier = Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(Tertiary.copy(alpha = 0.3f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            sharedBy.take(1).uppercase(),
+                            color = Tertiary,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Column {
+                        Text(title, color = OnSurface, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("${rawRoutines.size} sequências", color = OnSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Tertiary.copy(alpha = 0.15f))
+                            .border(1.dp, Tertiary.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+                            .padding(horizontal = 10.dp, vertical = 3.dp)
+                    ) {
+                        Text("PLAN", color = Tertiary, style = MaterialTheme.typography.labelSmall)
+                    }
+                    if (isOwner) {
+                        IconButton(onClick = { showDeleteConfirm = true }) {
+                            Icon(Icons.Outlined.Delete, null, tint = Error, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
+            }
+            if (desc.isNotBlank()) {
+                Text(desc, color = OnSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+            }
+            HorizontalDivider(color = OutlineVariant.copy(alpha = 0.3f))
+            rawRoutines.forEach { r ->
+                val rTitle = r["routineTitle"] as? String ?: ""
+                val rDur = r["durationMinutes"] ?: 10
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(rTitle, color = OnSurface, style = MaterialTheme.typography.bodySmall)
+                    Text("$rDur min", color = Tertiary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                }
+            }
+            if (!isOwner) {
+                Spacer(Modifier.height(4.dp))
+                Button(
+                    onClick = {
+                        communityViewModel.cloneSharedPlan(plan, routineViewModel)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Secondary),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Icon(Icons.Outlined.FileDownload, null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("ADICIONAR PLANO", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
             }
         }
