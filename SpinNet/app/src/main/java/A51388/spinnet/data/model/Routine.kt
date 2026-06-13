@@ -17,5 +17,6 @@ data class Shot(
     val zone: Int = 0,
     val spinName: String = "",
     val velocity: Int = 0,
-    val freq: String = ""
+    val freq: String = "",
+    val racketSide: String = "Forehand"
 )

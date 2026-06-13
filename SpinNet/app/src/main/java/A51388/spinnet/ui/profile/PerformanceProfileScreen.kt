@@ -186,6 +186,29 @@ fun PerformanceProfileScreen(
                 }
             }
 
+            Spacer(Modifier.height(16.dp))
+
+            GlassCard(modifier = Modifier.fillMaxWidth()) {
+                Column {
+                    Text(
+                        "Evolução da Precisão",
+                        color = OnSurface,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Precisão média por semana (últimas 8 semanas)",
+                        color = OnSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    AccuracyLineChart(data = stats.weeklyAccuracy)
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     Text(
@@ -922,6 +945,134 @@ private fun RacketSideBalanceChart(sessions: List<TrainingSession>) {
                         .fillMaxHeight()
                         .weight(otherCount.toFloat().coerceAtLeast(0.1f))
                         .background(OnSurfaceVariant.copy(alpha = 0.4f))
+                )
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Text(
+            "Baseado no lado dominante por sessão",
+            color = OnSurfaceVariant,
+            style = MaterialTheme.typography.labelSmall
+        )
+    }
+}
+
+@Composable
+private fun AccuracyLineChart(data: List<Pair<String, Float>>) {
+    if (data.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "Sem dados suficientes",
+                color = OnSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+        return
+    }
+
+    val animationProgress by animateFloatAsState(
+        targetValue = 1f,
+        animationSpec = tween(1000),
+        label = "accuracyLineProgress"
+    )
+
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+        ) {
+            val width = size.width
+            val height = size.height
+            val paddingLeft = 40.dp.toPx()
+            val paddingRight = 20.dp.toPx()
+            val paddingTop = 10.dp.toPx()
+            val paddingBottom = 20.dp.toPx()
+
+            val chartWidth = width - paddingLeft - paddingRight
+            val chartHeight = height - paddingTop - paddingBottom
+
+            // Y grid lines at 0%, 25%, 50%, 75%, 100%
+            val gridLines = listOf(0f, 0.25f, 0.5f, 0.75f, 1f)
+            gridLines.forEach { ratio ->
+                val y = paddingTop + chartHeight * (1f - ratio)
+                drawLine(
+                    color = OnSurfaceVariant.copy(alpha = 0.2f),
+                    start = androidx.compose.ui.geometry.Offset(paddingLeft, y),
+                    end = androidx.compose.ui.geometry.Offset(width - paddingRight, y),
+                    strokeWidth = 1.dp.toPx()
+                )
+            }
+
+            val points = data.mapIndexed { index, pair ->
+                val x = paddingLeft + if (data.size > 1) {
+                    index.toFloat() / (data.size - 1) * chartWidth
+                } else {
+                    chartWidth / 2f
+                }
+                val normValue = (pair.second / 100f).coerceIn(0f, 1f)
+                val y = paddingTop + chartHeight * (1f - normValue)
+                x to y
+            }
+
+            // Draw line segment by segment, scaling by progress
+            for (i in 0 until points.size - 1) {
+                val p1 = points[i]
+                val p2 = points[i + 1]
+                
+                val startRatio = i.toFloat() / (points.size - 1)
+                val endRatio = (i + 1).toFloat() / (points.size - 1)
+                
+                if (animationProgress > startRatio) {
+                    val segmentProgress = ((animationProgress - startRatio) / (endRatio - startRatio)).coerceIn(0f, 1f)
+                    val currentX = p1.first + (p2.first - p1.first) * segmentProgress
+                    val currentY = p1.second + (p2.second - p1.second) * segmentProgress
+                    
+                    drawLine(
+                        color = Tertiary,
+                        start = androidx.compose.ui.geometry.Offset(p1.first, p1.second),
+                        end = androidx.compose.ui.geometry.Offset(currentX, currentY),
+                        strokeWidth = 3.dp.toPx(),
+                        cap = androidx.compose.ui.graphics.StrokeCap.Round
+                    )
+                }
+            }
+
+            // Draw dots at data points
+            points.forEachIndexed { index, (x, y) ->
+                val dotRatio = index.toFloat() / (points.size - 1)
+                if (animationProgress >= dotRatio) {
+                    drawCircle(
+                        color = Secondary,
+                        center = androidx.compose.ui.geometry.Offset(x, y),
+                        radius = 5.dp.toPx()
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // Week labels aligned under points
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 40.dp, end = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            data.forEach { (week, _) ->
+                Text(
+                    text = week,
+                    color = OnSurfaceVariant,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 10.sp,
+                    modifier = Modifier.width(32.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
             }
         }

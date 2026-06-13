@@ -55,7 +55,7 @@ private enum class SpinDir(
 }
 
 private data class SeqShot(
-    val index: Int, val zone: Int, val spin: SpinDir, val velocity: Int, val freq: String
+    val index: Int, val zone: Int, val spin: SpinDir, val velocity: Int, val freq: String, val racketSide: String = "Forehand"
 )
 
 @Composable
@@ -76,6 +76,8 @@ fun RoutinePlannerScreen(
         }
     }
 
+
+
     // Rotina selecionada para partilh
     var routineToShare by remember { mutableStateOf<Routine?>(null) }
 
@@ -95,16 +97,35 @@ fun RoutinePlannerScreen(
     var selectedZone by remember { mutableStateOf<Int?>(3) }
     var selectedSpin by remember { mutableStateOf(SpinDir.E) }
     var intensity by remember { mutableFloatStateOf(0.85f) }
+    var selectedRacketSide by remember { mutableStateOf("Forehand") }
     var sequence by remember {
         mutableStateOf(
             listOf(
-                SeqShot(1, 3, SpinDir.N, 45, "High"),
-                SeqShot(2, 11, SpinDir.S, 30, "Low"),
-                SeqShot(3, 6, SpinDir.W, 38, "Med"),
+                SeqShot(1, 3, SpinDir.N, 45, "High", "Forehand"),
+                SeqShot(2, 11, SpinDir.S, 30, "Low", "Backhand"),
+                SeqShot(3, 6, SpinDir.W, 38, "Med", "Both"),
             )
         )
     }
     val scrollState = rememberScrollState()
+
+    val generatedSequence by routineViewModel.generatedSequenceToLoad.collectAsStateWithLifecycle()
+    LaunchedEffect(generatedSequence) {
+        generatedSequence?.let { (title, shots) ->
+            routineTitle = title
+            sequence = shots.map { s ->
+                SeqShot(
+                    index = s.index,
+                    zone = s.zone,
+                    spin = SpinDir.entries.find { it.spinName == s.spinName } ?: SpinDir.N,
+                    velocity = s.velocity,
+                    freq = s.freq,
+                    racketSide = s.racketSide
+                )
+            }
+            routineViewModel.clearGeneratedSequence()
+        }
+    }
 
     Scaffold(
         containerColor = Surface,
@@ -149,20 +170,40 @@ fun RoutinePlannerScreen(
                     )
                 }
                 Spacer(Modifier.width(8.dp))
-                OutlinedButton(
-                    onClick = { onNavigate(SpinNetDestination.MyRoutines) },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = OnSurface),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, OutlineVariant),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Outlined.History, null, Modifier.size(16.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        "MY ROUTINES",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold
-                    )
+                    OutlinedButton(
+                        onClick = { onNavigate(SpinNetDestination.AiRoutine) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Tertiary),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Tertiary.copy(alpha = 0.5f)),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Icon(Icons.Outlined.AutoAwesome, null, Modifier.size(16.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            "AI COACH",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = { onNavigate(SpinNetDestination.MyRoutines) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = OnSurface),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, OutlineVariant),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Icon(Icons.Outlined.History, null, Modifier.size(16.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            "MY ROUTINES",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
 
@@ -344,38 +385,38 @@ fun RoutinePlannerScreen(
 
                     Spacer(Modifier.height(14.dp))
 
+                    Text(
+                        "LADO DA RAQUETE",
+                        color = OnSurfaceVariant,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(6.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            "INTENSITY",
-                            color = OnSurfaceVariant,
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                        Text(
-                            "${(intensity * 100).toInt()}%",
-                            color = Tertiary,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(SurfaceContainerHighest)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(intensity)
-                                .fillMaxHeight()
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Brush.horizontalGradient(listOf(Secondary, Tertiary)))
-                        )
+                        val options = listOf("Forehand" to "FH", "Backhand" to "BH", "Both" to "Both")
+                        options.forEach { (value, label) ->
+                            val active = selectedRacketSide == value
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(if (active) Secondary else SurfaceContainerLow)
+                                    .border(1.dp, if (active) Secondary else OutlineVariant, RoundedCornerShape(8.dp))
+                                    .clickable { selectedRacketSide = value }
+                                    .padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = label,
+                                    color = if (active) Color.White else OnSurfaceVariant,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                     }
 
                     Spacer(Modifier.height(16.dp))
@@ -392,7 +433,8 @@ fun RoutinePlannerScreen(
                                         zone = z,
                                         spin = selectedSpin,
                                         velocity = listOf(30, 38, 45, 52).random(),
-                                        freq = listOf("Low", "Med", "High").random()
+                                        freq = listOf("Low", "Med", "High").random(),
+                                        racketSide = selectedRacketSide
                                     )
                                 }
                             },
@@ -415,16 +457,13 @@ fun RoutinePlannerScreen(
                                 val playerZones = (1..8).toList()
                                 val opponentZones = (9..16).toList()
 
-                                // KEY FIX: read selectedZone first (updated by previous Randomize click),
-                                // then fall back to last sequence item. This gives true alternation on
-                                // repeated Randomize clicks without needing to add to sequence each time.
                                 val currentZone = selectedZone
                                     ?: sequence.lastOrNull()?.zone
                                     ?: playerZones.random()
                                 val currentIsPlayer = currentZone in playerZones
                                 selectedZone = if (currentIsPlayer) opponentZones.random() else playerZones.random()
                                 selectedSpin = SpinDir.entries.random()
-                                intensity = 0.3f + (Math.random() * 0.7f).toFloat()
+                                selectedRacketSide = listOf("Forehand", "Backhand", "Both").random()
                             },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
@@ -553,8 +592,14 @@ fun RoutinePlannerScreen(
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 fontWeight = FontWeight.Bold
                                             )
+                                            val sideAbbrev = when (s.racketSide) {
+                                                "Forehand" -> "FH"
+                                                "Backhand" -> "BH"
+                                                "Both" -> "FH+BH"
+                                                else -> s.racketSide
+                                            }
                                             Text(
-                                                s.spin.spinName,
+                                                "${s.spin.spinName} ($sideAbbrev)",
                                                 color = Tertiary,
                                                 style = MaterialTheme.typography.bodySmall
                                             )
@@ -611,7 +656,8 @@ fun RoutinePlannerScreen(
                                             zone = s.zone,
                                             spinName = s.spin.spinName,
                                             velocity = s.velocity,
-                                            freq = s.freq
+                                            freq = s.freq,
+                                            racketSide = s.racketSide
                                         )
                                     })
                                 sequence = emptyList()
@@ -708,11 +754,12 @@ fun RoutinePlannerScreen(
                                                     SeqShot(
                                                         index = i + 1,
                                                         zone = s.zone,
-                                                        spin = SpinDir.values()
+                                                        spin = SpinDir.entries
                                                             .find { it.spinName == s.spinName }
                                                             ?: SpinDir.N,
                                                         velocity = s.velocity,
-                                                        freq = s.freq)
+                                                        freq = s.freq,
+                                                        racketSide = s.racketSide)
                                                 }
                                                 routineTitle = routine.title
                                             }, modifier = Modifier.size(36.dp)
@@ -981,9 +1028,14 @@ private fun ShotCard(shot: SeqShot, onRemove: () -> Unit) {
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
-                Spacer(Modifier.height(2.dp))
+                val sideAbbrev = when (shot.racketSide) {
+                    "Forehand" -> "FH"
+                    "Backhand" -> "BH"
+                    "Both" -> "FH+BH"
+                    else -> shot.racketSide
+                }
                 Text(
-                    "Velocity: ${shot.velocity}m/s • Freq: ${shot.freq}",
+                    "Velocity: ${shot.velocity}m/s • Freq: ${shot.freq} • $sideAbbrev",
                     color = Tertiary,
                     style = MaterialTheme.typography.labelSmall
                 )

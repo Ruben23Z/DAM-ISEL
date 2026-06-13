@@ -15,6 +15,8 @@ import A51388.spinnet.ui.planner.TrainingSessionScreen
 import A51388.spinnet.ui.community.CommunityFeedScreen
 import A51388.spinnet.ui.profile.PerformanceProfileScreen
 import A51388.spinnet.ui.profile.PlayerProfileScreen
+import A51388.spinnet.ui.ai.AiRoutineScreen
+import A51388.spinnet.ui.training.SoloTrainingScreen
 
 enum class SpinNetDestination(val route: String) {
     Login("login"),
@@ -25,7 +27,9 @@ enum class SpinNetDestination(val route: String) {
     Community("community"),
     PlayerProfile("player_profile"),
     MyRoutines("my_routines"),
-    TrainingSession("training_session")
+    TrainingSession("training_session"),
+    AiRoutine("ai_routine"),
+    SoloTraining("solo_training")
 }
 
 @Composable
@@ -92,6 +96,18 @@ fun SpinNetNavHost(
         }
         composable(SpinNetDestination.TrainingSession.route) {
             TrainingSessionScreen(
+                onNavigate = onNavigate,
+                routineViewModel = routineViewModel
+            )
+        }
+        composable(SpinNetDestination.AiRoutine.route) {
+            AiRoutineScreen(
+                onNavigate = onNavigate,
+                routineViewModel = routineViewModel
+            )
+        }
+        composable(SpinNetDestination.SoloTraining.route) {
+            SoloTrainingScreen(
                 onNavigate = onNavigate,
                 routineViewModel = routineViewModel
             )

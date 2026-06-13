@@ -30,6 +30,16 @@ class RoutineViewModel : ViewModel() {
     val activeTrainingRoutine = MutableStateFlow<Routine?>(null)
     val activeTrainingPlan = MutableStateFlow<TrainingPlan?>(null)
 
+    val generatedSequenceToLoad = MutableStateFlow<Pair<String, List<Shot>>?>(null)
+
+    fun loadGeneratedSequence(shots: List<Shot>, title: String) {
+        generatedSequenceToLoad.value = Pair(title, shots)
+    }
+
+    fun clearGeneratedSequence() {
+        generatedSequenceToLoad.value = null
+    }
+
     init {
         loadRoutines()
         loadTrainingPlans()

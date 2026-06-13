@@ -24,6 +24,7 @@ data class PerformanceStats(
 
     val recentSessions: List<TrainingSession> = emptyList(),
     val timeTrainedThisWeek: Long = 0L,
+    val weeklyAccuracy: List<Pair<String, Float>> = emptyList()
 )
 
 class PerformanceViewModel : ViewModel() {
@@ -38,6 +39,9 @@ class PerformanceViewModel : ViewModel() {
 
     //permite ler dados do _stats, recebe os valores de _stats, e mostra a UI, esta não pode alterar os valores de stats
     val stats: StateFlow<PerformanceStats> = _stats
+
+    private val _racketSideDistribution = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val racketSideDistribution: StateFlow<Map<String, Int>> = _racketSideDistribution
 
 
     init {
@@ -120,6 +124,16 @@ class PerformanceViewModel : ViewModel() {
 
 
 
+        val weeklyAccuracy = (0..7).map { weeksAgo ->
+            val end = now - weeksAgo * oneWeekMs
+            val start = end - oneWeekMs
+            val weekSessions = sessions.filter { it.completedAt in start..<end }
+            val avg = if (weekSessions.isEmpty()) 0f else weekSessions.map { it.accuracy }.average().toFloat()
+            "S${8 - weeksAgo}" to avg
+        }.reversed().filter { it.second > 0f }
+
+        _racketSideDistribution.value = sessions.groupBy { it.racketSide }.mapValues { it.value.size }
+
         _stats.value = PerformanceStats(
             totalDrills = totalDrills,
             timeTrained = timeTrained,
@@ -132,7 +146,8 @@ class PerformanceViewModel : ViewModel() {
             recentSessions = sessions.take(10),
             volumeGrowthPercentage = volumeGrowthPercentage,
             longestSessionMinutes = longestSessionMinutes,
-            daysSinceLastSession = daysSinceLastSession
+            daysSinceLastSession = daysSinceLastSession,
+            weeklyAccuracy = weeklyAccuracy
         )
 
     }

@@ -1,5 +1,6 @@
 package A51388.spinnet.ui.planner
 
+import A51388.spinnet.data.remote.GroqApiService
 import A51388.spinnet.data.model.Routine
 import A51388.spinnet.data.model.Shot
 import A51388.spinnet.ui.components.GlassCard
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun TrainingSessionScreen(
@@ -113,6 +115,9 @@ fun TrainingSessionScreen(
         var accuracy by remember { mutableFloatStateOf(80f) }
         var selectedSide by remember { mutableStateOf("Forehand") }
         var notes by remember { mutableStateOf("") }
+        var aiAnalysis by remember { mutableStateOf<String?>(null) }
+        var aiLoading by remember { mutableStateOf(false) }
+        val coroutineScope = rememberCoroutineScope()
         val finalDurationMin = maxOf(1, ((System.currentTimeMillis() - startTime) / 60000).toInt())
         val totalShots = segments.sumOf { it.routine.shots.size }
 
@@ -314,6 +319,50 @@ fun TrainingSessionScreen(
                             )
                         }
 
+                        if (aiLoading) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().height(52.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = Tertiary)
+                            }
+                        } else {
+                            OutlinedButton(
+                                onClick = {
+                                    aiLoading = true
+                                    coroutineScope.launch {
+                                        val res = GroqApiService.analyzeSession(
+                                            routineTitle = plan?.title ?: currentSegment.routine.title,
+                                            durationMinutes = finalDurationMin,
+                                            reps = totalShots,
+                                            accuracy = accuracy.toInt(),
+                                            racketSide = selectedSide,
+                                            notes = notes
+                                        )
+                                        aiLoading = false
+                                        res.fold(
+                                            onSuccess = { aiAnalysis = it },
+                                            onFailure = { aiAnalysis = "Erro ao obter análise: ${it.localizedMessage}" }
+                                        )
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Tertiary),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Tertiary)
+                            ) {
+                                Icon(Icons.Outlined.Psychology, null, modifier = Modifier.size(20.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "ANÁLISE IA",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
                         OutlinedButton(
                             onClick = {
                                 routineViewModel.activeTrainingPlan.value = null
@@ -331,9 +380,54 @@ fun TrainingSessionScreen(
                     Spacer(Modifier.height(16.dp))
                 }
             }
+
+            if (aiAnalysis != null) {
+                AlertDialog(
+                    onDismissRequest = { aiAnalysis = null },
+                    containerColor = Color(0xFF10172A),
+                    shape = RoundedCornerShape(20.dp),
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(Icons.Outlined.AutoAwesome, null, tint = Tertiary)
+                            Text(
+                                "Análise do Teu Treino",
+                                color = OnSurface,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    },
+                    text = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 300.dp)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            Text(
+                                text = aiAnalysis!!,
+                                color = OnSurface,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = { aiAnalysis = null },
+                            colors = ButtonDefaults.buttonColors(containerColor = Secondary)
+                        ) {
+                            Text("Fechar", color = Color.White)
+                        }
+                    }
+                )
+            }
+            }
         }
         return
-    }
+    
 
     var selectedShotForDetail by remember { mutableStateOf<Shot?>(null) }
 
@@ -372,6 +466,10 @@ fun TrainingSessionScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("Velocidade", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                             Text("${shot.velocity}m/s", color = OnSurface, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("RAQUETE", color = OnSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                            Text(shot.racketSide, color = OnSurface, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                         }
                     }
 
