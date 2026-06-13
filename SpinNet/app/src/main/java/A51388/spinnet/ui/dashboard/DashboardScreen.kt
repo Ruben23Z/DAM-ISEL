@@ -180,8 +180,6 @@ fun DashboardScreen(
                                 label = if (activePlan != null) "Ready to run: ${activePlan.routines.size} exercises" else "Go to My Routines to create a plan"
                             )
                         }
-                        Spacer(Modifier.width(16.dp))
-                        ArcProgressRing(progress = if (activePlan != null) 1.0f else 0.0f, size = 90.dp)
                     }
 
                     Spacer(Modifier.height(14.dp))
@@ -288,22 +286,6 @@ fun DashboardScreen(
                             )
                         }
                     }
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            Spacer(Modifier.height(8.dp))
-
-            GlassCard(modifier = Modifier.fillMaxWidth()) {
-                Column {
-                    Text(
-                        text = "SPIN FOCUS VECTORS",
-                        color = OnSurfaceVariant,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    SpinVectorBars()
                 }
             }
 

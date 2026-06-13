@@ -47,7 +47,7 @@ fun CommunityFeedScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     var feedSubTab by remember { mutableIntStateOf(0) }
     val scrollState = rememberScrollState()
-    val tabs = listOf("Feed", "Network", "Alerts")
+    val tabs = listOf("Feed", "Network")
 
     LaunchedEffect(cloneMessage) {
         cloneMessage?.let {

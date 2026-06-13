@@ -258,6 +258,14 @@ fun RoutinePlannerScreen(
                                             }
                                         }
                                     }
+                                    if (row == 1) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(1.dp)
+                                                .background(Color.White)
+                                        )
+                                    }
                                 }
                             }
                         }
